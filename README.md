@@ -13,7 +13,7 @@ python3 main.py
 
 
 ## Todo's (mostly by order)
-- [ ] and internationalization with i18n
+- [ ] add internationalization with i18n
 - [ ] add Buttons in status
 - [ ] add Music
 - [ ] add the rest of discord's
