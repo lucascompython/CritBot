@@ -6,5 +6,5 @@ echo "Done!"
 
 echo "Installing config files..."
 mv example_appsettings.yaml appsettings.yaml
-touch prefixes.json
+echo "{}" > prefixes.json
 echo "Done!"
