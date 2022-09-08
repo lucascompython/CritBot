@@ -1,0 +1,4 @@
+appsettings.yaml
+prefixes.json
+discord.log
+*.pyc
