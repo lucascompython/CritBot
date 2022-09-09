@@ -9,7 +9,7 @@ from aiohttp import ClientSession
 
 
 
-class CustomBot(commands.Bot):
+class CritBot(commands.Bot):
     def __init__(
         self,
         *args,
@@ -135,7 +135,7 @@ async def main():
             if filename.endswith(".py"):
                 exts.append(f"cogs.{filename[:-3]}")
     
-        async with CustomBot(defualt_prefix=data["default_prefix"], prefixes=prefixes, web_client=our_client, initial_extensions=exts, testing_guild_id=data["testing_guild_id"], intents=discord.Intents.all(), command_prefix = get_prefix, case_insensitive=True, description="Bruh", owner_id=data["owner_id"], strip_after_prefix=True) as bot:
+        async with CritBot(defualt_prefix=data["default_prefix"], prefixes=prefixes, web_client=our_client, initial_extensions=exts, testing_guild_id=data["testing_guild_id"], intents=discord.Intents.all(), command_prefix = get_prefix, case_insensitive=True, description="Bruh", owner_id=data["owner_id"], strip_after_prefix=True) as bot:
             await bot.start(data["discord_token"], reconnect=True)
 
 
