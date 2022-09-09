@@ -96,7 +96,7 @@ class CritBot(commands.Bot):
         
 async def main():
     print("Starting bot!")
-    with open("./appsettings.yaml", "r") as f:
+    with open("./config/appsettings.yaml", "r") as f:
         data = yaml.safe_load(f)
 
     with open("./prefixes.json", "r") as f:
@@ -110,7 +110,7 @@ async def main():
     logger.setLevel(logging.INFO)
 
     handler = logging.handlers.RotatingFileHandler(
-        filename="discord.log",
+        filename="./logs/discord.log",
         encoding="utf-8",
         maxBytes=32 * 1024 * 1024, # 32 MiB
         backupCount=5,
