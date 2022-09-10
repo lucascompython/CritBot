@@ -21,8 +21,8 @@ python3 main.py
 
 
 ## Contributions
-Feel free to help.
-All help is appreciated!
+Feel free to help.<br>
+All help is appreciated!<br>
 If you have any questions on the code you can send me a DM on my Discord (Lucas cheio da drip#0230)
 
 # License
