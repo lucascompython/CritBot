@@ -8,6 +8,7 @@ class Misc(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
         self.t = self.bot.i18n.t
+        self.log = self.bot.logger.log
 
 
     @commands.hybrid_command()
@@ -26,10 +27,10 @@ class Misc(commands.Cog):
 
 
     async def cog_load(self) -> None:
-        self.bot.logger.log(20, "Loaded {name} cog!".format(name=self.__class__.__name__))
+        self.log(20, "Loaded {name} cog!".format(name=self.__class__.__name__))
 
     async def cog_unload(self) -> None:
-        self.bot.logger.log(20, "Unloaded {name} cog!".format(name=self.__class__.__name__))
+        self.log(20, "Unloaded {name} cog!".format(name=self.__class__.__name__))
 
 
 

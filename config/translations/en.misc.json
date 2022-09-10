@@ -1,8 +1,12 @@
 {
     "ping": {
-        "cmd-output": "My ping is {latency}ms."
+        "cmd": {
+            "output": "My ping is {latency}ms."
+        }
     },
     "invite": {
-        "cmd-output": "You can invite me to your server with this link: {invite}"
+        "cmd": {
+            "output": "You can invite me to your server with this link: {invite}"
+        }
     }
 }

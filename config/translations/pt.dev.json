@@ -1,0 +1,73 @@
+{
+    "reload": {
+        "cmd": {
+            "cog_output": "**{cog_name}** foi recarregado com sucesso.\n",
+            "translations_output": "Traduções recarregadas com sucesso.\n",
+            "prefixes_output": "Prefixos recarregados com sucesso.\n"
+        },
+        "err": {
+            "extension_not_found": "**{cog_name}** não foi encontrado.\n",
+            "extension_not_loaded": "**{cog_name}** não está carregado.\n",
+            "extension_failed": "**{cog_name}** falhou.\n",
+            "no_entry_point": "**{cog_name}** não tem um ponto de entrada.\n"
+        }
+    },
+    "unload": {
+        "cmd": {
+            "unloaded": "**{cog_name}** foi descarregado com sucesso.\n"
+        },
+        "err": {
+            "cant_unload_dev": "Não podes descarregar **dev**.\n",
+            "already_unloaded": "**{cog_name}** já está descarregado.\n",
+            "not_found": "**{cog_name}** não foi encontrado.\n"
+        }
+    },
+    "load": {
+        "cmd": {
+            "loaded": "**{cog_name}** foi carregado com sucesso.\n"
+        },
+        "err": {
+            "already_loaded": "**{cog_name}** já está carregado.\n",
+            "not_found": "**{cog_name}** não foi encontrado.\n",
+            "failed": "**{cog_name}** falhou.\n",
+            "no_entry_point": "**{cog_name}** não tem um ponto de entrada.\n"
+        }
+    },
+    "all": {
+        "err": {
+            "all_cogs_loaded": "Todos os cogs já estão carregados.",
+            "all_cogs_unloaded": "Todos os cogs já estão descarregados."
+        }
+    },
+    "sync": {
+        "cmd": {
+            "output": "**{guild}** foi sincronizado com o bot.",
+            "global_output": "O bot foi sincronizado globalmente."
+        }
+    },
+    "cog": {
+        "cmd": {
+            "is_loaded_output": "**{cog_name}** está carregado.",
+            "is_unloaded_output": "**{cog_name}** está descarregado."
+        },
+        "err": {
+            "not_found_output": "**{cog_name}** não foi encontrado."
+        }
+    },
+    "cogs": {
+        "embed_fields": {
+            "loaded": "Carregados",
+            "unloaded": "Descarregados"
+        }
+    },
+    "print": {
+        "err": {
+            "exception": "Deu merda: {error}"
+        }
+    },
+    "restart": {
+        "cmd": {
+            "output": "Reiniciando..."
+        }
+    }
+}

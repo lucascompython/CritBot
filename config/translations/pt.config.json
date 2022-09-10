@@ -1,11 +1,19 @@
 {
     "change_prefix": {
-        "cmd-output": "Prefixo mudado para **{prefix}**",
-        "err-same_prefix": "O prefixo já é **{prefix}**"
+        "cmd": {
+            "output": "Prefixo mudado para **{prefix}**"
+        },
+        "err": {
+            "same_prefix": "O prefixo já é **{prefix}**"
+        }
     },
     "change_language": {
-        "cmd-output": "Língua mudada para **{lang}**!",
-        "err-same_language": "**{lang}** já é a língua atual!",
-        "err-invalid_language": "Desculpa ainda não suporto **{lang}** :frowning2:."
+        "cmd": {
+            "output": "Língua mudada para **{lang}**!"
+        },
+        "err": {
+            "same_language": "**{lang}** já é a língua atual!",
+            "invalid_language": "Desculpa ainda não suporto **{lang}** :frowning2:."
+        }
     }
 }

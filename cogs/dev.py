@@ -7,29 +7,78 @@ class Dev(commands.Cog):
     """Classe que define comandos que apenas o desenvolvedor pode usar."""
     def __init__(self, bot) -> None:
         self.bot = bot
+        self.t = self.bot.i18n.t
+        self.log = self.bot.logger.log
 
 
-    async def cog_all(self, mode: str) -> str:
-        """Loads or unloads (except dev cog) all cogs."""
-        adjective = mode + "ed"
-        contrary = lambda adj: "load" if adj == "unload" else "unload"
-        contrary_adjective = contrary(mode) + "ed"
+    async def set_cog(self, mode: str, input_cogs: list[str] | None = None) -> str:
+        """Set cog(s) to a certain state (loaded, unloaded or reload)
 
-        cogs = self.bot.cogs_state[contrary_adjective]
+        Args:
+            mode (str): Mode can me either load, unload or reload
+            input_cogs (list[str] | None, optional): List of cogs to set IF none will do the action to all the available cogs. Defaults to None.
+
+        Returns:
+            str: Message accumulated by all the actions done
+        """
+        
+        
+        if mode != "reload":
+            adjective = mode + "ed"
+            contrary = lambda adj: "load" if adj == "unload" else "unload"
+            contrary_adjective = contrary(mode) + "ed"
+
+        cogs = input_cogs or (self.bot.cogs_state[contrary_adjective] if mode != "reload" else self.bot.cogs_state["loaded"])
         cogs_copy = cogs.copy()
         
-        if len(cogs) != 0:
-            msg_queue = ""
+        if len(cogs) == 0 or (len(cogs) == 1 and cogs[0] == "dev" and mode != "reload"):
+            return self.t("err", "all_cogs_loaded") if mode == "load" else self.t("err", "all_cogs_unloaded")
+
+        msg_queue = ""
+        if mode == "load":
             for cog in cogs:
-                if mode == "load":
+                try:
                     await self.bot.load_extension(f"cogs.{cog}")
-                    msg_queue += f"**{cog}** foi carregado com sucesso!\n"
-                elif mode == "unload":
-                    if cog == "dev":
-                        continue
+                    msg_queue += self.t("cmd", "loaded", mcommand_name="load", cog_name=cog)
+                except commands.ExtensionAlreadyLoaded:
+                    msg_queue += self.t("cmd", "already_loaded", mcommand_name="load", cog_name=cog)
+                except commands.ExtensionNotFound:
+                    msg_queue += self.t("err", "not_found", mcommand_name="load", cog_name=cog)
+                except commands.ExtensionFailed as e:
+                    msg_queue += self.t("err", "failed", mcommand_name="load", cog_name=cog)
+                    self.log(40, f"Failed to load cog {cog}!\n{e}")
+                except commands.NoEntryPointError:
+                    msg_queue += self.t("err", "no_entry_point", mcommand_name="load", cog_name=cog)
+                    
+        elif mode == "unload":
+            for cog in cogs:
+                if cog == "dev":
+                    if len(cogs) == 1:
+                        msg_queue += self.t("cmd", "dev_cog_not_unloaded")
+                    continue
+                try:
                     await self.bot.unload_extension(f"cogs.{cog}")
-                    msg_queue += f"**{cog}** foi descarregado com sucesso!\n"
-            
+                    msg_queue += self.t("cmd", "unloaded", mcommand_name="unload", cog_name=cog)
+                except commands.ExtensionNotLoaded:
+                    msg_queue += self.t("err", "already_unloaded", mcommand_name="unload", cog_name=cog)
+                except commands.ExtensionNotFound:
+                    msg_queue += self.t("err", "not_found", mcommand_name="unload", cog_name=cog)
+
+        elif mode == "reload":
+            for cog in cogs:
+                try:
+                    await self.bot.reload_extension(f"cogs.{cog}")
+                    msg_queue += self.t("cmd", "cog_output", mcommand_name="reload", cog_name=cog)
+                except commands.ExtensionNotFound:
+                    msg_queue += self.t("err", "extension_not_found", mcommand_name="reload", cog_name=cog)
+                except commands.ExtensionNotLoaded:
+                    msg_queue += self.t("err", "extension_not_loaded", mcommand_name="reload", cog_name=cog)
+                except commands.ExtensionFailed:
+                    msg_queue += self.t("err", "extension_failed", mcommand_name="reload", cog_name=cog)
+                    self.log(40, f"Failed to load cog {cog}!\n{e}")
+                except commands.NoEntryPointError:
+                    msg_queue += self.t("err", "no_entry_point", mcommand_name="reload", cog_name=cog)
+        if mode != "reload":
             for cog in cogs:
                 if cog == "dev":
                     continue
@@ -37,106 +86,100 @@ class Dev(commands.Cog):
                 cogs_copy.remove(cog)
             self.bot.cogs_state[contrary_adjective] = cogs_copy
 
-            return msg_queue
-        return "Todos os cogs disponiveis já foram carregados!"
+        return msg_queue
 
 
 
     @commands.is_owner()
-    @commands.command()
-    async def reload(self, ctx, cog_name: str, sincronizar: str | None = None) -> None:
-        try:
-            await self.bot.reload_extension(f"cogs.{cog_name}")
-            await ctx.send(f"**{cog_name}** foi recarregado.")
-        except:
-            return await ctx.send(f"**{cog_name}** não existe ou não foi carregado...")
+    @commands.group(case_insensitive=True, invoke_without_command=True, aliases=["recarregar"])
+    async def reload(self, ctx, name: str, sync: str | None = None) -> None:
+        
+        msg = await self.set_cog("reload", [name])
+        await ctx.send(msg)
 
-        if sincronizar in ["sync", "sincronizar"]:
+        if sync in ["sync", "sincronizar"]:
             await ctx.invoke(self.bot.get_command("sync"), guild=None)
 
-    @commands.is_owner()
-    @commands.group(case_insensitive=True, invoke_without_command=True)
-    async def unload(self, ctx, *, cog_name: str) -> None:
-        cog_name = cog_name.split()
-        msg_queue = ""
-        for cog in cog_name:
-            if cog == "dev":
-                msg_queue += "Não podes dar unload a **dev**.\n"
-                continue
-            try:
-                await self.bot.change_cogs_state("unload", cog)
-                msg_queue += f"**{cog}** foi descarregado.\n"
-            except commands.ExtensionNotLoaded:
-                exts = [i.replace("cogs.", "") for i in self.bot.initial_extensions]
-                if cog in exts:
-                    msg_queue += f"**{cog}** já está descarregado.\n" 
-                else:
-                    msg_queue += f"**{cog}** não pôde ser descarregada (prob. não existe).\n"
+    @reload.command(name="translations", aliases=["traduções", "traducoes", "trans"])
+    async def reload_trans(self, ctx):
+        await self.bot.i18n.reload_translations()
+        await ctx.send(self.t("cmd", "translations_output", mcommand_name="reload"))
 
+    @reload.command(name="prefixes", aliases=["prefixos"])
+    async def reload_prefixes(self, ctx):
+        await self.bot.reload_prefixes()
+        await ctx.send(self.t("cmd", "prefixes_output", mcommand_name="reload"))
+
+    @reload.command(name="all", alises=["todos"])
+    async def reload_all(self, ctx):
+        await ctx.send(await self.set_cog("reload"))
+    
+    @reload.command(name="everything", aliases=["tudo"])
+    async def reload_everything(self, ctx, sync: str | None = None):
+        msg_queue = ""
+
+        msg_queue += await self.set_cog("reload")
+        
+        await self.bot.i18n.reload_translations()
+        msg_queue += self.t("cmd", "translations_output", mcommand_name="reload")
+
+        await self.bot.reload_prefixes()
+        msg_queue += self.t("cmd", "prefixes_output", mcommand_name="reload")
+        
         await ctx.send(msg_queue)
 
+        if sync in ["sync", "sincronizar"]:
+            await ctx.invoke(self.bot.get_command("sync"), guild=None)
+
+
+
+    @commands.is_owner()
+    @commands.group(case_insensitive=True, invoke_without_command=True, aliases=["descarregar"])
+    async def unload(self, ctx, *, cog_name: str) -> None:
+        await ctx.send(await self.set_cog("unload", [cog_name]))
 
     @unload.command(name="all")
     async def unload_all(self, ctx) -> None:
-
-        msg = await self.cog_all("unload")
-        await ctx.send(msg)
-
+        await ctx.send(await self.set_cog("unload"))
 
     @commands.is_owner()
-    @commands.group(case_insensitive=True, invoke_without_command=True)
+    @commands.group(case_insensitive=True, invoke_without_command=True, aliases=["carregar"])
     async def load(self, ctx, *, cog_name: str) -> None:
-        cog_name = cog_name.split()
-        msg_queue = ""
-        
-        for cog in cog_name:
-            try:
-                await self.bot.change_cogs_state("load", cog)
-                msg_queue += f"**{cog}** foi carregado.\n"
-            except commands.ExtensionAlreadyLoaded:
-                msg_queue += f"**{cog}** já está carregado.\n"
-            except commands.ExtensionNotFound:
-                msg_queue += f"**{cog}** não pôde carregada (prob. não existe).\n"
-            except commands.ExtensionFailed:
-                msg_queue += f"**{cog}** não foi carregada pois falhou a inicializar.\n"
-        await ctx.send(msg_queue)
+        await ctx.send(await self.set_cog("load", [cog_name]))
 
     @load.command(name="all")
     async def load_all(self, ctx) -> None:
-
-        msg = await self.cog_all("load")
-        await ctx.send(msg)
-
+        await ctx.send(await self.set_cog("load"))
 
     @commands.is_owner()
-    @commands.hybrid_group()
+    @commands.hybrid_group(case_insensitive=True, invoke_without_command=True, alises=["sincronizar"])
     async def sync(self, ctx, guild: int | None) -> None:
         async with ctx.typing():
             if not guild: guild = ctx.guild.id
             guild_obj = discord.Object(guild)
             self.bot.tree.copy_global_to(guild=guild_obj)
             await self.bot.tree.sync(guild=guild_obj)
-        await ctx.send(f"**{ctx.guild}** foi sincronizado com o bot.")
+        await ctx.send(self.t("cmd", "output", mcommand_name="sync", guild=ctx.guild))
 
     @commands.is_owner()
     @sync.command(name="global")
-    async def _global(self, ctx) -> None:
+    async def sync_global(self, ctx) -> None:
         async with ctx.typing():
             await self.bot.tree.sync()
-        await ctx.send("O bot foi sincronizado globalmente.")
+        await ctx.send(self.t("cmd", "global_output", mcommand_name="sync"))
         
     @commands.is_owner()
     @commands.hybrid_command()
-    async def cog(self, ctx, cog_name: str | None = None) -> None:
+    async def cog(self, ctx, cog_name: str) -> None:
         """Check for one single cog."""
         try:
             await self.bot.load_extension(f"cogs.{cog_name}")
         except commands.ExtensionAlreadyLoaded:
-            await ctx.send(f"**{cog_name}** está carregado.")
+            await ctx.send(self.t("cmd", "is_loaded_output", cog_name=cog_name))
         except commands.ExtensionNotFound:
-            await ctx.send(f"**{cog_name}** não encontrado.")
+            await ctx.send(self.t("err", "not_found_output", cog_name=cog_name))
         else:
-            await ctx.send(f"**{cog_name}** não está carregado.")
+            await ctx.send(self.t("cmd", "is_unloaded_output", cog_name=cog_name))
             await self.bot.unload_extension(f"cogs.{cog_name}")
 
     @commands.is_owner()
@@ -147,8 +190,8 @@ class Dev(commands.Cog):
         unloaded = self.bot.cogs_state["unloaded"]
         client = self.bot.user
         embed = discord.Embed(title="Cogs")
-        embed.add_field(name="Carregados", value=", ".join(loaded))
-        embed.add_field(name="Descarregados", value=", ".join(unloaded) if unloaded else "N/A")
+        embed.add_field(name=self.t("embed_fields", "loaded"), value=", ".join(loaded))
+        embed.add_field(name=self.t("embed_fields", "unloaded"), value=", ".join(unloaded) if unloaded else "N/A")
         embed.set_author(name=client, icon_url=client.avatar)
         embed.set_footer(text=f"ID: {client.id}")
 
@@ -159,46 +202,28 @@ class Dev(commands.Cog):
     @commands.is_owner()
     @commands.hybrid_command(name="print")
     async def _print(self, ctx, thing):
+        """Prints a value from the bot"""
         try:
             await ctx.send(eval(thing))
         except Exception as err:
-            await ctx.send(f"Algo deu merda: {err}")
+            await ctx.send(self.t("err", "exception", error=err))
 
 
     #DANGEROUS
     @commands.is_owner()
-    @commands.hybrid_command(alises=["reboot"])
+    @commands.hybrid_command(alises=["reboot", "reiniciar"])
     async def restart(self, ctx):
-        await ctx.send("Reiniciando!")
+        await ctx.send(self.t("cmd", "output"))
         os.execv(sys.executable, ['python3'] + sys.argv)
-
-    @commands.is_owner()
-    @commands.hybrid_command()
-    async def reload_prefixes(self, ctx):
-        await self.bot.reload_prefixes()
-        await ctx.send("Prefixos recarregados.")
-                    
-    @commands.is_owner()
-    @commands.hybrid_command(name="reload_translations")
-    async def _reload_translations(self, ctx):
-        await self.bot.i18n.reload_translations()
-        await ctx.send("Traduções recarregadas.")
-
-    #error handling
-
-    #    @reload.error
-    #    async def reload_error(ctx, error):
-    #        if isinstance(error, commands.CommandInvokeError):
-    #            await ctx.send("Esse cog")
 
 
 
     #loader and unloader
     async def cog_load(self) -> None:
-        self.bot.logger.log(20, "Loaded {name} cog!".format(name=self.__class__.__name__))
+        self.log(20, "Loaded {name} cog!".format(name=self.__class__.__name__))
 
     async def cog_unload(self) -> None:
-        self.bot.logger.log(20, "Unloaded {name} cog!".format(name=self.__class__.__name__))
+        self.log(20, "Unloaded {name} cog!".format(name=self.__class__.__name__))
 
 
 async def setup(bot):

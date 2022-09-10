@@ -9,6 +9,20 @@ class SafeDict(dict):
     def __missing__(self, key):
         return "{" + key + "}"
 
+def create_dump(contents: dict) -> dict:
+    dump = {}
+    for key, val in contents.items():
+        for k, v in val.items():
+
+            if key not in dump:
+                dump[key] = {k: {q: "" for q in v.keys()}}
+
+            if k not in dump[key]:
+                dump[key][k] = {q: "" for q in v.keys()}
+    
+            else:
+                dump[key][k] = {q: "" for q in v.keys()}
+    return dump
 
 cog_template = """from discord.ext import commands
 
@@ -16,16 +30,17 @@ class {cog_name}(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
         self.t = self.bot.i18n.t
+        self.log = self.bot.logger.log
         
 
 
 
         
     async def cog_load(self) -> None:
-        self.bot.logger.log(20, "Loaded {name} cog!".format(name=self.__class__.__name__))
+        self.log(20, "Loaded {name} cog!".format(name=self.__class__.__name__))
         
     async def cog_unload(self) -> None:
-        self.bot.logger.log(20, "Unloaded {name} cog!".format(name=self.__class__.__name__))
+        self.log(20, "Unloaded {name} cog!".format(name=self.__class__.__name__))
         
 
 async def setup(bot) -> None:
@@ -85,9 +100,8 @@ def main() -> None:
                         contents = json.load(f)
 
                     
-                    dump = {}
-                    for key, val in contents.items():
-                        dump[key] = {k: "" for k in val.keys()}
+                    dump = create_dump(contents)
+
                     with open(path + "/" + file.replace(original, new), "w") as f:
                         json.dump(dump, f, indent=4)
                 
@@ -104,13 +118,18 @@ def main() -> None:
         with open(path_original, "r") as f:
             contents = json.load(f)
 
-        with open(path_new, "w") as f:
-            dump = {}
-            for key, val in contents.items():
-                dump[key] = {k: "" for k in val.keys()}
+        dump = create_dump(contents)
+                
 
+
+        with open(path_new, "w") as f:
             json.dump(dump, f, indent=4)
-        
+
+                    #print(v)
+                    #dump[key] = {l: "" for l in v.keys()}
+
+                #dump[key] = {k: "" for k in val.keys()}
+
         print(f"Created {path_new} with the keys of {path_original}!")
 
 

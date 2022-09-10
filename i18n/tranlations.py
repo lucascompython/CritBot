@@ -31,10 +31,23 @@ class I18n:
     def check_lang(self, lang: str) -> bool:
         return lang in self.accepted_langs or lang in self.accepted_langs.values()
 
-    def t(self, *args, **kwargs) -> str:
+    def t(self, mode: str,  *args, mcommand_name: str | None = None, mcog_name: str | None = None, **kwargs) -> str:
+        """Searches in the translations for the correct translation
+
+        Args:
+            mode (str): The mode (most commun are "cmd" and "err" but it can be anything)
+            mcommand_name (str | None, optional): Manually define the command name to use a translation from another command. Defaults to None.
+            mcog_name (str | None, optional): Manually define the cog name to use translations of another cog. Defaults to None.
+
+        Returns:
+            str: The translated string
+        """
         return self.get_key_string(
             self.get_lang(self.guild_id),
             self.cog_name,
+            mode,
+            mcommand_name, # if needed to use another command's text Manually change the command name
+            mcog_name, # if needed to use another cog's text Manually change the cog name
             *args
         ).format(**kwargs)
 
@@ -45,16 +58,14 @@ class I18n:
             self.translations[file_name[:-5]] = json.loads(contents)
 
 
-    def get_key_string(self, lang: str, cog: str, *args) -> str:
-        #args = list(args)
-        #args[1:1] = [self.command_name]
-        #key_string = "-".join(args)
-        #print(key_string)
+    def get_key_string(self, lang: str, cog: str, mode: str, mcommand_name: str | None = None, mcog_name: str | None = None, *args) -> str:
+        command_name = mcommand_name or self.command_name
+        cog_name = mcog_name or self.cog_name
         try:
-            return self.get_keys_string(lang, cog)[self.command_name]["-".join(args)]
+            return self.get_keys_string(lang, cog_name)[command_name][mode]["-".join(args)]
         except KeyError:
             # if not implemented in the language, return the english version
-            return self.get_keys_string("en", cog)[self.command_name]["-".join(args)]
+            return self.get_keys_string("en", cog)[self.command_name][mode]["-".join(args)]
 
     def get_keys_string(self, lang: str, cog: str) -> dict:
         return self.translations[lang + "." + cog]
