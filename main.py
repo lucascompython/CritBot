@@ -117,7 +117,6 @@ class CritBot(commands.Bot):
 
     async def set_guild_and_cog_and_command(self, ctx, error: bool = False) -> bool:
         """Sets the guild id and the cog name to i18n"""
-        print("deu")
         self.i18n.guild_id = ctx.guild.id
         self.i18n.cog_name = ctx.cog.__class__.__name__.lower()
         self.i18n.command_name = ctx.command.name
