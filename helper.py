@@ -3,7 +3,6 @@
 import os
 import json
 import argparse
-#from collections import defaultdict
 
 
 class SafeDict(dict):
