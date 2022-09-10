@@ -2,8 +2,12 @@ discord_token: ""
 
 #guild for syncing the app_commands (slash commands and discord interactions) when starting the bot
 #if you wish to sync globaly between all your guild use the command "sync global" this will take a long time
-testing_guild_id: 
+testing_guild_id: 0
 
-owner_id: 
+owner_id: 0
 
-default_prefix: "."
+default_prefix: ""
+
+default_language: ""
+
+invite_link: ""

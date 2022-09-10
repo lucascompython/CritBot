@@ -1,4 +1,7 @@
+#/usr/bin/env python3
+
 import os
+import json
 import argparse
 #from collections import defaultdict
 
@@ -8,11 +11,12 @@ class SafeDict(dict):
         return "{" + key + "}"
 
 
-file_template = """from discord.ext import commands
+cog_template = """from discord.ext import commands
 
 class {cog_name}(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
+        self.t = self.bot.i18n.t
         
 
 
@@ -34,20 +38,82 @@ async def teardown(bot) -> None:
 
 
 
+
+
 def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
-    parser.add_argument("-a", "--add", help="Add an extension file with a cog inside. Input the name of the file without extension", metavar="N", type=str)
+    parser.add_argument("-a", "--add", help="This command has 2 possible modes: (add) cog and (add) translation. Add cog will add a cog file with a template and add translate will add a translation file. All input should be added without file extensions.", nargs=2, type=str, required=False)
+    parser.add_argument("-c", "--copy", help="This command will copy the keys of one translation file to another. Example: -c en.misc es.misc. Can also copy all the keys. Example: -c en.* es.*. File names may need to be inside of quotes when copying all the keys. All input should be added without file extensions.", nargs=2, type=str, required=False)
     return parser.parse_args()
 
 def main() -> None:
     args = get_args()
-    path = f"./cogs/{args.add}.py"
-    if not os.path.isfile(path):
-        with open(path, "w") as f:
-            f.write(file_template.format_map(SafeDict(cog_name=args.add.capitalize())))
-        print(f"Created {args.add}.py")
-    else:
-        print(f"{args.add} already exists!")
+    add = args.add
+    copy = args.copy
+    if add:
+        mode = add[0].lower()
+        name = add[1].lower()
+        if mode in ["cog", "ext", "extension", "c"]:
+
+            path = f"./cogs/{name}.py"
+            if not os.path.isfile(path):
+                with open(path, "w") as f:
+                    f.write(cog_template.format_map(SafeDict(cog_name=name.capitalize())))
+                print(f"Created {path}.py")
+            else:
+                print(f"{path} already exists!")
+
+        elif mode in ["trans", "translation", "t"]:
+            path = f"./config/translations/{name}.json"
+
+            if os.path.isfile(path): return print(f"{path} already exists!")
+
+            with open(path, "w") as f:
+                f.write("{}")
+            print(f"Created {path}!")
+
+    elif copy:
+    
+        original = copy[0].lower()
+        new = copy[1].lower()
+        if original.split(".")[1] == "*" and new.split(".")[1] == "*":
+            original = original.split(".")[0]
+            new = new.split(".")[0]
+            path = "./config/translations"
+            for file in os.listdir(path):
+                if file.startswith(original):
+                    with open(path + "/" + file, "r") as f:
+                        contents = json.load(f)
+
+                    
+                    dump = {}
+                    for key, val in contents.items():
+                        dump[key] = {k: "" for k in val.keys()}
+                    with open(path + "/" + file.replace(original, new), "w") as f:
+                        json.dump(dump, f, indent=4)
+                
+                elif file.startswith(new):
+                    continue
+
+            return print(f"Succesfully created {new} translations from {original} translations!")
+
+        path_original = f"./config/translations/{original}.json"
+        path_new = f"./config/translations/{new}.json"
+
+        if os.path.isfile(path_new): return print(f"{path_new} already exists!")
+
+        with open(path_original, "r") as f:
+            contents = json.load(f)
+
+        with open(path_new, "w") as f:
+            dump = {}
+            for key, val in contents.items():
+                dump[key] = {k: "" for k in val.keys()}
+
+            json.dump(dump, f, indent=4)
+        
+        print(f"Created {path_new} with the keys of {path_original}!")
+
 
 
 if __name__ == "__main__":

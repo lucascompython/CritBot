@@ -1,19 +1,21 @@
 import discord
 from discord.ext import commands
-
+from aiohttp import ClientSession
+from aiofiles import open as async_open
 
 import json, os, asyncio, logging, yaml
 import logging.handlers
 from typing import List
-from aiohttp import ClientSession
 
-
+from i18n import I18n
 
 class CritBot(commands.Bot):
     def __init__(
         self,
         *args,
-        default_prefix: str = ".",
+        invite_link: str,
+        default_prefix: str,
+        default_language: str,
         prefixes: dict[str, str],
         initial_extensions: List[str],
         web_client: ClientSession,
@@ -26,8 +28,13 @@ class CritBot(commands.Bot):
         self.initial_extensions = initial_extensions
         self.logger = logging.getLogger("discord")
         self.cogs_state: dict[str, list[str]] = {"loaded": [], "unloaded": []}
-        self.default_prefix = "."
+        self.default_prefix = default_prefix
         self.prefixes = prefixes
+        self.invite_link = invite_link
+        
+        # i18n
+        self.i18n = I18n()
+        self.default_language = default_language
         
 
     async def setup_hook(self) -> None:
@@ -64,7 +71,7 @@ class CritBot(commands.Bot):
                 name=f"{self.default_prefix}help",
             )
         )
-
+        self.add_check(self.set_guild_and_cog_and_command) # adds a fake check to all commands to set the guild id and the cog name
         self.logger.log(20, f"Logado como {self.user}!")
 
 
@@ -82,17 +89,46 @@ class CritBot(commands.Bot):
             self.cogs_state["loaded"].remove(cog)
             self.cogs_state["unloaded"].append(cog)
 
-    def update_prefixes(self, guild_id: int, new_prefix: str) -> None:
+    async def update_prefixes(self, guild_id: int, new_prefix: str) -> None:
         """Updates the prefixes.json file with the new prefix"""
+        try:
+            if self.prefixes[str(guild_id)] == new_prefix:
+                raise ValueError("The new prefix is the same as the old one")
+        except KeyError:
+            # if the guild is not in the prefixes.json file yet probably because it's a new guild from a new server
+            pass
+
         self.prefixes[str(guild_id)] = new_prefix
-        with open("./prefixes.json", "w") as f:
-            json.dump(self.prefixes, f, indent=4)
+        async with async_open("./prefixes.json", mode="w") as f:
+            # write json async
+            await f.write(json.dumps(self.prefixes, indent=4))
         
-    def delete_prefix(self, guild_id: int) -> None:
+    async def delete_prefix(self, guild_id: int) -> None:
         """Deletes the prefix for the guild"""
         self.prefixes.pop(str(guild_id))
-        with open("./prefixes.json", "w") as f:
-            json.dump(self.prefixes, f, indent=4)
+        async with async_open("./prefixes.json", "w") as f:
+            await f.write(json.dumps(self.prefixes, indent=4))
+
+    async def reload_prefixes(self) -> None:
+        """Reloads from the prefixes.json file
+        Only use case when the developer changes manually the prefixes"""
+        async with async_open("./prefixes.json", "r") as f:
+            self.prefixes = json.loads(await f.read())
+
+    async def set_guild_and_cog_and_command(self, ctx, error: bool = False) -> bool:
+        """Sets the guild id and the cog name to i18n"""
+        print("deu")
+        self.i18n.guild_id = ctx.guild.id
+        self.i18n.cog_name = ctx.cog.__class__.__name__.lower()
+        self.i18n.command_name = ctx.command.name
+        if not error:
+            return True
+            
+        
+
+
+
+
         
 async def main():
     print("Starting bot!")
@@ -127,7 +163,6 @@ async def main():
     
 
 
-
     async with ClientSession() as our_client:
         
         exts = []
@@ -135,7 +170,10 @@ async def main():
             if filename.endswith(".py"):
                 exts.append(f"cogs.{filename[:-3]}")
     
-        async with CritBot(defualt_prefix=data["default_prefix"],
+        async with CritBot(
+                invite_link=data["invite_link"],
+                default_prefix=data["default_prefix"],
+                default_language=data["default_language"],
                 prefixes=prefixes,
                 web_client=our_client,
                 initial_extensions=exts,

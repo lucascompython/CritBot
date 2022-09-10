@@ -172,8 +172,17 @@ class Dev(commands.Cog):
         await ctx.send("Reiniciando!")
         os.execv(sys.executable, ['python3'] + sys.argv)
 
+    @commands.is_owner()
+    @commands.hybrid_command()
+    async def reload_prefixes(self, ctx):
+        await self.bot.reload_prefixes()
+        await ctx.send("Prefixos recarregados.")
                     
-                
+    @commands.is_owner()
+    @commands.hybrid_command(name="reload_translations")
+    async def _reload_translations(self, ctx):
+        await self.bot.i18n.reload_translations()
+        await ctx.send("Traduções recarregadas.")
 
     #error handling
 

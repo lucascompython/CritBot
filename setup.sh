@@ -5,6 +5,7 @@ pip3 install -r requirements.txt
 echo "Done!"
 
 echo "Installing config files..."
-mv example_appsettings.yaml appsettings.yaml
+mv ./config/example_appsettings.yaml ./config/appsettings.yaml
 echo "{}" > prefixes.json
+echo "{}" > ./i18n/langs.json
 echo "Done!"

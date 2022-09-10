@@ -7,17 +7,22 @@ class Misc(commands.Cog):
 
     def __init__(self, bot) -> None:
         self.bot = bot
+        self.t = self.bot.i18n.t
 
 
     @commands.hybrid_command()
     async def ping(self, ctx):
         """Ping do bot."""
-        await ctx.send(f"O meu ping é {round(self.bot.latency * 1000, 3)}ms.")
+        latency = round(self.bot.latency * 1000, 3)
+        await ctx.send(self.t("cmd", "output", latency=latency))
+        #await ctx.send(f"O meu ping é {round(self.bot.latency * 1000, 3)}ms.")
 
     @commands.hybrid_command()
     async def invite(self, ctx):
         """Get the bot's invite link."""
-        await ctx.reply("My invite link is: https://discord.com/api/oauth2/authorize?client_id=832679098740506644&permissions=8&scope=bot")
+        await ctx.send(self.t("cmd", "output", invite=self.bot.invite_link))
+
+
 
 
     async def cog_load(self) -> None:

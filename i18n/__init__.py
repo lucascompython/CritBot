@@ -1,0 +1,1 @@
+from .tranlations import I18n

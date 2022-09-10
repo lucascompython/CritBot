@@ -2,3 +2,5 @@ appsettings.yaml
 prefixes.json
 discord.log
 *.pyc
+langs.json
+test.py
