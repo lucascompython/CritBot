@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from aiohttp import ClientSession
 from aiofiles import open as async_open
+import uvloop
 
 import json, os, asyncio, logging, yaml
 import logging.handlers
@@ -9,6 +10,7 @@ from typing import List
 
 from i18n import I18n
 
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 class CritBot(commands.Bot):
     def __init__(
         self,
