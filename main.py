@@ -90,6 +90,8 @@ class CritBot(commands.Bot):
             await self.unload_extension(f"cogs.{cog}")
             self.cogs_state["loaded"].remove(cog)
             self.cogs_state["unloaded"].append(cog)
+        else:
+            raise ValueError("Invalid mode")
 
     async def update_prefixes(self, guild_id: int, new_prefix: str) -> None:
         """Updates the prefixes.json file with the new prefix"""

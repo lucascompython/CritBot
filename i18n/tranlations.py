@@ -1,6 +1,7 @@
 from aiofiles import open as async_open
 
 import os, json
+from typing import Optional
 
 
 class I18n:
@@ -31,7 +32,7 @@ class I18n:
     def check_lang(self, lang: str) -> bool:
         return lang in self.accepted_langs or lang in self.accepted_langs.values()
 
-    def t(self, mode: str,  *args, mcommand_name: str | None = None, mcog_name: str | None = None, **kwargs) -> str:
+    def t(self, mode: str,  *args, mcommand_name: Optional[str] = None, mcog_name: Optional[str] = None, **kwargs) -> str:
         """Searches in the translations for the correct translation
 
         Args:
@@ -58,7 +59,7 @@ class I18n:
             self.translations[file_name[:-5]] = json.loads(contents)
 
 
-    def get_key_string(self, lang: str, cog: str, mode: str, mcommand_name: str | None = None, mcog_name: str | None = None, *args) -> str:
+    def get_key_string(self, lang: str, cog: str, mode: str, mcommand_name: Optional[str] = None, mcog_name: Optional[str] = None, *args) -> str:
         command_name = mcommand_name or self.command_name
         cog_name = mcog_name or self.cog_name
         try:
