@@ -22,6 +22,11 @@ class Misc(commands.Cog):
     async def invite(self, ctx):
         """Get the bot's invite link."""
         await ctx.send(self.t("cmd", "output", invite=self.bot.invite_link))
+    
+    @commands.hybrid_command(aliases=["contributions", "contribuir", "source", "github"])
+    async def source_code(self, ctx):
+        """Get the bot's GitHub link."""
+        await ctx.send(self.t("cmd", "output", github=self.bot.github_link))
 
 
 

@@ -8,5 +8,10 @@
         "cmd": {
             "output": "You can invite me to your server with this link: {invite}"
         }
+    },
+    "source_code": {
+        "cmd": {
+            "output": "You can find my source code on GitHub: {github}"
+        }
     }
 }

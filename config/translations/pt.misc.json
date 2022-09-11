@@ -8,5 +8,10 @@
         "cmd": {
             "output": "O meu convite é {invite}."
         }
+    },
+    "source_code": {
+        "cmd": {
+            "output": "O meu código fonte está disponível em {source_code}."
+        }
     }
 }

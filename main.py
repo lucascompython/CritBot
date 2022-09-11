@@ -13,6 +13,7 @@ class CritBot(commands.Bot):
     def __init__(
         self,
         *args,
+        github_link: str,
         invite_link: str,
         default_prefix: str,
         default_language: str,
@@ -31,6 +32,7 @@ class CritBot(commands.Bot):
         self.default_prefix = default_prefix
         self.prefixes = prefixes
         self.invite_link = invite_link
+        self.github_link = github_link
         
         # i18n
         self.i18n = I18n()
@@ -170,6 +172,7 @@ async def main():
                 exts.append(f"cogs.{filename[:-3]}")
     
         async with CritBot(
+                github_link=data["github_link"],
                 invite_link=data["invite_link"],
                 default_prefix=data["default_prefix"],
                 default_language=data["default_language"],
