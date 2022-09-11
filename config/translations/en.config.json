@@ -14,7 +14,7 @@
         },
         "err": {
             "same_language": "**{lang}** is already the defined language.",
-            "invalid_language": "Sorry I don't support **{lang}** yet :frowning2:."
+            "invalid_language": "Sorry I don't support **{lang}** yet :frowning2:.\nThe supported languages are: **{langs}**."
         }
     }
 

@@ -28,7 +28,7 @@ class Config(commands.Cog):
             except ValueError:
                 await ctx.send(self.t("err", "same_language", lang=lang))
         else:
-            await ctx.send(self.t("err", "invalid_language", lang=lang))
+            await ctx.send(self.t("err", "invalid_language", lang=lang, langs=", ".join(self.bot.i18n.accepted_langs)))
 
 
     

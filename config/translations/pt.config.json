@@ -13,7 +13,7 @@
         },
         "err": {
             "same_language": "**{lang}** já é a língua atual!",
-            "invalid_language": "Desculpa ainda não suporto **{lang}** :frowning2:."
+            "invalid_language": "Desculpa ainda não suporto **{lang}** :frowning2:.\nAs línguas suportadas são: **{langs}**."
         }
     }
 }
