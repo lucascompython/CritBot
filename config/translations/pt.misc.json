@@ -11,7 +11,7 @@
     },
     "source_code": {
         "cmd": {
-            "output": "O meu código fonte está disponível em {source_code}."
+            "output": "O meu código fonte está disponível em {github}."
         }
     }
 }

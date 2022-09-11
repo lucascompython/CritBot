@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 import os, sys
+from typing import Union, Optional
 
 class Dev(commands.Cog):
     """Classe que define comandos que apenas o desenvolvedor pode usar."""
@@ -73,7 +74,7 @@ class Dev(commands.Cog):
                     msg_queue += self.t("err", "extension_not_found", mcommand_name="reload", cog_name=cog)
                 except commands.ExtensionNotLoaded:
                     msg_queue += self.t("err", "extension_not_loaded", mcommand_name="reload", cog_name=cog)
-                except commands.ExtensionFailed:
+                except commands.ExtensionFailed as e:
                     msg_queue += self.t("err", "extension_failed", mcommand_name="reload", cog_name=cog)
                     self.log(40, f"Failed to load cog {cog}!\n{e}")
                 except commands.NoEntryPointError:
@@ -215,6 +216,19 @@ class Dev(commands.Cog):
     async def restart(self, ctx):
         await ctx.send(self.t("cmd", "output"))
         os.execv(sys.executable, ['python3'] + sys.argv)
+
+
+    @commands.is_owner()
+    @commands.command()
+    async def sudo(self, ctx, channel: Optional[discord.TextChannel], member: Union[discord.Member, discord.User], *, command: str):
+        """Run a command as another user optionally in another channel."""
+        msg = ctx.message
+        new_channel = channel or ctx.channel
+        msg.channel = new_channel
+        msg.author = member
+        msg.content = ctx.prefix + command
+        new_ctx = await self.bot.get_context(msg, cls=type(ctx))
+        await self.bot.invoke(new_ctx)
 
 
 
