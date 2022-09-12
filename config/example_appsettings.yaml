@@ -8,6 +8,10 @@ owner_id: 0
 
 default_prefix: ""
 
+# Check the translations folder to see the available languages
+# When the bot enters a new guild it will use this language as default.
+# You can also change the language of the bot with the change_language command
+# If the bot fails to find a translation in one other language it will use the translation from the default language if that fails it will use the english translation
 default_language: ""
 
 invite_link: ""

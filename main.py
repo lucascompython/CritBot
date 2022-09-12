@@ -37,8 +37,8 @@ class CritBot(commands.Bot):
         self.github_link = github_link
         
         # i18n
-        self.i18n = I18n()
         self.default_language = default_language
+        self.i18n = I18n(self.default_language)
         
 
     async def setup_hook(self) -> None:

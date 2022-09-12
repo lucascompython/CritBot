@@ -5,9 +5,9 @@ from typing import Optional
 
 
 class I18n:
-    __slots__ = ("path_to_langs", "path_to_translations", "langs", "translations", "guild_id", "cog_name", "command_name", "accepted_langs")
+    __slots__ = ("path_to_langs", "path_to_translations", "langs", "translations", "guild_id", "cog_name", "command_name", "accepted_langs", "default_lang")
 
-    def __init__(self) -> None:
+    def __init__(self, default_lang) -> None:
         self.path_to_langs = "./i18n/langs.json"
         self.path_to_translations = "./config/translations/"
         self.translations = {}
@@ -20,6 +20,7 @@ class I18n:
             "pt": ["portuguese", "português"],
             "en": ["english", "inglês"]
         }
+        self.default_lang = default_lang
 
         #load the file that contains the guilds and their languages
         with open(self.path_to_langs, "r") as f:
@@ -73,8 +74,8 @@ class I18n:
         try:
             return self.get_keys_string(lang, cog_name)[command_name][mode]["-".join(args)]
         except KeyError:
-            # if not implemented in the language, return the english version
-            return self.get_keys_string("en", cog)[self.command_name][mode]["-".join(args)]
+            # if not implemented in the language, return the default language version
+            return self.get_keys_string(self.default_lang, cog)[self.command_name][mode]["-".join(args)]
 
     def get_keys_string(self, lang: str, cog: str) -> dict:
         return self.translations[lang + "." + cog]
