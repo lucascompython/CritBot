@@ -27,9 +27,13 @@ class I18n:
             
 
         #load all translations
-        for file_name in [file for file in os.listdir(self.path_to_translations) if file.endswith('.json')]:
-            with open(self.path_to_translations + file_name) as json_file:
-                self.translations[file_name[:-5]] = json.load(json_file)
+        for dir_name in [dir for dir in os.listdir(self.path_to_translations)]:
+            if dir_name not in self.accepted_langs:
+                continue
+            for file_name in [file for file in os.listdir(os.path.join(self.path_to_translations, dir_name)) if file.endswith('.json')]:
+                with open(os.path.join(self.path_to_translations, dir_name, file_name)) as json_file:
+                    self.translations[dir_name + "." + file_name[:-5]] = json.load(json_file)
+
 
     def check_lang(self, lang: str) -> bool:
         return lang in self.accepted_langs or lang in self.accepted_langs.values()
@@ -55,10 +59,12 @@ class I18n:
         ).format(**kwargs)
 
     async def reload_translations(self) -> None:
-        for file_name in [file for file in os.listdir(self.path_to_translations) if file.endswith('.json')]:
-            async with async_open(self.path_to_translations + file_name) as f:
-                contents = await f.read()
-            self.translations[file_name[:-5]] = json.loads(contents)
+        for dir_name in [dir for dir in os.listdir(self.path_to_translations)]:
+            if dir_name not in self.accepted_langs:
+                continue
+            for file_name in [file for file in os.listdir(os.path.join(self.path_to_translations, dir_name)) if file.endswith('.json')]:
+                async with async_open(os.path.join(self.path_to_translations, dir_name, file_name), mode="r") as f:
+                    self.translations[dir_name + "." + file_name[:-5]] = json.loads(await f.read())
 
 
     def get_key_string(self, lang: str, cog: str, mode: str, mcommand_name: Optional[str] = None, mcog_name: Optional[str] = None, *args) -> str:

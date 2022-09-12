@@ -93,44 +93,57 @@ def main() -> None:
         if original.split(".")[1] == "*" and new.split(".")[1] == "*":
             original = original.split(".")[0]
             new = new.split(".")[0]
-            path = "./config/translations"
+            path = "./config/translations/" + original
+            new_path = "./config/translations/" + new
+
+            if not os.path.isdir(new_path):
+                os.mkdir(new_path)
+                print(f"Created {new_path}!")
+
             for file in os.listdir(path):
-                if file.startswith(original):
-                    with open(path + "/" + file, "r") as f:
-                        contents = json.load(f)
-
-                    
-                    dump = create_dump(contents)
-
-                    with open(path + "/" + file.replace(original, new), "w") as f:
-                        json.dump(dump, f, indent=4)
-                
-                elif file.startswith(new):
+                if os.path.isfile(os.path.join(new_path, file)):
+                    print(f"{new_path}/{file} already exists, skipping!")
                     continue
+
+                with open(path + "/" + file, "r") as f:
+                    contents = json.load(f)
+
+                dump = create_dump(contents)
+            
+
+                with open((path + "/" + file).replace(original, new), "w") as f:
+                    json.dump(dump, f, indent=4)
+            
 
             return print(f"Succesfully created {new} translations from {original} translations!")
 
-        path_original = f"./config/translations/{original}.json"
-        path_new = f"./config/translations/{new}.json"
+        original_lang = original.split(".")[0]
+        new_lang = new.split(".")[0]
 
-        if os.path.isfile(path_new): return print(f"{path_new} already exists!")
+        original_path = f"./config/translations/{original_lang}"
+        new_path = f"./config/translations/{new_lang}"
 
-        with open(path_original, "r") as f:
+        original_file_path = os.path.join(original_path, original[3:] + ".json")
+        new_file_path = os.path.join(new_path, new[3:] + ".json")
+
+        if not os.path.isdir(new_path):
+            os.mkdir(new_path)
+            print(f"Created {new_path}!")
+
+        if os.path.isfile(new_file_path): return print(f"{new_file_path} already exists!")
+
+
+        with open(original_file_path, "r") as f:
             contents = json.load(f)
 
         dump = create_dump(contents)
                 
 
 
-        with open(path_new, "w") as f:
+        with open(new_file_path, "w") as f:
             json.dump(dump, f, indent=4)
 
-                    #print(v)
-                    #dump[key] = {l: "" for l in v.keys()}
-
-                #dump[key] = {k: "" for k in val.keys()}
-
-        print(f"Created {path_new} with the keys of {path_original}!")
+        print(f"Created {new_path} with the keys of {original_path}!")
 
 
 

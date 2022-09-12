@@ -214,6 +214,7 @@ class Dev(commands.Cog):
         try:
             await ctx.send(eval(thing))
         except Exception as err:
+            self.log(40, err)
             await ctx.send(self.t("err", "exception", error=err))
 
 
