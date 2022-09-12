@@ -5,6 +5,8 @@ from typing import Optional
 
 
 class I18n:
+    __slots__ = ("path_to_langs", "path_to_translations", "langs", "translations", "guild_id", "cog_name", "command_name", "accepted_langs")
+
     def __init__(self) -> None:
         self.path_to_langs = "./i18n/langs.json"
         self.path_to_translations = "./config/translations/"
