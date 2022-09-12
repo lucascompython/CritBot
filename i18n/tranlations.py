@@ -19,8 +19,8 @@ class I18n:
         self.command_name = None
 
         self.accepted_langs = {
-            "pt": ["portuguese", "português"],
-            "en": ["english", "inglês"]
+            "pt": ("portuguese", "português", "portugues"),
+            "en": ("english", "inglês", "ingles")
         }
         self.default_lang = default_lang
 
@@ -39,7 +39,7 @@ class I18n:
 
 
     def check_lang(self, lang: str) -> bool:
-        return lang in self.accepted_langs or lang in self.accepted_langs.values()
+        return lang in self.accepted_langs or any(lang in sublist for sublist in self.accepted_langs.values())
 
     def t(self, mode: str,  *args, mcommand_name: Optional[str] = None, mcog_name: Optional[str] = None, **kwargs) -> str:
         """Searches in the translations for the correct translation

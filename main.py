@@ -124,14 +124,12 @@ class CritBot(commands.Bot):
         async with async_open("./prefixes.json", "r") as f:
             self.prefixes = orjson.loads(await f.read())
 
-    async def set_guild_and_cog_and_command(self, ctx, error: bool = False) -> bool:
+    async def set_guild_and_cog_and_command(self, ctx):
         """Sets the guild id and the cog name to i18n"""
         self.i18n.guild_id = ctx.guild.id
-        if not error:
-            self.i18n.cog_name = ctx.cog.__class__.__name__.lower()
-            self.i18n.command_name = ctx.command.name
-            print(self.i18n.command_name)
-            return True
+        self.i18n.cog_name = ctx.cog.__class__.__name__.lower()
+        self.i18n.command_name = ctx.command.name
+        return True
             
         
 
