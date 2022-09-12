@@ -5,7 +5,7 @@ from discord import app_commands
 
 
 
-class Arvore(commands.Cog):
+class AppCommands(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
         self.ctx_menu = app_commands.ContextMenu(name="Reportar a mensagem", callback=self.report_message)
@@ -57,8 +57,8 @@ class Arvore(commands.Cog):
         self.bot.logger.log(20, "Unloaded {name} cog!".format(name=self.__class__.__name__))
 
 async def setup(bot):
-    await bot.add_cog(Arvore(bot))
+    await bot.add_cog(AppCommands(bot))
 
 async def teardown(bot):
-    await bot.remove_cog("Arvore")
+    await bot.remove_cog("AppCommands")
 
