@@ -78,14 +78,19 @@ def main() -> None:
                 print(f"{path} already exists!")
 
         elif mode in ["trans", "translation", "t"]:
-            lang = name.split()[0]
-            path = f"./config/translations/{lang}/{name[3:]}.json"
+            lang = name.split(".")[0]
+            path = f"./config/translations/{lang}/"
+            file_path = path + name[3:] + ".json"
 
-            if os.path.isfile(path): return print(f"{path} already exists!")
+            if not os.path.isdir(path):
+                print(f"Creating {path} directory...")
+                os.mkdir(path)
 
-            with open(path, "w") as f:
+            if os.path.isfile(file_path): return print(f"{file_path} already exists!")
+
+            with open(file_path, "w") as f:
                 f.write("{}")
-            print(f"Created {path}!")
+            print(f"Created {file_path}!")
 
     elif copy:
     

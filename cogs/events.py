@@ -3,6 +3,7 @@ from discord.ext import commands
 class Events(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
+        self.t = self.bot.i18n.t
         self.log = self.bot.logger.log
         
 
@@ -18,11 +19,10 @@ class Events(commands.Cog):
         await self.bot.i18n.delete_lang(guild.id)
         self.log(20, f"Left {guild.name} ({guild.id})")
 
-    #@commands.Cog.listener()
-    #async def on_command_error(self, ctx, error):
-        #print("morre")
-        #await self.bot.set_guild_and_cog_and_command(ctx, True)
-        ##TODO error handling
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        if isinstance(error, commands.NotOwner):
+            await ctx.reply(self.t("err", "not_owner", mcommand_name="on_command_error", mcog_name="events"))
 
 
         

@@ -1,0 +1,7 @@
+{
+    "on_command_error": {
+        "err": {
+            "not_owner": "You are not a developer of this bot."
+        }
+    }
+}
