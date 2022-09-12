@@ -3,8 +3,11 @@ from discord.ext import commands
 from aiohttp import ClientSession
 from aiofiles import open as async_open
 import uvloop
+import orjson
 
-import json, os, asyncio, logging, yaml
+
+import json
+import os, asyncio, logging, yaml
 import logging.handlers
 from typing import List
 
@@ -119,7 +122,7 @@ class CritBot(commands.Bot):
         """Reloads from the prefixes.json file
         Only use case when the developer changes manually the prefixes"""
         async with async_open("./prefixes.json", "r") as f:
-            self.prefixes = json.loads(await f.read())
+            self.prefixes = orjson.loads(await f.read())
 
     async def set_guild_and_cog_and_command(self, ctx, error: bool = False) -> bool:
         """Sets the guild id and the cog name to i18n"""
@@ -141,7 +144,7 @@ async def main():
         data = yaml.safe_load(f)
 
     with open("./prefixes.json", "r") as f:
-        prefixes = json.load(f)
+        prefixes = orjson.loads(f.read())
     
     def get_prefix(bot, message):
         return prefixes[str(message.guild.id)]

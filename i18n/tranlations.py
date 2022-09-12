@@ -1,7 +1,9 @@
 from aiofiles import open as async_open
 
-import os, json
+import os
 from typing import Optional
+import json
+import orjson
 
 
 class I18n:
@@ -24,7 +26,7 @@ class I18n:
 
         #load the file that contains the guilds and their languages
         with open(self.path_to_langs, "r") as f:
-            self.langs = json.load(f)
+            self.langs = orjson.loads(f.read())
             
 
         #load all translations
@@ -33,7 +35,7 @@ class I18n:
                 continue
             for file_name in [file for file in os.listdir(os.path.join(self.path_to_translations, dir_name)) if file.endswith('.json')]:
                 with open(os.path.join(self.path_to_translations, dir_name, file_name)) as json_file:
-                    self.translations[dir_name + "." + file_name[:-5]] = json.load(json_file)
+                    self.translations[dir_name + "." + file_name[:-5]] = orjson.loads(json_file.read())
 
 
     def check_lang(self, lang: str) -> bool:
@@ -65,7 +67,7 @@ class I18n:
                 continue
             for file_name in [file for file in os.listdir(os.path.join(self.path_to_translations, dir_name)) if file.endswith('.json')]:
                 async with async_open(os.path.join(self.path_to_translations, dir_name, file_name), mode="r") as f:
-                    self.translations[dir_name + "." + file_name[:-5]] = json.loads(await f.read())
+                    self.translations[dir_name + "." + file_name[:-5]] = orjson.loads(await f.read())
 
 
     def get_key_string(self, lang: str, cog: str, mode: str, mcommand_name: Optional[str] = None, mcog_name: Optional[str] = None, *args) -> str:
