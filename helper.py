@@ -78,7 +78,8 @@ def main() -> None:
                 print(f"{path} already exists!")
 
         elif mode in ["trans", "translation", "t"]:
-            path = f"./config/translations/{name}.json"
+            lang = name.split()[0]
+            path = f"./config/translations/{lang}/{name[3:]}.json"
 
             if os.path.isfile(path): return print(f"{path} already exists!")
 
