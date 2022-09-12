@@ -16,6 +16,7 @@ python3 main.py
 - [X] add internationalization with i18n
 - [ ] add i18n to app_commands and on commands descriptions
 - [ ] get a real database probably PostgreSql
+- [ ] Cythonize i18n custom module
 - [ ] add Music
 - [ ] add most of the Discord API
 
