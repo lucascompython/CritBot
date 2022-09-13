@@ -1,4 +1,6 @@
 from aiofiles import open as async_open
+from discord.ext.commands import Context
+
 
 import os
 from typing import Optional
@@ -41,17 +43,22 @@ class I18n:
     def check_lang(self, lang: str) -> bool:
         return lang in self.accepted_langs or any(lang in sublist for sublist in self.accepted_langs.values())
 
-    def t(self, mode: str,  *args, mcommand_name: Optional[str] = None, mcog_name: Optional[str] = None, **kwargs) -> str:
+    def t(self, mode: str,  *args, mcommand_name: Optional[str] = None, mcog_name: Optional[str] = None, ctx: Optional[Context] = None, **kwargs) -> str:
         """Searches in the translations for the correct translation
 
         Args:
             mode (str): The mode (most commun are "cmd" and "err" but it can be anything)
             mcommand_name (str | None, optional): Manually define the command name to use a translation from another command. Defaults to None.
             mcog_name (str | None, optional): Manually define the cog name to use translations of another cog. Defaults to None.
+            ctx (commands.Context): The context of the command, used to get the guild id, command name and cog name when the global check doesn't work. Mostly used for app_commands.
 
         Returns:
             str: The translated string
         """
+        if ctx:
+            self.guild_id = ctx.guild.id
+            self.cog_name = ctx.command.cog_name
+            self.command_name = ctx.command.name
         return self.get_key_string(
             self.get_lang(self.guild_id),
             self.cog_name,

@@ -23,7 +23,7 @@ class CritBot(commands.Bot):
         default_prefix: str,
         default_language: str,
         prefixes: dict[str, str],
-        initial_extensions: List[str],
+        initial_extensions: list[str],
         web_client: ClientSession,
         testing_guild_id: int,
         **kwargs,
@@ -145,8 +145,8 @@ async def main():
     with open("./prefixes.json", "r") as f:
         prefixes = orjson.loads(f.read())
     
-    def get_prefix(bot, message):
-        return prefixes[str(message.guild.id)]
+    async def get_prefix(bot, message):
+        return commands.when_mentioned_or(prefixes[str(message.guild.id)])(bot, message)
 
 
     logger = logging.getLogger("discord")
@@ -189,7 +189,7 @@ async def main():
                 intents=discord.Intents.all(),
                 command_prefix=get_prefix,
                 case_insensitive=True,
-                description="Bruh",
+                description=data["description"],
                 owner_id=data["owner_id"],
                 strip_after_prefix=True
             ) as bot:

@@ -6,6 +6,8 @@ testing_guild_id: 0
 
 owner_id: 0
 
+description: ""
+
 default_prefix: ""
 
 # Check the translations folder to see the available languages

@@ -1,0 +1,20 @@
+{
+    "report_message": {
+        "info": {
+            "name": "Report Message"
+        },
+        "cmd": {
+            "output": "Thank you for reporting this message by {author} to our moderators.",
+            "embed_title": "Reported Message",
+            "button_goto_msg": "Go to Message"
+        }
+    },
+    "show_info": {
+        "info": {
+            "name": "Show Info"
+        },
+        "cmd": {
+            "output": ""
+        }
+    }
+}

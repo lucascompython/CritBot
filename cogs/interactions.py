@@ -5,9 +5,12 @@ from discord import app_commands
 
 
 
-class AppCommands(commands.Cog):
+class Interactions(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
+        self.t = self.bot.i18n.t
+
+
         self.ctx_menu = app_commands.ContextMenu(name="Reportar a mensagem", callback=self.report_message)
         self.bot.tree.add_command(self.ctx_menu)
         self.ctx_menu = app_commands.ContextMenu(name="Mostrar info", callback=self.show_join_date)
@@ -24,14 +27,15 @@ class AppCommands(commands.Cog):
         await interaction.response.send_message(f'{member} entrou em {discord.utils.format_dt(member.joined_at)}')
 
     async def report_message(self, interaction: discord.Interaction, message: discord.Message):
+        ctx = await self.bot.get_context(interaction)
         await interaction.response.send_message(
-            f'Obrigado por reportar esta mensagem por {message.author.mention} aos nossos moderadores.', ephemeral=True
+            self.t("cmd", "report_message", ctx=ctx, author=message.author.mention)
         ) 
     
         guild = self.bot.get_guild(404691077216600067)
         log_channel = guild.get_channel(810164720832348221) 
         
-        embed = discord.Embed(title='Mensagem reportada')
+        embed = discord.Embed(title=self.t("cmd", "embed_title"))
         if message.content:
             embed.description = message.content
     
@@ -39,7 +43,7 @@ class AppCommands(commands.Cog):
         embed.timestamp = message.created_at
     
         url_view = discord.ui.View()
-        url_view.add_item(discord.ui.Button(label='Ver a mensagem', style=discord.ButtonStyle.url, url=message.jump_url))
+        url_view.add_item(discord.ui.Button(label=self.t("cmd", "button_goto_msg", ctx=ctx), style=discord.ButtonStyle.url, url=message.jump_url))
     
         await log_channel.send(embed=embed, view=url_view)
 
@@ -57,8 +61,8 @@ class AppCommands(commands.Cog):
         self.bot.logger.log(20, "Unloaded {name} cog!".format(name=self.__class__.__name__))
 
 async def setup(bot):
-    await bot.add_cog(AppCommands(bot))
+    await bot.add_cog(Interactions(bot))
 
 async def teardown(bot):
-    await bot.remove_cog("AppCommands")
+    await bot.remove_cog("Interactions")
 
