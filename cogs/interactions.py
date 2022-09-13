@@ -1,8 +1,28 @@
-from typing import Literal
 import discord
 from discord.ext import commands
 from discord import app_commands
 
+from typing import Literal, NamedTuple
+
+class Point(NamedTuple):
+    x: int
+    y: int
+
+class PointTransformer(app_commands.Transformer):
+    async def transform(self, interaction: discord.Interaction, value: str) -> Point:
+        (x, _, y) = value.partition(',')
+        return Point(x=int(x.strip()), y=int(y.strip()))
+
+
+class Point3D(NamedTuple):
+    x: int
+    y: int
+    z: int
+
+    @classmethod
+    async def transform(cls, interaction: discord.Interaction, value: str):
+        x, y, z = value.split(',')
+        return cls(x=int(x.strip()), y=int(y.strip()), z=int(z.strip()))
 
 
 class Interactions(commands.Cog):
@@ -46,6 +66,34 @@ class Interactions(commands.Cog):
         url_view.add_item(discord.ui.Button(label=self.t("cmd", "button_goto_msg", ctx=ctx), style=discord.ButtonStyle.url, url=message.jump_url))
     
         await log_channel.send(embed=embed, view=url_view)
+
+
+
+
+    @app_commands.command()
+    async def graph(
+        self,
+        interaction: discord.Interaction,
+        point: app_commands.Transform[Point, PointTransformer],
+    ):
+        await interaction.response.send_message(str(point))
+
+
+
+    @app_commands.command()
+    async def graph3d(interaction: discord.Interaction, point: Point3D):
+        await interaction.response.send_message(str(point))
+
+
+
+
+
+
+
+
+
+
+
 
 
     @app_commands.command()
