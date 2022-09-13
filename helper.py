@@ -73,7 +73,7 @@ def main() -> None:
             if not os.path.isfile(path):
                 with open(path, "w") as f:
                     f.write(cog_template.format_map(SafeDict(cog_name=name.capitalize())))
-                print(f"Created {path}.py")
+                print(f"Created {path}")
             else:
                 print(f"{path} already exists!")
 
