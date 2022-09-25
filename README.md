@@ -25,7 +25,7 @@ python3 main.py
 
 
 ## Known "bugs"
-- The interaction name and description is is set per user locale while everything else is set per guild language.
+- The interaction name, description, choices, etc. are set per user locale while everything else is set per guild language.
 
 ## Contributions
 Feel free to help.<br>
