@@ -1,30 +1,42 @@
+print("Starting bot!")
+import uvloop
+import orjson
 import discord
 from discord.ext import commands
 from aiohttp import ClientSession
+from colorlog import ColoredFormatter
 from aiofiles import open as async_open
-import uvloop
-import orjson
 
 
 import json
-import os, asyncio, logging, yaml
+import os, asyncio, logging
 import logging.handlers
-from typing import List
 
-from i18n import I18n
+
+from config import (
+    data,
+    prefixes,
+)
+from i18n import (
+    i18n,
+    Translator,
+    Tree
+)
+
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 class CritBot(commands.Bot):
     def __init__(
         self,
         *args,
-        github_link: str,
+        i18n,
+        prefixes: dict[str, str],
+        web_client: ClientSession,
+        initial_extensions: list[str],
+        source_link: str,
         invite_link: str,
         default_prefix: str,
         default_language: str,
-        prefixes: dict[str, str],
-        initial_extensions: list[str],
-        web_client: ClientSession,
         testing_guild_id: int,
         **kwargs,
     ):
@@ -37,29 +49,39 @@ class CritBot(commands.Bot):
         self.default_prefix = default_prefix
         self.prefixes = prefixes
         self.invite_link = invite_link
-        self.github_link = github_link
+        self.source_link = source_link
         
         # i18n
         self.default_language = default_language
-        self.i18n = I18n(self.default_language)
+        self.i18n = i18n
         
 
     async def setup_hook(self) -> None:
         
+        self.logger.log(20, "Setting up the translator.")
+        await self.tree.set_translator(Translator)
+        self.logger.log(20, "Translator set up")
+
+
+        self.logger.log(20, "Loading the cogs.")
+        # load all cogs in ./cogs
         for extension in self.initial_extensions:
             await self.load_extension(extension)
             self.cogs_state["loaded"].append(extension.replace("cogs.", ""))
+        self.logger.log(20, "Cogs loaded.")
 
+
+
+        self.logger.log(20, "Syncing the bot.")
         guild = discord.Object(self.testing_guild_id)
         self.tree.copy_global_to(guild=guild)
         await self.tree.sync(guild=guild)
         #await self.tree.sync() # syncs all guilds takes a longe time
-        print("Syncing done!")
+        self.logger.log(20, "Syncing done!")
 
 
     async def change_activity(self) -> None:
         """Changes the bot's activity"""
-        #puts a button on the activity
         await self.change_presence(
             activity=discord.Activity(
                 type=discord.ActivityType.listening,
@@ -79,7 +101,7 @@ class CritBot(commands.Bot):
             )
         )
         self.add_check(self.set_guild_and_cog_and_command) # adds a fake check to all commands to set the guild id and the cog name
-        self.logger.log(20, f"Logado como {self.user}!")
+        self.logger.log(20, f"Logged as {self.user}!")
 
 
     async def change_cogs_state(self, mode: str, cog: str) -> None:
@@ -128,7 +150,7 @@ class CritBot(commands.Bot):
         """Sets the guild id and the cog name to i18n"""
         self.i18n.guild_id = ctx.guild.id
         self.i18n.cog_name = ctx.cog.__class__.__name__.lower()
-        self.i18n.command_name = ctx.command.name
+        self.i18n.command_name = ctx.command.qualified_name.replace(" ", "_")
         return True
             
         
@@ -136,15 +158,10 @@ class CritBot(commands.Bot):
 
 
 
+
         
 async def main():
-    print("Starting bot!")
-    with open("./config/appsettings.yaml", "r") as f:
-        data = yaml.safe_load(f)
 
-    with open("./prefixes.json", "r") as f:
-        prefixes = orjson.loads(f.read())
-    
     async def get_prefix(bot, message):
         return commands.when_mentioned_or(prefixes[str(message.guild.id)])(bot, message)
 
@@ -159,7 +176,18 @@ async def main():
         backupCount=5,
     )
     dt_fmt = '%Y-%m-%d %H:%M:%S'
-    formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', dt_fmt, style='{')
+    formatter = ColoredFormatter(
+        '[{asctime}] {log_color}[{levelname:<8}]{reset}{purple} {name}{reset}: {blue}{message}{reset}', 
+        dt_fmt, 
+        style='{',
+        log_colors={
+            'DEBUG': 'cyan',
+            'INFO': 'green',
+            'WARNING': 'yellow',
+            'ERROR': 'red',
+            'CRITICAL': 'red,bg_white',
+        }
+    )
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
@@ -169,7 +197,6 @@ async def main():
     logger.addHandler(console)
     
 
-
     async with ClientSession() as our_client:
         
         exts = []
@@ -178,25 +205,21 @@ async def main():
                 exts.append(f"cogs.{filename[:-3]}")
     
         async with CritBot(
-                github_link=data["github_link"],
-                invite_link=data["invite_link"],
-                default_prefix=data["default_prefix"],
-                default_language=data["default_language"],
+                i18n=i18n,
                 prefixes=prefixes,
                 web_client=our_client,
                 initial_extensions=exts,
-                testing_guild_id=data["testing_guild_id"],
+                **data,
                 intents=discord.Intents.all(),
                 command_prefix=get_prefix,
                 case_insensitive=True,
-                description=data["description"],
-                owner_id=data["owner_id"],
-                strip_after_prefix=True
+                strip_after_prefix=True,
+                tree_cls=Tree
             ) as bot:
                 await bot.start(data["discord_token"], reconnect=True)
-
-
+    
 if __name__ == "__main__":
     asyncio.run(main())
 else:
     print("\nJust die...")
+    exit(1)

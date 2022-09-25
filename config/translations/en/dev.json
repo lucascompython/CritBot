@@ -1,5 +1,8 @@
 {
     "reload": {
+        "group_name": "reaload",
+        "group_description": "Reloads some of the bots values.",
+
         "cmd": {
             "cog_output": "**{cog_name}** was reloaded successfully.\n",
             "translations_output": "Translations were reloaded successfully.\n",
@@ -14,6 +17,9 @@
     },
 
     "unload": {
+        "command_name": "unload",
+        "command_description": "Unloads a cog.",
+
         "cmd": {
             "unloaded": "**{cog_name}** was unloaded.\n"
         },
@@ -25,6 +31,9 @@
     },
 
     "load": {
+        "command_name": "load",
+        "command_description": "Loads a cog.",
+
         "cmd": {
             "loaded": "**{cog_name}** was loaded.\n"
         },
@@ -37,6 +46,9 @@
     },
 
     "all": {
+        "command_name": "all",
+        "command_description": "Loads all available cogs.",
+
         "err": {
             "all_cogs_loaded": "All of the available cogs are already loaded.",
             "all_cogs_unloaded": "All of the available cogs are already unloaded."
@@ -44,13 +56,30 @@
     },
 
     "sync": {
+        "group_name": "sync",
+        "group_description": "Syncs the bot.",
+
         "cmd": {
-            "output": "**{guild}** was synced with the bot successfully.",
-            "global_output": "The bot was synced globally."
+            "output": "**{guild}** was synced with the bot successfully."
+        },
+        "err": {
+            "command_sync_failure": "Something went wrong while syncing the bot."
+        }
+    },
+
+    "sync_global": {
+        "command_name": "global",
+        "command_description": "Syncs the bot globally.",
+        
+        "cmd": {
+            "output": "The bot was synced globally."
         }
     },
 
     "cog": {
+        "command_name": "cog",
+        "command_description": "Shows the state of a cog.",
+
         "cmd": {
             "is_loaded_output": "**{cog_name}** is loaded",
             "is_unloaded_output": "**{cog_name}** is unloaded"
@@ -61,6 +90,9 @@
     },
 
     "cogs": {
+        "command_name": "cogs",
+        "command_description": "Shows the state of all cogs.",
+
         "embed_fields": {
             "loaded": "Loaded",
             "unloaded": "Unloaded"
@@ -68,12 +100,18 @@
     },
 
     "print": {
+        "command_name": "print",
+        "command_description": "Prints a value from the bot.",
+
         "err": {
             "exception": "Something went wrong: {error}"
         }
     },
     
     "restart": {
+        "command_name": "restart",
+        "command_description": "Restarts the bot.",
+
         "cmd": {
             "output": "Restarting..."
         }

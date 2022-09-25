@@ -1,5 +1,4 @@
 from discord.ext import commands
-from discord import app_commands
 
 class Config(commands.Cog):
     """Manage the bot's configuration."""
@@ -11,7 +10,6 @@ class Config(commands.Cog):
 
     @commands.hybrid_command(aliases=["mudar_prefixo"])
     async def change_prefix(self, ctx, prefix) -> None:
-        """Change the bot prefix."""
         try:
             await self.bot.update_prefixes(ctx.guild.id, prefix)
             await ctx.send(self.t("cmd", "output", prefix=prefix))
@@ -34,10 +32,10 @@ class Config(commands.Cog):
     
         
     async def cog_load(self) -> None:
-        self.log(20, "Loaded {name} cog!".format(name=self.__class__.__name__))
+        print("Loaded {name} cog!".format(name=self.__class__.__name__))
         
     async def cog_unload(self) -> None:
-        self.log(20, "Unloaded {name} cog!".format(name=self.__class__.__name__))
+        print("Unloaded {name} cog!".format(name=self.__class__.__name__))
         
 
 async def setup(bot) -> None:

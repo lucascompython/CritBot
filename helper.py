@@ -15,13 +15,22 @@ def create_dump(contents: dict) -> dict:
         for k, v in val.items():
 
             if key not in dump:
-                dump[key] = {k: {q: "" for q in v.keys()}}
+                try:
+                    dump[key] = {k: {q: "" for q in v.keys()}} 
+                except AttributeError:
+                    dump[key] = {k: ""}
 
-            if k not in dump[key]:
-                dump[key][k] = {q: "" for q in v.keys()}
+            elif k not in dump[key]:
+                try:
+                    dump[key][k] = {q: "" for q in v.keys()}
+                except AttributeError:
+                    dump[key][k] = ""
     
             else:
-                dump[key][k] = {q: "" for q in v.keys()}
+                try:
+                    dump[key][k] = {q: "" for q in v.keys()}
+                except AttributeError:
+                    dump[key] = {k: ""}
     return dump
 
 cog_template = """from discord.ext import commands
@@ -37,10 +46,10 @@ class {cog_name}(commands.Cog):
 
         
     async def cog_load(self) -> None:
-        self.log(20, "Loaded {name} cog!".format(name=self.__class__.__name__))
+        print("Loaded {name} cog!".format(name=self.__class__.__name__))
         
     async def cog_unload(self) -> None:
-        self.log(20, "Unloaded {name} cog!".format(name=self.__class__.__name__))
+        print("Unloaded {name} cog!".format(name=self.__class__.__name__))
         
 
 async def setup(bot) -> None:
@@ -141,7 +150,6 @@ def main() -> None:
 
         with open(original_file_path, "r") as f:
             contents = json.load(f)
-
         dump = create_dump(contents)
                 
 

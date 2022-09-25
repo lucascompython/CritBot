@@ -1,11 +1,14 @@
-from aiofiles import open as async_open
-from discord.ext.commands import Context
-
-
 import os
-from typing import Optional
+from typing import Optional, Union
 import json
+
+from aiofiles import open as async_open
 import orjson
+from discord import Locale
+
+from sys import path
+path.append("..")
+from config import data
 
 
 class I18n:
@@ -43,7 +46,7 @@ class I18n:
     def check_lang(self, lang: str) -> bool:
         return lang in self.accepted_langs or any(lang in sublist for sublist in self.accepted_langs.values())
 
-    def t(self, mode: str,  *args, mcommand_name: Optional[str] = None, mcog_name: Optional[str] = None, ctx: Optional[Context] = None, **kwargs) -> str:
+    def t(self, mode: str, *args, mcommand_name: Optional[str] = None, mcog_name: Optional[str] = None, ctx = None, **kwargs) -> str:
         """Searches in the translations for the correct translation
 
         Args:
@@ -81,10 +84,12 @@ class I18n:
         command_name = mcommand_name or self.command_name
         cog_name = mcog_name or self.cog_name
         try:
-            return self.get_keys_string(lang, cog_name)[command_name][mode]["-".join(args)]
+            translated_string = self.get_keys_string(lang, cog_name)[command_name][mode]
+            return translated_string["-".join(args)] if args else translated_string
         except KeyError:
             # if not implemented in the language, return the default language version
-            return self.get_keys_string(self.default_lang, cog)[self.command_name][mode]["-".join(args)]
+            translated_string = self.get_keys_string(self.default_lang, cog)[self.command_name][mode]
+            return translated_string["-".join(args)] if args else translated_string
 
     def get_keys_string(self, lang: str, cog: str) -> dict:
         return self.translations[lang + "." + cog]
@@ -92,6 +97,40 @@ class I18n:
     def get_lang(self, guild_id: int) -> str:
         return self.langs[str(guild_id)]
     
+
+    def get_command_name(self, command_name: str, cog: str, lang: str) -> str:
+        return self.get_keys_string(lang, cog)[command_name]["command_name"]
+
+    def get_command_description(self, command_description: str, cog: str, lang: str) -> str:
+        return self.get_keys_string(lang, cog)[command_description]["command_description"]
+
+    def get_group_name(self, group_name: str, cog: str, lang: str) -> str:
+        return self.get_keys_string(lang, cog)[group_name]["group_name"]
+
+    def get_group_description(self, group_description: str, cog: str, lang: str) -> str:
+        return self.get_keys_string(lang, cog)[group_description]["group_description"]
+
+
+    def get_locale_lang(self, locale: str) -> Union[str, Locale]:
+        """Helper function to get the proper Locale from a string E.g. "pt" -> Locale.brazil_portuguese
+
+        Args:
+            locale (str): The string
+
+        Returns:
+            Union[str, Locale]: Return the proper Locale
+        """
+        if locale == "pt":
+            return Locale.brazil_portuguese
+        
+        if locale == "en":
+            return Locale.american_english
+
+        return None
+
+
+
+
 
 
     async def update_langs(self, guild_id: int, lang: str) -> None:
@@ -110,3 +149,7 @@ class I18n:
         self.langs.pop(str(guild_id))
         async with async_open("./i18n/langs.json", "w") as f:
             await f.write(json.dumps(self.langs, indent=4))
+
+
+
+i18n = I18n(data["default_language"])

@@ -1,5 +1,9 @@
 {
     "change_prefix": {
+        "command_name": "prefixo",
+        "command_description": "Muda o prefixo do bot",
+
+
         "cmd": {
             "output": "Prefixo mudado para **{prefix}**"
         },
@@ -8,6 +12,9 @@
         }
     },
     "change_language": {
+        "command_name": "idioma",
+        "command_description": "Muda o idioma do bot",
+
         "cmd": {
             "output": "Língua mudada para **{lang}**!"
         },

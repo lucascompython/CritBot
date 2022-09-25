@@ -1,9 +1,13 @@
 import discord
+from discord import app_commands
 from discord.ext import commands
+from discord.app_commands import locale_str as _T
 
 import os, sys
 from typing import Union, Optional
 
+
+#command_attres=dict(hidden=True)
 class Dev(commands.Cog):
     """Classe que define comandos que apenas o desenvolvedor pode usar."""
     def __init__(self, bot) -> None:
@@ -161,23 +165,33 @@ class Dev(commands.Cog):
 
     @commands.is_owner()
     @commands.hybrid_group(case_insensitive=True, invoke_without_command=True, alises=["sincronizar"])
-    async def sync(self, ctx, guild: Optional[int] = None) -> None:
+    async def sync(self, ctx, guild: Optional[int] = None, copy: Optional[bool] = True) -> None:
         async with ctx.typing():
             if not guild: guild = ctx.guild.id
             guild_obj = discord.Object(guild)
-            self.bot.tree.copy_global_to(guild=guild_obj)
-            await self.bot.tree.sync(guild=guild_obj)
-        await ctx.send(self.t("cmd", "output", mcommand_name="sync", guild=ctx.guild))
+            try:
+                if copy:
+                    self.bot.tree.copy_global_to(guild=guild_obj)
+                await self.bot.tree.sync(guild=guild_obj)
+            except app_commands.CommandSyncFailure:
+                #TODO Translate
+                await ctx.send(self.t("err", "command_sync_failure"))
+
+        await ctx.send(self.t("cmd", "output", guild=ctx.guild))
 
     @commands.is_owner()
-    @sync.command(name="global")
+    @sync.command(name=_T("global"))
     async def sync_global(self, ctx) -> None:
         async with ctx.typing():
-            await self.bot.tree.sync()
-        await ctx.send(self.t("cmd", "global_output", mcommand_name="sync"))
+            try:
+                await self.bot.tree.sync()
+            except app_commands.CommandSyncFailure:
+                await ctx.send(self.t("err", "command_sync_failure", mcommand_name="sync"))
+        await ctx.send(self.t("cmd", "output"))
         
     @commands.is_owner()
     @commands.hybrid_command()
+    #@app_commands.describe(cog_name=_T("cog_name"))
     async def cog(self, ctx, cog_name: str) -> None:
         """Check for one single cog."""
         try:
@@ -208,7 +222,8 @@ class Dev(commands.Cog):
 
     #DANGEROUS
     @commands.is_owner()
-    @commands.hybrid_command(name="print")
+    @commands.hybrid_command(name=_T("print"))
+    #@app_commands.describe(thing=_T("print"))
     async def _print(self, ctx, thing):
         """Prints a value from the bot"""
         try:
@@ -242,10 +257,10 @@ class Dev(commands.Cog):
 
     #loader and unloader
     async def cog_load(self) -> None:
-        self.log(20, "Loaded {name} cog!".format(name=self.__class__.__name__))
+        print("Loaded {name} cog!".format(name=self.__class__.__name__))
 
     async def cog_unload(self) -> None:
-        self.log(20, "Unloaded {name} cog!".format(name=self.__class__.__name__))
+        print("Unloaded {name} cog!".format(name=self.__class__.__name__))
 
 
 async def setup(bot):

@@ -31,25 +31,26 @@ class Interactions(commands.Cog):
         self.t = self.bot.i18n.t
 
 
-        self.ctx_menu = app_commands.ContextMenu(name="Reportar a mensagem", callback=self.report_message)
+        self.ctx_menu = app_commands.ContextMenu(name="report_message", callback=self.report_message, extras={"cog_name": "interactions"})
         self.bot.tree.add_command(self.ctx_menu)
-        self.ctx_menu = app_commands.ContextMenu(name="Mostrar info", callback=self.show_join_date)
+        self.ctx_menu = app_commands.ContextMenu(name="show_info", callback=self.show_join_date, extras={"cog_name": "interactions"})
         self.bot.tree.add_command(self.ctx_menu)
 
-    @app_commands.command()
-    async def slash(self, interaction: discord.Interaction) -> None:
-        await interaction.response.send_message("OLa")
+    #@app_commands.command()
+    #async def slash(self, interaction: discord.Interaction) -> None:
+        #await interaction.response.send_message("OLa")
 
 
 
 
     async def show_join_date(self, interaction: discord.Interaction, member: discord.Member):
-        await interaction.response.send_message(f'{member} entrou em {discord.utils.format_dt(member.joined_at)}')
+        await interaction.response.send_message(self.t("cmd", "output", member=member.mention, joined_at=discord.utils.format_dt(member.joined_at)))
 
     async def report_message(self, interaction: discord.Interaction, message: discord.Message):
-        ctx = await self.bot.get_context(interaction)
+        interaction.extras = {"cog_name", "interactions"}
         await interaction.response.send_message(
-            self.t("cmd", "report_message", ctx=ctx, author=message.author.mention)
+            self.t("cmd", "output", author=message.author.mention),
+            ephemeral=True
         ) 
     
         guild = self.bot.get_guild(404691077216600067)
@@ -63,30 +64,26 @@ class Interactions(commands.Cog):
         embed.timestamp = message.created_at
     
         url_view = discord.ui.View()
-        url_view.add_item(discord.ui.Button(label=self.t("cmd", "button_goto_msg", ctx=ctx), style=discord.ButtonStyle.url, url=message.jump_url))
+        url_view.add_item(discord.ui.Button(label=self.t("cmd", "button_goto_msg"), style=discord.ButtonStyle.url, url=message.jump_url))
     
         await log_channel.send(embed=embed, view=url_view)
 
 
 
 
-    @app_commands.command()
-    async def graph(
-        self,
-        interaction: discord.Interaction,
-        point: app_commands.Transform[Point, PointTransformer],
-    ):
-        await interaction.response.send_message(str(point))
+    #@app_commands.command()
+    #async def graph(
+        #self,
+        #interaction: discord.Interaction,
+        #point: app_commands.Transform[Point, PointTransformer],
+    #):
+        #await interaction.response.send_message(str(point))
 
 
 
-    @app_commands.command()
-    async def graph3d(interaction: discord.Interaction, point: Point3D):
-        await interaction.response.send_message(str(point))
-
-
-
-
+    #@app_commands.command()
+    #async def graph3d(interaction: discord.Interaction, point: Point3D):
+        #await interaction.response.send_message(str(point))
 
 
 
@@ -94,11 +91,9 @@ class Interactions(commands.Cog):
 
 
 
-
-
-    @app_commands.command()
-    async def shop(self, interaction: discord.Interaction, action: Literal["Comprar", "Vender"], item: str) -> None:
-        await interaction.response.send_message(f"Ação: {action}\nItem: {item}")
+    #@app_commands.command()
+    #async def shop(self, interaction: discord.Interaction, action: Literal["Comprar", "Vender"], item: str) -> None:
+        #await interaction.response.send_message(f"Ação: {action}\nItem: {item}")
 
 
 

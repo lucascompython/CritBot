@@ -1,8 +1,8 @@
 {
     "report_message": {
-        "info": {
-            "name": "Report Message"
-        },
+        "command_name": "Report Message",
+        "command_description": "Report a message to the moderators.",
+
         "cmd": {
             "output": "Thank you for reporting this message by {author} to our moderators.",
             "embed_title": "Reported Message",
@@ -10,11 +10,10 @@
         }
     },
     "show_info": {
-        "info": {
-            "name": "Show Info"
-        },
+        "command_name": "Show Info",
+        "command_description": "Show information about a given user.",
         "cmd": {
-            "output": ""
+            "output": "{member} joined in {joined_at}."
         }
     }
 }

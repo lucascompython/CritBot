@@ -1,17 +1,26 @@
 {
     "ping": {
+        "command_name": "ping",
+        "command_description": "Get the bot's ping",
+
         "cmd": {
             "output": "My ping is {latency}ms."
         }
     },
     "invite": {
+        "command_name": "invite",
+        "command_description": "Get the bot's invite link",
+
         "cmd": {
             "output": "You can invite me to your server with this link: {invite}"
         }
     },
     "source_code": {
+        "command_name": "source",
+        "command_description": "Get the bot's source code",
+
         "cmd": {
-            "output": "You can find my source code on GitHub: {github}"
+            "output": "You can find my source code on GitHub: {source_link}"
         }
     }
 }
