@@ -1,6 +1,6 @@
 {
     "ping": {
-        "command_name": "Pingdsa",
+        "command_name": "ping",
         "command_description": "Mostra o ping do bot.",
 
         "cmd": {
