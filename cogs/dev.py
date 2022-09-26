@@ -4,7 +4,7 @@ from discord.ext import commands
 from discord.app_commands import locale_str as _T
 
 import os, sys
-from typing import Union, Optional
+from typing import Optional
 
 
 #command_attres=dict(hidden=True)
@@ -243,7 +243,7 @@ class Dev(commands.Cog):
 
     @commands.is_owner()
     @commands.command()
-    async def sudo(self, ctx, channel: Optional[discord.TextChannel], member: Union[discord.Member, discord.User], *, command: str):
+    async def sudo(self, ctx, channel: Optional[discord.TextChannel], member: discord.Member | discord.User, *, command: str):
         """Run a command as another user optionally in another channel."""
         msg = ctx.message
         new_channel = channel or ctx.channel

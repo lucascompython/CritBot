@@ -1,5 +1,5 @@
 import os
-from typing import Optional, Union
+from typing import Optional
 import json
 
 from aiofiles import open as async_open
@@ -111,14 +111,14 @@ class I18n:
         return self.get_keys_string(lang, cog)[group_description]["group_description"]
 
 
-    def get_locale_lang(self, locale: str) -> Union[str, Locale]:
+    def get_locale_lang(self, locale: str) -> str | Locale:
         """Helper function to get the proper Locale from a string E.g. "pt" -> Locale.brazil_portuguese
 
         Args:
             locale (str): The string
 
         Returns:
-            Union[str, Locale]: Return the proper Locale
+            str | Locale: Return the proper Locale
         """
         if locale == "pt":
             return Locale.brazil_portuguese

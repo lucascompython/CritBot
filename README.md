@@ -5,7 +5,8 @@ This is discord bot written in discord.py v2.0 that aims at exploring the possib
 ## Installation & Execution
 I would prefer if you don't run an instance of my bot. You can just invite him [here](https://discord.com/api/oauth2/authorize?client_id=832679098740506644&permissions=8&scope=bot).<br>
 Nevertheless, the installation steps are as follows:<br>
-This bot was only teted on linux. 
+This bot was only teted on linux.  
+Python3.10+ is required.
 ```bash
 git clone https:/github.com/lucascompython/CritBot.git
 cd CritBot

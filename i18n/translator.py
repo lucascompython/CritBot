@@ -2,7 +2,7 @@ from discord import Locale
 from discord import app_commands
 from discord.app_commands import TranslationContextLocation
 
-from typing import Optional, Union
+from typing import Optional
 
 
 from .translations import i18n
@@ -243,7 +243,7 @@ class Translator(app_commands.Translator):
         
 
 
-    def __get_locale(self, locale: Locale) -> Union[str, None]:
+    def __get_locale(self, locale: Locale) -> str | None:
         if locale == Locale.brazil_portuguese:
             return "pt"
 
@@ -266,7 +266,6 @@ class Translator(app_commands.Translator):
             return None
 
         if context.location is TranslationContextLocation.command_name:
-
 
             cog = context.data.module.replace("cogs.", "")
             command_name = context.data.qualified_name.replace(" ", "_")
@@ -292,10 +291,10 @@ class Translator(app_commands.Translator):
             return translated_group_description
 
 
-        if context.location in TranslationContextLocation.parameter_name:
+        if context.location is TranslationContextLocation.parameter_name:
             return "parameter_name"
 
-        if context.location in TranslationContextLocation.parameter_description:
+        if context.location is TranslationContextLocation.parameter_description:
             return "parameter_description"
 
         if context.location is TranslationContextLocation.choice_name:
@@ -303,6 +302,50 @@ class Translator(app_commands.Translator):
 
         if context.location is TranslationContextLocation.other:
             return "choice_value"
+
+
+
+
+        #match context.location:
+            #case TranslationContextLocation.command_name():
+                #cog = context.data.module.replace("cogs.", "")
+                #command_name = context.data.qualified_name.replace(" ", "_")
+                #translated_command_name = i18n.get_command_name(command_name, cog, locale)
+                #return translated_command_name
+                
+
+            #case TranslationContextLocation.command_description():
+                #cog = context.data.module.replace("cogs.", "")
+                #command_name = context.data.qualified_name.replace(" ", "_")
+                #translated_command_description = i18n.get_command_description(command_name, cog, locale)
+                #return translated_command_description
+
+            #case TranslationContextLocation.group_name():
+                #cog = context.data.module.replace("cogs.", "")
+                #group_name = context.data.qualified_name.replace(" ", "_")
+                #translated_group_name = i18n.get_group_name(group_name, cog, locale)
+                #return translated_group_name
+
+            #case TranslationContextLocation.group_description():
+                #cog = context.data.module.replace("cogs.", "")
+                #group_description = context.data.qualified_name.replace(" ", "_")
+                #translated_group_description = i18n.get_group_description(group_description, cog, locale)
+                #return translated_group_description
+
+
+            #case TranslationContextLocation.parameter_name():
+                #return "parameter_name"
+
+            #case TranslationContextLocation.parameter_description():
+                #return "parameter_description"
+
+            #case TranslationContextLocation.choice_name():
+                #return "choice_name"
+
+            #case TranslationContextLocation.other():
+                #return "choice_value"
+
+
 
         
         #if context.location is not TranslationContextLocation.parameter_name and context.location is not TranslationContextLocation.parameter_description:
