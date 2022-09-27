@@ -291,17 +291,17 @@ class Translator(app_commands.Translator):
             return translated_group_description
 
 
-        if context.location is TranslationContextLocation.parameter_name:
-            return "parameter_name"
+        #if context.location is TranslationContextLocation.parameter_name:
+            #return "parameter_name"
 
-        if context.location is TranslationContextLocation.parameter_description:
-            return "parameter_description"
+        #if context.location is TranslationContextLocation.parameter_description:
+            #return "parameter_description"
 
-        if context.location is TranslationContextLocation.choice_name:
-            return "choice_name"
+        #if context.location is TranslationContextLocation.choice_name:
+            #return "choice_name"
 
-        if context.location is TranslationContextLocation.other:
-            return "choice_value"
+        #if context.location is TranslationContextLocation.other:
+            #return "choice_value"
 
 
 
