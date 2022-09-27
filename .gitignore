@@ -4,3 +4,4 @@ discord.log
 *.pyc
 langs.json
 test.py
+.idea

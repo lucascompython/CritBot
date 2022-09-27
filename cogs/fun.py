@@ -15,37 +15,36 @@ class Fun(commands.Cog):
 
 
     @commands.hybrid_command()
-    async def spam(self, ctx, mbr: discord.Member | discord.User, number: int, *, message: str) -> None:
+    async def spam(self, ctx, member: discord.Member | discord.User, number: int, *, message: str) -> None:
 
         if number > 100:
             return await ctx.send(self.t("err", "dont_be_a_dick"))
-        await ctx.send(self.t("cmd", "spamming", user=mbr))
+        await ctx.send(self.t("cmd", "spamming", user=member))
 
         try:
             for _ in range(number):
-                await mbr.send(message)
+                await member.send(message)
                 await asyncio.sleep(1)
         except errors.HTTPException:
-            return await ctx.send(self.t("err", "cant_send", user=mbr))
+            return await ctx.send(self.t("err", "cant_send", user=member))
         
-        await ctx.send(self.t("cmd", "output", user=mbr))
+        await ctx.send(self.t("cmd", "output", user=member))
 
 
     @commands.hybrid_command(aliases=["acorda"])
-    async def wake(self, ctx, mbr: discord.Member | discord.User, channel: discord.VoiceChannel | discord.StageChannel, number: int, *, reason: Optional[str]) -> None:
+    async def wake(self, ctx, member: discord.Member | discord.User, channel: discord.VoiceChannel | discord.StageChannel, number: int, *, reason: Optional[str]) -> None:
         if number > 50:
             return await ctx.send(self.t("err", "dont_be_a_dick"))
         author_channel = ctx.author.voice.channel
 
-        await ctx.send(self.t("cmd", "waking", user=mbr))
+        await ctx.send(self.t("cmd", "waking", user=member))
         for _ in range(number):
-            await mbr.move_to(channel, reason=reason)
-            await mbr.move_to(author_channel, reason=reason)
+            await member.move_to(channel, reason=reason)
+            await member.move_to(author_channel, reason=reason)
         
-        await ctx.send(self.t("cmd", "output", user=mbr))
+        await ctx.send(self.t("cmd", "output", user=member))
 
 
-        
 
 
 
