@@ -230,7 +230,7 @@ class Dev(commands.Cog):
             await ctx.send(eval(thing))
         except Exception as err:
             self.log(40, err)
-            await ctx.send(self.t("err", "exception", error=err))
+            await ctx.reply(self.t("err", "exception", error=err))
 
 
     #DANGEROUS

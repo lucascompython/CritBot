@@ -242,9 +242,9 @@ class Translator(app_commands.Translator):
         #self.default_lang = default_lang
         
 
-
-    def __get_locale(self, locale: Locale) -> str | None:
-        if locale == Locale.brazil_portuguese:
+    @staticmethod
+    def __get_locale(locale: Locale) -> str | None:
+        if locale == Locale.brazil_portuguese or locale == Locale.brazil_portuguese.value:
             return "pt"
 
         if locale == Locale.american_english or locale == Locale.british_english:
@@ -252,10 +252,23 @@ class Translator(app_commands.Translator):
 
         return None 
 
+    @staticmethod
+    def get_translated(mode: str, context: app_commands.TranslationContext, locale: Locale) -> str:
+        if mode not in ["command_name", "command_description", "group_name", "group_description"]:
+            return None
+        
+        cog = context.data.module.replace("cogs.", "")
+        name = context.data.qualified_name.replace(" ", "_")
 
-
-
-
+        match mode:
+            case "command_name":
+                return i18n.get_command_name(name, cog, locale)
+            case "command_description":
+                return i18n.get_command_description(name, cog, locale)
+            case "group_name":
+                return i18n.get_group_name(name, cog, locale)
+            case "group_description":
+                return i18n.get_group_description(name, cog, locale)
 
     async def translate(self, string: app_commands.locale_str, locale: Locale, context: app_commands.TranslationContext) -> Optional[str]:
         # translate
@@ -265,30 +278,33 @@ class Translator(app_commands.Translator):
         if not i18n.check_lang(locale):
             return None
 
-        if context.location is TranslationContextLocation.command_name:
 
-            cog = context.data.module.replace("cogs.", "")
-            command_name = context.data.qualified_name.replace(" ", "_")
-            translated_command_name = i18n.get_command_name(command_name, cog, locale)
-            return translated_command_name
+
+        
+
+        if context.location is TranslationContextLocation.command_name:
+            return self.get_translated("command_name", context, locale)
 
         if context.location is TranslationContextLocation.command_description:
-            cog = context.data.module.replace("cogs.", "")
-            command_name = context.data.qualified_name.replace(" ", "_")
-            translated_command_description = i18n.get_command_description(command_name, cog, locale)
-            return translated_command_description
+            return self.get_translated("command_description", context, locale)
+            #cog = context.data.module.replace("cogs.", "")
+            #command_name = context.data.qualified_name.replace(" ", "_")
+            #translated_command_description = i18n.get_command_description(command_name, cog, locale)
+            #return translated_command_description
 
         if context.location is TranslationContextLocation.group_name:
-            cog = context.data.module.replace("cogs.", "")
-            group_name = context.data.qualified_name.replace(" ", "_")
-            translated_group_name = i18n.get_group_name(group_name, cog, locale)
-            return translated_group_name
+            return self.get_translated("group_name", context, locale)
+            #cog = context.data.module.replace("cogs.", "")
+            #group_name = context.data.qualified_name.replace(" ", "_")
+            #translated_group_name = i18n.get_group_name(group_name, cog, locale)
+            #return translated_group_name
 
         if context.location is TranslationContextLocation.group_description:
-            cog = context.data.module.replace("cogs.", "")
-            group_description = context.data.qualified_name.replace(" ", "_")
-            translated_group_description = i18n.get_group_description(group_description, cog, locale)
-            return translated_group_description
+            return self.get_translated("group_description", context, locale)
+            #cog = context.data.module.replace("cogs.", "")
+            #group_description = context.data.qualified_name.replace(" ", "_")
+            #translated_group_description = i18n.get_group_description(group_description, cog, locale)
+            #return translated_group_description
 
 
         #if context.location is TranslationContextLocation.parameter_name:
