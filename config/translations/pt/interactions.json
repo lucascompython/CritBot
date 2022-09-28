@@ -9,10 +9,22 @@
         }
     },
     "show_info": {
-        "command_name": "Mostrar Info",
-        "command_description": "Mostrar informações sobre uma pessoa.",
-        "cmd": {
-            "output": "{member} entrou em {joined_at}."
+        "command_name": "Mostar Informações",
+        "command_description": "Mostra informções sobre um utilizador.",
+        "embed": {
+            "true": "Verdadeiro",
+            "false": "Falso",
+            "title": "Informação de Utilizador",
+            "entry_position": "Posição de entrada",
+            "joined_at": "Juntou-se em",
+            "created_at": "Resgistrou-se em",
+            "status": "Status",
+            "is_on_mobile": "Está no telemóvel",
+            "premium": "Premium/Nitro",
+            "activity": "Atividade",
+            "top_role": "Cargo principal"
+
         }
     }
+
 }

@@ -12,8 +12,20 @@
     "show_info": {
         "command_name": "Show Info",
         "command_description": "Show information about a given user.",
-        "cmd": {
-            "output": "{member} joined in {joined_at}."
+        "embed": {
+            "true": "True",
+            "false": "False",
+            "title": "User Information",
+            "entry_position": "Entry Position",
+            "joined_at": "Joined At",
+            "created_at": "Created At",
+            "status": "Status",
+            "is_on_mobile": "Is on Mobile",
+            "premium": "Premium/Nitro",
+            "activity": "Activity",
+            "top_role": "Top Role"
+
         }
     }
+
 }

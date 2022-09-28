@@ -22,5 +22,32 @@
         "cmd": {
             "output": "You can find my source code on GitHub: {source_link}"
         }
+    },
+
+
+    "show_info": {
+        "command_name": "Show Info",
+        "command_description": "Show information about a given user.",
+        "embed": {
+            "true": "True",
+            "false": "False",
+            "title": "User Information",
+            "entry_position": "Entry Position",
+            "joined_at": "Joined At",
+            "created_at": "Created At",
+            "status": "Status",
+            "is_on_mobile": "Is on Mobile",
+            "premium": "Premium/Nitro",
+            "activity": "Activity",
+            "top_role": "Top Role"
+
+        }
+    },
+
+    "userinfo": {
+        "command_name": "userinfo",
+        "command_description": "Show information about a given user."
     }
+
+
 }

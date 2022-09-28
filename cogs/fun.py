@@ -1,6 +1,7 @@
 import discord
 from discord import errors
 from discord.ext import commands
+from discord.app_commands import locale_str as _T
 
 import asyncio
 from typing import Optional
@@ -31,7 +32,7 @@ class Fun(commands.Cog):
         await ctx.send(self.t("cmd", "output", user=member))
 
 
-    @commands.hybrid_command(aliases=["acorda"])
+    @commands.hybrid_command(name=_T("wake"))
     async def wake(self, ctx, member: discord.Member | discord.User, channel: discord.VoiceChannel | discord.StageChannel, number: int, *, reason: Optional[str]) -> None:
         if number > 50:
             return await ctx.send(self.t("err", "dont_be_a_dick"))
