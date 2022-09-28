@@ -174,7 +174,6 @@ class Dev(commands.Cog):
                     self.bot.tree.copy_global_to(guild=guild_obj)
                 await self.bot.tree.sync(guild=guild_obj)
             except app_commands.CommandSyncFailure:
-                #TODO Translate
                 await ctx.send(self.t("err", "command_sync_failure"))
 
         await ctx.send(self.t("cmd", "output", guild=ctx.guild))
