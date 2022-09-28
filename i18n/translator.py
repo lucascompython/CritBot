@@ -23,6 +23,9 @@ class Tree(app_commands.CommandTree):
 
 
 class Translator(app_commands.Translator):
+    """
+    This class is responsable for translating everything interaction related.
+    """
     def __init__(self) -> None:
         super().__init__()
 

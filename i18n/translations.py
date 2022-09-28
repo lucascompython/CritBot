@@ -12,6 +12,9 @@ from config import data
 
 
 class I18n:
+    """
+    This class is responsible for internationalization and localization of most of the bot's messages.
+    """
     __slots__ = ("path_to_langs", "path_to_translations", "langs", "translations", "guild_id", "cog_name", "command_name", "accepted_langs", "default_lang")
 
     def __init__(self, default_lang) -> None:
