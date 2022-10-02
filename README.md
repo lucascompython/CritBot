@@ -25,6 +25,7 @@ python3 main.py
 - [ ] add Music
 - [ ] get a real database probably PostgreSql
 - [ ] add support for other languages with Google Translate
+- [ ] add Docker support
 - [ ] add most of the Discord API
 
 
