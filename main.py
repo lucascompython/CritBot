@@ -38,6 +38,7 @@ class CritBot(commands.Bot):
         default_prefix: str,
         default_language: str,
         testing_guild_id: int,
+        lavalink_password: str,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
@@ -50,6 +51,7 @@ class CritBot(commands.Bot):
         self.prefixes = prefixes
         self.invite_link = invite_link
         self.source_link = source_link
+        self.lavalink_password = lavalink_password
         
         # i18n
         self.default_language = default_language

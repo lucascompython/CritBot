@@ -1,0 +1,12 @@
+{
+    "play": {
+        "command_name": "play",
+        "command_description": "Play a song",
+
+        "cmd": {
+            "connect": "Connecting to {channel}!",
+            
+            "queued": "Queued {song}!"
+        }
+    }
+}

@@ -1,0 +1,6 @@
+{
+    "play": {
+        "command_name": "play",
+        "command_description": "Toca uma musica."
+    }
+}

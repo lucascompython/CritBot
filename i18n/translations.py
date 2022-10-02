@@ -34,7 +34,7 @@ class I18n:
         }
         self.default_lang = default_lang
         # IMPORTANT UPDATE THIS NUMBER WHEN ADDING ANOTHER TRANSLATION FILE
-        self.translations = LRU(12)
+        self.translations = LRU(14)
 
         #load the file that contains the guilds and their languages
         with open(self.path_to_langs, "r") as f:
