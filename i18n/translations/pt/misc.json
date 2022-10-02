@@ -1,0 +1,52 @@
+{
+    "ping": {
+        "command_name": "ping",
+        "command_description": "Mostra o ping do bot.",
+
+        "cmd": {
+            "output": "O meu ping é {latency}ms."
+        }
+    },
+    "invite": {
+        "command_name": "convidar",
+        "command_description": "Mostra o link de convite do bot.",
+
+        "cmd": {
+            "output": "O meu convite é {invite}."
+        }
+    },
+    "source_code": {
+        "command_name": "codigo",
+        "command_description": "Mostra o link do codigo fonte do bot.",
+
+        "cmd": {
+            "output": "O meu código fonte está disponível em {source_link}."
+        }
+    },
+
+
+    "show_info": {
+        "command_name": "Mostar Informações",
+        "command_description": "Mostra informções sobre um utilizador.",
+        "embed": {
+            "true": "Verdadeiro",
+            "false": "Falso",
+            "title": "Informação de Utilizador",
+            "entry_position": "Posição de entrada",
+            "joined_at": "Juntou-se em",
+            "created_at": "Resgistrou-se em",
+            "status": "Status",
+            "is_on_mobile": "Está no telemóvel",
+            "premium": "Premium/Nitro",
+            "activity": "Atividade",
+            "top_role": "Cargo principal"
+
+        }
+    },
+
+    "userinfo": {
+        "command_name": "userinfo",
+        "command_description": "Mostra informções sobre um membro."
+    }
+    
+}

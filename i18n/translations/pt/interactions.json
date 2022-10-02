@@ -1,0 +1,30 @@
+{
+    "report_message": {
+        "command_name": "Reportar a mensagem",
+        "command_description": "Reportar a mensagem para os moderadores.",
+        "cmd": {
+            "output": "Obrigado por reportar esta mensagem por {author} para os nossos moderadores.",
+            "embed_title": "Mensagem Reportada",
+            "button_goto_msg": "Ver a mensagem"
+        }
+    },
+    "show_info": {
+        "command_name": "Mostar Informações",
+        "command_description": "Mostra informções sobre um utilizador.",
+        "embed": {
+            "true": "Verdadeiro",
+            "false": "Falso",
+            "title": "Informação de Utilizador",
+            "entry_position": "Posição de entrada",
+            "joined_at": "Juntou-se em",
+            "created_at": "Resgistrou-se em",
+            "status": "Status",
+            "is_on_mobile": "Está no telemóvel",
+            "premium": "Premium/Nitro",
+            "activity": "Atividade",
+            "top_role": "Cargo principal"
+
+        }
+    }
+
+}

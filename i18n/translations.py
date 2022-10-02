@@ -21,7 +21,7 @@ class I18n:
 
     def __init__(self, default_lang) -> None:
         self.path_to_langs = "./i18n/langs.json"
-        self.path_to_translations = "./config/translations/"
+        self.path_to_translations = "./i18n/translations/"
         self.translations = {}
 
         self.guild_id = None

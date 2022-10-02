@@ -1,0 +1,27 @@
+{
+    "change_prefix": {
+        "command_name": "prefix",
+        "command_description": "Change the prefix of the bot.",
+
+        "cmd": {
+            "output": "Prefix changed to **{prefix}**"
+        },
+        "err": {
+            "same_prefix": "The prefix is already **{prefix}**"
+        }
+    },
+
+    "change_language": {
+        "command_name": "language",
+        "command_description": "Change the language of the bot.",
+
+        "cmd": {
+            "output": "Language changed to **{lang}**!"
+        },
+        "err": {
+            "same_language": "**{lang}** is already the defined language.",
+            "invalid_language": "Sorry I don't support **{lang}** yet :frowning2:.\nThe supported languages are: **{langs}**."
+        }
+    }
+
+}

@@ -88,7 +88,7 @@ def main() -> None:
 
         elif mode in ["trans", "translation", "t"]:
             lang = name.split(".")[0]
-            path = f"./config/translations/{lang}/"
+            path = f"./i18n/translations/{lang}/"
             file_path = path + name[3:] + ".json"
 
             if not os.path.isdir(path):
@@ -108,8 +108,8 @@ def main() -> None:
         if original.split(".")[1] == "*" and new.split(".")[1] == "*":
             original = original.split(".")[0]
             new = new.split(".")[0]
-            path = "./config/translations/" + original
-            new_path = "./config/translations/" + new
+            path = "./i18n/translations/" + original
+            new_path = "./i18n/translations/" + new
 
             if not os.path.isdir(new_path):
                 os.mkdir(new_path)
@@ -135,8 +135,8 @@ def main() -> None:
         original_lang = original.split(".")[0]
         new_lang = new.split(".")[0]
 
-        original_path = f"./config/translations/{original_lang}"
-        new_path = f"./config/translations/{new_lang}"
+        original_path = f"./i18n/translations/{original_lang}"
+        new_path = f"./i18n/translations/{new_lang}"
 
         original_file_path = os.path.join(original_path, original[3:] + ".json")
         new_file_path = os.path.join(new_path, new[3:] + ".json")

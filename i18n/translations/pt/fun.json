@@ -1,0 +1,25 @@
+{
+    "spam": {
+        "command_name": "spam",
+        "command_description": "Spama um usuário",
+        "cmd": {
+            "spamming": "Spamando {user}!",
+            "output": "{user} foi spamado com sucesso!"
+        },
+        "err": {
+            "dont_be_a_dick": "O maxímo de mensagens é 100.",
+            "cant_send": "Não foi possivel spamar {user}."
+        }
+    },
+    "wake": {
+        "command_name": "acorda",
+        "command_description": "Acorda um usuário (move entre canais)",
+        "cmd": {
+            "waking": "Acordando {user}!",
+            "output": "{user} foi acordado com sucesso!"
+        },
+        "err": {
+            "dont_be_a_dick": "O maxímo de vezes a acordar um utilizador é 50."
+        }
+    }
+}
