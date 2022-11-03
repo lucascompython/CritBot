@@ -148,10 +148,6 @@ def arg_parser() -> argparse.ArgumentParser:
     return parser.parse_args()
 
 
-    
-
-
-
 
 async def main() -> None:
     args = arg_parser()
@@ -161,27 +157,6 @@ async def main() -> None:
     lavalink = Lavalink(args.lavalink, args.path)
     lavalink.start_lavalink()
     await start_bot()
-
-
-    #if (lavalink := args.lavalink) != default:
-        #lavalink = args.lavalink.split(":")
-        #lavalink_ip = lavalink[0]
-        #lavalink_port = int(lavalink[1])
-        
-    #else:
-        #print(f"No Lavalink IP and port provided. Running default values with Lavalink at {Colors.bold + os.path.abspath('./config/Lavalink.jar') + Colors.reset}.")
-        #lavalink_proc = subprocess.Popen(["java", "-jar", "./config/Lavalink.jar"], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-
-
-
-
-
-
-
-    
-
-
-
 
 
 
