@@ -23,5 +23,10 @@ invite_link: ""
 source_link: ""
 # Yes I am fun at parties, I promise.
 
-# The same password that is in application.yml
-lavalink_password: ""
+
+# The same info that is in application.yml
+lavalink: 
+  ip: "0.0.0.0"
+  port: 2333
+  password: ""
+  path: "./config/Lavalink.jar"

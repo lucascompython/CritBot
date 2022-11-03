@@ -6,7 +6,27 @@
         "cmd": {
             "connect": "Connecting to {channel}!",
             
-            "queued": "Queued {song}!"
+            "queued": "Queued {track}!"
+        },
+        "embed": {
+            "title": "Now Playing from {source}",
+            "author": "Requested by {user}",
+            "duration": "Duration",
+            "uploader": "Uploader",
+            "click": "[Click]({url})",
+            "views": "Views",
+            "likes": "Likes",
+            "footer": "Upload date: {upload_date}",
+            "subs": "Subscribers"
+        }
+    },
+    "queue": {
+        "command_name": "queue",
+        "command_description": "Show the queue",
+
+        "embed": {
+            "title": "Currently playing: `{track}` added by `{user}` `[{current_time}/{total_time}]`"
+
         }
     }
 }

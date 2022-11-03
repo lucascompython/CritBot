@@ -1,7 +1,8 @@
 {
     "on_command_error": {
         "err": {
-            "not_owner": "Não és um desenvolvedor do bot."
+            "not_owner": "Não és um desenvolvedor do bot.",
+            "unknown": "Um erro desconhecido ocorreu."
         }
     }
 }

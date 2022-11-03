@@ -1,9 +1,10 @@
 appsettings.yaml
 prefixes.json
-discord.log
 *.pyc
 langs.json
 test.py
 .idea
 Lavalink.jar
 application.yml
+*.log
+*.gz

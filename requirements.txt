@@ -8,3 +8,4 @@ PyYAML==6.0
 uvloop==0.16.0
 wavelink==1.3.2
 psutil==5.9.2
+yt_dlp==2022.9.1

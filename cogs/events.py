@@ -1,5 +1,7 @@
 from discord.ext import commands
 
+import traceback
+
 class Events(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
@@ -21,8 +23,16 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
+        self.bot.i18n.command_name = "on_command_error"
+        self.bot.i18n.cog_name = "events"
+
         if isinstance(error, commands.NotOwner):
-            await ctx.reply(self.t("err", "not_owner", mcommand_name="on_command_error", mcog_name="events"))
+            await ctx.reply(self.t("err", "not_owner"))
+        else:
+            await ctx.reply(self.t("err", "unknown"))
+            self.log(40, error)
+            traceback.print_exception(type(error), error, error.__traceback__)
+
 
 
         
