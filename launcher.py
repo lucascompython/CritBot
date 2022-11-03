@@ -164,8 +164,8 @@ if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        print("\nKilling Lavalink...")
         if lavalink_proc:
+            print("\nKilling Lavalink...")
             lavalink_proc.terminate()
 
 
