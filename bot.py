@@ -1,4 +1,3 @@
-import uvloop
 import orjson
 import discord
 from discord.ext import commands
@@ -7,22 +6,12 @@ from aiofiles import open as async_open
 
 
 import json
-import os, asyncio, logging
+import logging
 import logging.handlers
 
 
-from config import (
-    data,
-    prefixes,
-)
-from i18n import (
-    i18n,
-    Translator,
-    Tree
-)
+from i18n import Translator
 
-
-#asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 class CritBot(commands.Bot):
     def __init__(
         self,
@@ -154,72 +143,3 @@ class CritBot(commands.Bot):
         return True
             
         
-
-
-
-
-
-        
-#async def start_bot(data: dict) -> None:
-
-    #async def get_prefix(bot, message):
-        #return commands.when_mentioned_or(prefixes[str(message.guild.id)])(bot, message)
-
-
-    #logger = logging.getLogger("discord")
-    #logger.setLevel(logging.INFO)
-
-    #handler = logging.handlers.RotatingFileHandler(
-        #filename="./logs/discord.log",
-        #encoding="utf-8",
-        #maxBytes=32 * 1024 * 1024, # 32 MiB
-        #backupCount=5,
-    #)
-    #dt_fmt = '%Y-%m-%d %H:%M:%S'
-    #formatter = ColoredFormatter(
-        #'[{asctime}] {log_color}[{levelname:<8}]{reset}{purple} {name}{reset}: {blue}{message}{reset}', 
-        #dt_fmt, 
-        #style='{',
-        #log_colors={
-            #'DEBUG': 'cyan',
-            #'INFO': 'green',
-            #'WARNING': 'yellow',
-            #'ERROR': 'red',
-            #'CRITICAL': 'red,bg_white',
-        #}
-    #)
-    #handler.setFormatter(formatter)
-    #logger.addHandler(handler)
-
-    #console = logging.StreamHandler()
-    #console.setLevel(logging.INFO)
-    #console.setFormatter(formatter)
-    #logger.addHandler(console)
-    
-
-    #async with ClientSession() as our_client:
-        
-        #exts = []
-        #for filename in os.listdir("./cogs"):
-            #if filename.endswith(".py"):
-                #exts.append(f"cogs.{filename[:-3]}")
-    
-        #async with CritBot(
-                #i18n=i18n,
-                #prefixes=prefixes,
-                #web_client=our_client,
-                #initial_extensions=exts,
-                #**data,
-                #intents=discord.Intents.all(),
-                #command_prefix=get_prefix,
-                #case_insensitive=True,
-                #strip_after_prefix=True,
-                #tree_cls=Tree
-            #) as bot:
-                #await bot.start(data["discord_token"], reconnect=True)
-    
-#if __name__ == "__main__":
-    #asyncio.run(main())
-#else:
-    #print("\nJust die...")
-    #exit(1)
