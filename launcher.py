@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-print("Starting bot...")
 
 import uvloop
 import discord
@@ -102,7 +101,13 @@ async def start_bot() -> None:
 
 
 class Lavalink:
-    __slots__ = ("lavalink", "path", "default_lavalink", "default_lavalink_ip", "default_lavalink_port", "default_lavalink_path", "ip", "port", "path", "run_lavalink_command")
+    __slots__ = ("lavalink", "path", "ip", "port", "path", "run_lavalink_command")
+
+    default_lavalink_ip = "0.0.0.0"
+    default_lavalink_port = "2333"
+    default_lavalink = default_lavalink_ip + ":" + default_lavalink_port
+    default_lavalink_path = "./config/Lavalink.jar"
+
     def __init__(self, lavalink: str, path: int) -> None:
         self.lavalink = lavalink
         self.path = path
@@ -114,10 +119,6 @@ class Lavalink:
             self.port = lavalink.split(":")[1]
 
 
-        self.default_lavalink_ip = "0.0.0.0"
-        self.default_lavalink_port = "2333"
-        self.default_lavalink = self.default_lavalink_ip + ":" + self.default_lavalink_port
-        self.default_lavalink_path = "./config/Lavalink.jar"
 
         self.run_lavalink_command = lambda p = None: ["java", "-jar", self.default_lavalink_path] if not p else ["java", "-jar", p]
 
@@ -135,25 +136,6 @@ class Lavalink:
         data["lavalink"]["path"] = self.path
         data["lavalink"]["ip"] = self.ip if self.ip else self.default_lavalink_ip
         data["lavalink"]["port"] = int(self.port) if self.port else int(self.default_lavalink_port)
-
-        #if not self.path and self.lavalink != self.default_lavalink:
-            #print(f"Connecting to {Colors.green + self.lavalink + Colors.reset}.")
-            #return
-            
-
-        #if self.lavalink == self.default_lavalink and self.path == self.default_path:
-            #print(f"No Lavalink IP, port and path provided. Running default values {Colors.bold + self.lavalink + '@' + os.path.abspath(self.default_lavalink_path) + Colors.reset}.")
-            #lavalink_proc = subprocess.Popen(self.run_lavalink_command(), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-        
-        #elif self.lavalink != self.default_lavalink and self.path != self.default.path:
-            #lavalink_proc = subprocess.Popen(self.run_lavalink_command(self.path))
-
-        #elif   
-
-            
-
-
-
 
 
 
@@ -174,6 +156,7 @@ def arg_parser() -> argparse.ArgumentParser:
 async def main() -> None:
     args = arg_parser()
 
+    print("Starting bot...")
     print("Starting Lavalink...")
     lavalink = Lavalink(args.lavalink, args.path)
     lavalink.start_lavalink()
@@ -207,7 +190,8 @@ if __name__ == "__main__":
         asyncio.run(main())
     except KeyboardInterrupt:
         print("\nKilling Lavalink...")
-        lavalink_proc.terminate()
+        if lavalink_proc:
+            lavalink_proc.terminate()
 
 
 else:
