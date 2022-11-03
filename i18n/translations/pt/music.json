@@ -28,9 +28,6 @@
     "skip": {
         "command_name": "skip",
         "command_description": "Pula a música",
-        "cmd": {
-            "skipped": "Pulou {track}"
-        },
         "err": {
             "queue_empty": "Nada para pular!"
         }

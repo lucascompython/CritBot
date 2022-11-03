@@ -169,8 +169,9 @@ class Music(commands.Cog):
         if vc.queue.count < 1:
             return await ctx.send(self.t("err", "queue_empty"))
         
-        await ctx.send(self.t("cmd", "skipped", track=vc.queue[0].title))
+        #await ctx.send(self.t("cmd", "skipped", track=vc.queue[0].title))
         await vc.stop()
+        await ctx.message.add_reaction("⏭️")
 
     @commands.Cog.listener()
     async def on_wavelink_track_end(self, player: wavelink.Player, track: wavelink.Track, reason: str):

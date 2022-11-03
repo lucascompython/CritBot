@@ -34,9 +34,6 @@
         "command_name": "skip",
         "command_description": "Skip the current song",
 
-        "cmd": {
-            "skipped": "Skipped {track}"
-        },
         "err": {
             "queue_empty": "Nothing to skip!"
         }
