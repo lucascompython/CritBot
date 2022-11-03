@@ -1,8 +1,6 @@
 import asyncio
-from keyboard import play
 import psutil
 import discord
-from tenacity import retry_never
 import wavelink
 from yt_dlp import YoutubeDL # for extra info TODO add shorts, stories and tiktok 
 from discord.ext import tasks
