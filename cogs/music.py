@@ -116,6 +116,8 @@ class Music(commands.Cog):
         uploader_url = track_info.get("uploader_url")
         upload_date = date[6:8] + "." + date[4:6] + "." + date[0:4]
         if subs: subs = self.human_format(subs)
+        if views: views = self.human_format(views)
+        if likes: likes = self.human_format(likes)
         
         #TODO estimated time until play
 
@@ -160,6 +162,16 @@ class Music(commands.Cog):
             await ctx.send(self.t("cmd", "queued", track=track.title))
     
 
+
+    @commands.hybrid_command(aliases=["s"])
+    async def skip(self, ctx) -> None:
+        vc: wavelink.Player = ctx.voice_client
+        if vc.queue.count < 1:
+            return await ctx.send(self.t("err", "queue_empty"))
+        
+        await ctx.send(self.t("cmd", "skipped", track=vc.queue[0].title))
+        await vc.stop()
+
     @commands.Cog.listener()
     async def on_wavelink_track_end(self, player: wavelink.Player, track: wavelink.Track, reason: str):
         """Play the next song in the queue."""
@@ -167,6 +179,12 @@ class Music(commands.Cog):
             return
         
         track = await player.queue.get_wait()
+        #requester = await player.queue.get().requester
+        #embed = await self.embed_generator(track, requester)
+        #await requester.channel.send(embed=embed)
+        ##send embed 
+
+        
         await player.play(track)
 
 

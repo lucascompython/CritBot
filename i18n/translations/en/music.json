@@ -6,7 +6,7 @@
         "cmd": {
             "connect": "Connecting to {channel}!",
             
-            "queued": "Queued {track}!"
+            "queued": "Queued {track}"
         },
         "embed": {
             "title": "Now Playing from {source}",
@@ -28,5 +28,18 @@
             "title": "Currently playing: `{track}` added by `{user}` `[{current_time}/{total_time}]`"
 
         }
+    },
+
+    "skip": {
+        "command_name": "skip",
+        "command_description": "Skip the current song",
+
+        "cmd": {
+            "skipped": "Skipped {track}"
+        },
+        "err": {
+            "queue_empty": "Nothing to skip!"
+        }
     }
+
 }
