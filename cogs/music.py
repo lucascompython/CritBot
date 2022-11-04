@@ -80,7 +80,8 @@ class Music(commands.Cog):
         self.log(20, f"Node <{node.identifier}> is ready.")
 
 
-    def parse_duration(self, duration: int) -> str:
+    @staticmethod
+    def parse_duration(duration: int) -> str:
         value = str(datetime.timedelta(seconds = duration))
         return value
     
@@ -151,6 +152,7 @@ class Music(commands.Cog):
             vc: wavelink.Player = ctx.voice_client
         
         track = await wavelink.YouTubeTrack.search(query=query, return_first=True)
+        track.info["context"] = ctx
 
         if not vc.is_playing():
             await ctx.send(embed=await self.embed_generator(track, ctx.author))
@@ -167,7 +169,6 @@ class Music(commands.Cog):
         if vc.queue.count < 1:
             return await ctx.send(self.t("err", "queue_empty"))
         
-        #await ctx.send(self.t("cmd", "skipped", track=vc.queue[0].title))
         await vc.stop()
         await ctx.message.add_reaction("⏭️")
 
@@ -178,10 +179,11 @@ class Music(commands.Cog):
             return
         
         track = await player.queue.get_wait()
-        #requester = await player.queue.get().requester
-        #embed = await self.embed_generator(track, requester)
-        #await requester.channel.send(embed=embed)
-        ##send embed 
+
+        ctx = track.info["context"]
+        requester = ctx.author
+        embed = await self.embed_generator(track, requester)
+        await ctx.send(embed=embed)
 
         
         await player.play(track)
