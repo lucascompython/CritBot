@@ -209,10 +209,8 @@ class Music(commands.Cog):
         
         #if the bot is left alone in a channel disconnect
         if not member.bot and after.channel is None:
-            print("DEU 1")
             player: wavelink.Player = before.channel.guild.voice_client
             if not [m for m in before.channel.members if not m.bot]:
-                print("DEU")
                 return await player.disconnect()
         
         
