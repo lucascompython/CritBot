@@ -7,7 +7,7 @@ The only supported languages for now are Portuguese and English.
 
 ## Installation & Execution
 
-This bot was only teted on Linux.  
+This bot was only tested on Linux.  
 Python ^3.10 is required.  
 I would prefer if you don't run an instance of my bot. You can just invite him [here](https://discord.com/api/oauth2/authorize?client_id=832679098740506644&permissions=8&scope=bot).  
 Nevertheless, the installation steps are as follows:
