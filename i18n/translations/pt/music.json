@@ -64,5 +64,15 @@
             "too_high": "O volume não pode ser maior que 100!",
             "too_low": "O volume não pode ser menor que 0!"
         }
+    },
+    "history": {
+        "command_name": "historico",
+        "command_description": "Mostra o histórico",
+        "err": {
+            "no_history": "Não há histórico!"
+        },
+        "embed": {
+            "title": "Histórico"
+        }
     }
 }

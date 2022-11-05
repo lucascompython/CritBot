@@ -1,21 +1,18 @@
-import asyncio
-import psutil
 import discord
 import wavelink
 from yt_dlp import YoutubeDL # for extra info TODO add shorts, stories and tiktok 
-from discord.ext import tasks
 from discord.ext import commands
 
 
 
-import sys
 import asyncio
 import datetime
 import functools
+from typing import Union
 
 
 
-
+Provider = wavelink.YouTubeTrack | wavelink.YouTubePlaylist
 
 class AudioSourceTracked(discord.AudioSource):
     def __init__(self, source):
@@ -159,15 +156,16 @@ class Music(commands.Cog):
             vc: wavelink.Player = await ctx.author.voice.channel.connect(cls=wavelink.Player)
         else:
             vc: wavelink.Player = ctx.voice_client
-        
         track = await wavelink.YouTubeTrack.search(query=query, return_first=True)
         track.info["context"] = ctx
 
         if not vc.is_playing():
             await ctx.send(embed=await self.embed_generator(track, ctx.author))
+            await vc.queue.put_wait(track)
+            track = await vc.queue.get_wait()
             await vc.play(track)
         else:
-            vc.queue.put(track)
+            await vc.queue.put_wait(track)
             await ctx.send(self.t("cmd", "queued", track=track.title, author=track.author))
     
 
@@ -247,6 +245,21 @@ class Music(commands.Cog):
 
         await vc.set_volume(volume)
         await ctx.send(self.t("cmd", "output", volume=volume))
+
+
+    @commands.hybrid_command(aliases=["h"])
+    async def history(self, ctx) -> None:
+        vc: wavelink.Player = ctx.voice_client
+
+        if not vc:
+            return await ctx.send(self.t("not_connected"))
+        
+        if not vc.queue.history:
+            return await ctx.reply(self.t("err", "no_history"))
+
+        embed = discord.Embed(title=self.t("embed", "title", user=ctx.author.name), description="\n".join([f'[{i+1}]({track.uri}) - {track.title} - {track.author}' for i, track in enumerate(vc.queue.history)]))
+        await ctx.send(embed=embed)
+
 
     @commands.Cog.listener()
     async def on_wavelink_track_end(self, player: wavelink.Player, track: wavelink.Track, reason: str):

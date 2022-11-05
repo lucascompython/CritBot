@@ -71,5 +71,15 @@
             "too_high": "The volume can't be higher than 100%!",
             "too_low": "The volume can't be lower than 0%!"
         }
+    },
+    "history": {
+        "command_name": "history",
+        "command_description": "Show the history of the queue",
+        "err": {
+            "no_history": "There is no history!"
+        },
+        "embed": {
+            "title": "History"
+        }
     }
 }
