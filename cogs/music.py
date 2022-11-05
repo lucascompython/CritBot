@@ -225,17 +225,18 @@ class Music(commands.Cog):
     async def volume(self, ctx, volume: str | None) -> None:
         vc: wavelink.Player = ctx.voice_client
 
+        if not vc:
+            return await ctx.send(self.t("not_connected"))
+        
+        if not vc.is_playing():
+            return await ctx.reply(self.t("not_playing"))
+
         if not volume:
             return await ctx.reply(self.t("cmd", "volume", volume=vc.volume))
 
         volume.replace("%", "")
         volume = int(volume)
 
-        if not vc:
-            return await ctx.send(self.t("not_connected"))
-        
-        if not vc.is_playing():
-            return await ctx.reply(self.t("not_playing"))
 
         if volume > 100:
             return await ctx.reply(self.t("err", "too_high"))

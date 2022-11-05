@@ -57,7 +57,8 @@
         "command_name": "volume",
         "command_description": "Muda o volume",
         "cmd": {
-            "output": "Volume alterado para {volume}%!"
+            "output": "Volume alterado para {volume}%!",
+            "volume": "O volume atual é {volume}%!"
         },
         "err": {
             "too_high": "O volume não pode ser maior que 100!",

@@ -64,7 +64,8 @@
         "command_description": "Change the volume",
         
         "cmd": {
-            "output": "Changed the volume to {volume}%!"
+            "output": "Changed the volume to {volume}%!",
+            "volume": "The volume is {volume}%!"
         },
         "err": {
             "too_high": "The volume can't be higher than 100%!",
