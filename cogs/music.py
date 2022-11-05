@@ -94,6 +94,21 @@ class Music(commands.Cog):
             num /= 1000.0
         return '{}{}'.format('{:f}'.format(num).rstrip('0').rstrip('.'), ['', 'K', 'M', 'B', 'T'][magnitude])
 
+
+    async def get_dislikes(self, track_id: str) -> int | None:
+        """Get the dislikes of a video.
+
+        Args:
+            track_id (str): The track id.
+
+        Returns:
+            int: The dislikes.
+        """
+        async with self.bot.web_client.get(f"https://returnyoutubedislikeapi.com/votes?videoId={track_id}") as resp:
+            data = await resp.json()
+            return data["dislikes"]
+
+
     async def embed_generator(self, track: wavelink.YouTubeTrack, author: discord.Member) -> discord.Embed:
         """Helper function that generates a embed that is sent when a music is played.
 
@@ -114,9 +129,11 @@ class Music(commands.Cog):
         subs = track_info.get("channel_follower_count", 0)
         uploader_url = track_info.get("uploader_url")
         upload_date = date[6:8] + "." + date[4:6] + "." + date[0:4]
+        dislikes = await self.get_dislikes(track.identifier)
         if subs: subs = self.human_format(subs)
         if views: views = self.human_format(views)
         if likes: likes = self.human_format(likes)
+        if dislikes: dislikes = self.human_format(dislikes)
         
         #TODO estimated time until play
 
@@ -132,7 +149,7 @@ class Music(commands.Cog):
         embed.add_field(name=self.t("embed", "uploader"), value=f"[{track.author}]({uploader_url})")
         embed.add_field(name="URL", value=self.t("embed", "click", url=track.uri))
         embed.add_field(name=self.t("embed", "views"), value=views)
-        embed.add_field(name=self.t("embed", "likes"), value=likes)
+        embed.add_field(name=self.t("embed", "likes_dislikes"), value=f"{likes} / {dislikes}")
         embed.add_field(name=self.t("embed", "subs"), value=subs)
 
 
@@ -166,6 +183,13 @@ class Music(commands.Cog):
     @commands.hybrid_command(aliases=["s"])
     async def skip(self, ctx) -> None:
         vc: wavelink.Player = ctx.voice_client
+
+        if not vc:
+            return await ctx.send(self.t("err", "not_connected"))
+
+        if not vc.is_playing():
+            return await ctx.send(self.t("err", "not_playing"))
+
         if vc.queue.count < 1:
             return await ctx.send(self.t("err", "queue_empty"))
         
@@ -197,12 +221,14 @@ class Music(commands.Cog):
     @commands.hybrid_command(aliases=["q"])
     async def queue(self, ctx) -> None:
         vc: wavelink.Player = ctx.voice_client
+        if not vc:
+            return await ctx.send(self.t("err", "not_connected"))
         if not vc.is_playing():
-            await ctx.send('self.t("cmd", "empty")')
-            return
+            return await ctx.send(self.t("err", "empty"))
+            
         time = AudioSourceTracked(vc.track).progress
         print(time)
-        embed = discord.Embed(title="queue", description=self.t("embed", "title", track=vc.track.title, user=vc.user, current_time=time, total_time=self.parse_duration(vc.track.duration)))
+        embed = discord.Embed(title="queue", description=self.t("embed", "title", track=vc.track.title, user=vc.info["context"].author, current_time=time, total_time=self.parse_duration(vc.track.duration)))
         for i, track in enumerate(vc.queue._queue):
             embed.add_field(name=f"{i+1}. {track.title}", value=self.parse_duration(track.duration), inline=False)
         await ctx.send(embed=embed)

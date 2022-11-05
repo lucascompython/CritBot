@@ -15,7 +15,7 @@
             "uploader": "Uploader",
             "click": "[Click]({url})",
             "views": "Views",
-            "likes": "Likes",
+            "likes_dislikes": "Likes / Dislikes",
             "footer": "Upload date: {upload_date}",
             "subs": "Subscribers"
         }
@@ -23,7 +23,10 @@
     "queue": {
         "command_name": "queue",
         "command_description": "Show the queue",
-
+        "err": {
+            "empty": "The queue is empty!",
+            "not_connected": "I'm not connected to a voice channel!"
+        },
         "embed": {
             "title": "Currently playing: `{track}` added by `{user}` `[{current_time}/{total_time}]`"
 
@@ -35,7 +38,9 @@
         "command_description": "Skip the current song",
 
         "err": {
-            "queue_empty": "Nothing to skip!"
+            "queue_empty": "Nothing to skip!",
+            "not_playing": "I'm not playing anything!",
+            "not_connected": "I'm not connected to a voice channel!"
         }
     }
 

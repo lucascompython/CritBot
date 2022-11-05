@@ -1,7 +1,7 @@
 {
     "play": {
         "command_name": "play",
-        "command_description": "Toca uma music",
+        "command_description": "Toca uma musica",
         "cmd": {
             "connect": "Entrando em {channel}!",
             "queued": "Enfileirado {track}"
@@ -13,7 +13,7 @@
             "uploader": "Uploader",
             "click": "[Clica]({url})",
             "views": "Visualizações",
-            "likes": "Likes",
+            "likes_dislikes": "Likes / Dislikes",
             "footer": "Data de upload: {upload_date}",
             "subs": "Inscritos"
         }
@@ -21,6 +21,10 @@
     "queue": {
         "command_name": "fila",
         "command_description": "Mostra a fila",
+        "err": {
+            "empty": "A fila está vazia!",
+            "not_connected": "Não estou conectado a um canal de voz!"
+        },
         "embed": {
             "title": "Tocando agora: `{track}` adicionado por `{user}` `[{current_time}/{total_time}]`"
         }
@@ -29,7 +33,9 @@
         "command_name": "skip",
         "command_description": "Pula a música",
         "err": {
-            "queue_empty": "Nada para pular!"
+            "queue_empty": "Nada para pular!",
+            "not_playing": "Não estou a tocar nada!",
+            "not_connected": "Não estou conectado a um canal de voz!"
         }
     }
 }
