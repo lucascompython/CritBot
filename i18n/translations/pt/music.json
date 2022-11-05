@@ -34,7 +34,6 @@
         "command_name": "skip",
         "command_description": "Pula a música",
         "err": {
-            "queue_empty": "Nada para pular!",
             "not_playing": "Não estou a tocar nada!",
             "not_connected": "Não estou conectado a um canal de voz!"
         }

@@ -177,10 +177,8 @@ class Music(commands.Cog):
             return await ctx.send(self.t("err", "not_connected"))
 
         if not vc.is_playing():
-            return await ctx.send(self.t("err", "not_playing"))
+            return await ctx.reply(self.t("err", "not_playing"))
 
-        if vc.queue.count < 1:
-            return await ctx.send(self.t("err", "queue_empty"))
         
         await vc.stop()
         await ctx.message.add_reaction("⏭️")

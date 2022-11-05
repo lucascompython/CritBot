@@ -39,7 +39,6 @@
         "command_description": "Skip the current song",
 
         "err": {
-            "queue_empty": "Nothing to skip!",
             "not_playing": "I'm not playing anything!",
             "not_connected": "I'm not connected to a voice channel!"
         }
