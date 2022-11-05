@@ -118,7 +118,8 @@ class I18n:
         return self.get_keys_string(lang, cog)[group_description]["group_description"]
 
 
-    def get_locale_lang(self, locale: str) -> str | Locale:
+    @staticmethod
+    def get_locale_lang(locale: str) -> str | Locale:
         """Helper function to get the proper Locale from a string E.g. "pt" -> Locale.brazil_portuguese
 
         Args:
