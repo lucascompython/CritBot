@@ -1,10 +1,12 @@
 {
+    "not_playing": "Não estou a tocar nada!",
+    "not_connected": "Não estou num canal de voz!",
     "play": {
         "command_name": "play",
         "command_description": "Toca uma musica",
         "cmd": {
             "connect": "Entrando em {channel}!",
-            "queued": "Enfileirado **{track}**"
+            "queued": "Enfileirado **{track}** por **{author}**"
         },
         "err": {
             "not_in_voice": "Não estás num canal de voz!"
@@ -35,10 +37,31 @@
     },
     "skip": {
         "command_name": "skip",
-        "command_description": "Pula a música",
+        "command_description": "Pula a música"
+    },
+    "pause": {
+        "command_name": "pausa",
+        "command_description": "Pausa a música",
         "err": {
-            "not_playing": "Não estou a tocar nada!",
-            "not_connected": "Não estou conectado a um canal de voz!"
+            "already_paused": "A música já está pausada!"
+        }
+    },
+    "resume": {
+        "command_name": "resume",
+        "command_description": "Retoma a música",
+        "err": {
+            "not_paused": "A música não está pausada!"
+        }
+    },
+    "volume": {
+        "command_name": "volume",
+        "command_description": "Muda o volume",
+        "cmd": {
+            "output": "Volume alterado para {volume}%!"
+        },
+        "err": {
+            "too_high": "O volume não pode ser maior que 100!",
+            "too_low": "O volume não pode ser menor que 0!"
         }
     }
 }

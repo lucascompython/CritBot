@@ -69,9 +69,10 @@ class I18n:
             self.guild_id = ctx.guild.id
             self.cog_name = ctx.command.cog_name
             self.command_name = ctx.command.name
+        if len(args) == 0:
+            self.command_name = mode
         return self.get_key_string(
             self.get_lang(self.guild_id),
-            self.cog_name,
             mode,
             mcommand_name, # if needed to use another command's text Manually change the command name
             mcog_name, # if needed to use another cog's text Manually change the cog name
@@ -87,16 +88,31 @@ class I18n:
                     self.translations[dir_name + "." + file_name[:-5]] = orjson.loads(await f.read())
 
 
-    def get_key_string(self, lang: str, cog: str, mode: str, mcommand_name: Optional[str] = None, mcog_name: Optional[str] = None, *args) -> str:
+    def get_key_string(self, lang: str, mode: str, mcommand_name: Optional[str] = None, mcog_name: Optional[str] = None, *args) -> str:
         command_name = mcommand_name or self.command_name
         cog_name = mcog_name or self.cog_name
+        keys = self.get_keys_string(lang, cog_name)
         try:
-            translated_string = self.get_keys_string(lang, cog_name)[command_name][mode]
+            translated_string = keys[command_name][mode]
             return translated_string["-".join(args)] if args else translated_string
-        except KeyError:
-            # if not implemented in the language, return the default language version
-            translated_string = self.get_keys_string(self.default_lang, cog)[self.command_name][mode]
-            return translated_string["-".join(args)] if args else translated_string
+        except (KeyError, TypeError) as e:
+            if e == TypeError:
+                pass
+            try:
+                #if MODE and COMMAND not found try to get a "global" (inside file) translation
+                translated_string = keys[command_name]
+                return translated_string["-".join(args)] if args else translated_string
+            except KeyError:
+                keys = self.get_keys_string(self.default_lang, cog_name)
+                try:
+                    # if not implemented in the language, return the default language version
+                    translated_string = keys[self.command_name][mode]
+                    return translated_string["-".join(args)] if args else translated_string
+                except (KeyError, TypeError) as e:
+                    if e == TypeError:
+                        pass
+                    translated_string = keys[command_name]
+                    return translated_string["-" + "-".join(args)] if args else translated_string
 
     def get_keys_string(self, lang: str, cog: str) -> dict:
         return self.translations[lang + "." + cog]

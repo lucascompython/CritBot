@@ -168,7 +168,7 @@ class Music(commands.Cog):
             await vc.play(track)
         else:
             vc.queue.put(track)
-            await ctx.send(self.t("cmd", "queued", track=track.title))
+            await ctx.send(self.t("cmd", "queued", track=track.title, author=track.author))
     
 
 
@@ -177,14 +177,75 @@ class Music(commands.Cog):
         vc: wavelink.Player = ctx.voice_client
 
         if not vc:
-            return await ctx.send(self.t("err", "not_connected"))
+            return await ctx.send(self.t("not_connected"))
 
         if not vc.is_playing():
-            return await ctx.reply(self.t("err", "not_playing"))
+            return await ctx.reply(self.t("not_playing"))
 
         
         await vc.stop()
         await ctx.message.add_reaction("⏭️")
+
+
+    @commands.hybrid_command(aliases=["pausa"])
+    async def pause(self, ctx) -> None:
+        vc: wavelink.Player = ctx.voice_client
+
+        if not vc:
+            return await ctx.send(self.t("not_connected"))
+        
+        if not vc.is_playing():
+            return await ctx.reply(self.t("not_playing"))
+
+        if vc.is_paused():
+            return await ctx.reply(self.t("err", "already_paused"))
+
+        await vc.pause()
+        await ctx.message.add_reaction("⏸️")
+
+
+    @commands.hybrid_command(aliases=["resuma"])
+    async def resume(self, ctx) -> None:
+        vc: wavelink.Player = ctx.voice_client
+
+        if not vc:
+            return await ctx.send(self.t("not_connected"))
+        
+        if not vc.is_playing():
+            return await ctx.reply(self.t("not_playing"))
+        
+        if not vc.is_paused():
+            return await ctx.reply(self.t("err", "not_paused"))
+
+        await vc.resume()
+        await ctx.message.add_reaction("▶️")
+
+
+    @commands.hybrid_command(aliases=["vol"])
+    async def volume(self, ctx, volume: str | None) -> None:
+        vc: wavelink.Player = ctx.voice_client
+
+        if not volume:
+            return await ctx.reply(self.t("cmd", "volume", volume=vc.volume))
+
+        volume.replace("%", "")
+        volume = int(volume)
+
+        if not vc:
+            return await ctx.send(self.t("not_connected"))
+        
+        if not vc.is_playing():
+            return await ctx.reply(self.t("not_playing"))
+
+        if volume > 100:
+            return await ctx.reply(self.t("err", "too_high"))
+        
+        if volume < 0:
+            return await ctx.reply(self.t("err", "too_low"))
+
+
+        await vc.set_volume(volume)
+        await ctx.send(self.t("cmd", "output", volume=volume))
 
     @commands.Cog.listener()
     async def on_wavelink_track_end(self, player: wavelink.Player, track: wavelink.Track, reason: str):
@@ -205,8 +266,6 @@ class Music(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
-        print(after.channel)
-        
         #if the bot is left alone in a channel disconnect
         if not member.bot and after.channel is None:
             player: wavelink.Player = before.channel.guild.voice_client

@@ -1,4 +1,7 @@
 {
+    "not_playing": "I'm not playing anything!",
+    "not_connected": "I'm not connected to a voice channel!",
+
     "play": {
         "command_name": "play",
         "command_description": "Play a song",
@@ -6,7 +9,7 @@
         "cmd": {
             "connect": "Connecting to {channel}!",
             
-            "queued": "Queued **{track}**"
+            "queued": "Queued **{track}** by **{author}**"
         },
         "err": {
             "not_in_voice": "You are not in a voice channel!"
@@ -27,8 +30,7 @@
         "command_name": "queue",
         "command_description": "Show the queue",
         "err": {
-            "empty": "The queue is empty!",
-            "not_connected": "I'm not connected to a voice channel!"
+            "empty": "The queue is empty!"
         },
         "embed": {
             "title": "Queue",
@@ -39,12 +41,34 @@
 
     "skip": {
         "command_name": "skip",
-        "command_description": "Skip the current song",
-
+        "command_description": "Skip the current song"
+    },
+    "pause": {
+        "command_name": "pause",
+        "command_description": "Pause the current song",
+        
         "err": {
-            "not_playing": "I'm not playing anything!",
-            "not_connected": "I'm not connected to a voice channel!"
+            "already_paused": "The song is already paused!"
+        }
+    },
+    "resume": {
+        "command_name": "resume",
+        "command_description": "Resume the current song",
+        
+        "err": {
+            "not_paused": "The song is not paused!"
+        }
+    },
+    "volume": {
+        "command_name": "volume",
+        "command_description": "Change the volume",
+        
+        "cmd": {
+            "output": "Changed the volume to {volume}%!"
+        },
+        "err": {
+            "too_high": "The volume can't be higher than 100%!",
+            "too_low": "The volume can't be lower than 0%!"
         }
     }
-
 }

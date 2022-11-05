@@ -108,7 +108,7 @@ class Lavalink:
     default_lavalink = default_lavalink_ip + ":" + default_lavalink_port
     default_lavalink_path = "./config/Lavalink.jar"
 
-    def __init__(self, lavalink: str, path: int) -> None:
+    def __init__(self, lavalink: str | None, path: int | None) -> None:
         self.lavalink = lavalink
         self.path = path
 
@@ -131,6 +131,8 @@ class Lavalink:
         if (data_path := data["lavalink"]["path"]) or self.path or not self.lavalink:
             if data_path and not self.lavalink:
                 self.path = data_path
+            if self.lavalink:
+                return
             lavalink_proc = subprocess.Popen(self.run_lavalink_command(self.path), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         
         data["lavalink"]["path"] = self.path
@@ -153,7 +155,10 @@ async def main() -> None:
     args = arg_parser()
 
     print("Starting bot...")
-    print("Starting Lavalink...")
+    if args.lavalink:
+        print(f"Connecting to Lavalink at {args.lavalink}")
+    else:
+        print("Starting Lavalink...")
     lavalink = Lavalink(args.lavalink, args.path)
     lavalink.start_lavalink()
     await start_bot()
