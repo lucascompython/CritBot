@@ -28,7 +28,8 @@
             "not_connected": "I'm not connected to a voice channel!"
         },
         "embed": {
-            "title": "Currently playing: `{track}` added by `{user}` `[{current_time}/{total_time}]`"
+            "title": "Queue",
+            "description": "Currently playing: `{track}` added by `{user}` `[{current_time}/{total_time}]`"
 
         }
     },

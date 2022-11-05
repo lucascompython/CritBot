@@ -26,7 +26,8 @@
             "not_connected": "Não estou conectado a um canal de voz!"
         },
         "embed": {
-            "title": "Tocando agora: `{track}` adicionado por `{user}` `[{current_time}/{total_time}]`"
+            "title": "Fila",
+            "description": "Tocando agora: `{track}` adicionado por `{user}` `[{current_time}/{total_time}]`"
         }
     },
     "skip": {

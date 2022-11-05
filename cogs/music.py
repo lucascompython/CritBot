@@ -228,7 +228,7 @@ class Music(commands.Cog):
             
         time = AudioSourceTracked(vc.track).progress
         print(time)
-        embed = discord.Embed(title="queue", description=self.t("embed", "title", track=vc.track.title, user=vc.info["context"].author, current_time=time, total_time=self.parse_duration(vc.track.duration)))
+        embed = discord.Embed(title=self.t("embed", "title"), description=self.t("embed", "description", track=vc.track.title, user=vc.track.info["context"].author, current_time=time, total_time=self.parse_duration(vc.track.duration)))
         for i, track in enumerate(vc.queue._queue):
             embed.add_field(name=f"{i+1}. {track.title}", value=self.parse_duration(track.duration), inline=False)
         await ctx.send(embed=embed)
