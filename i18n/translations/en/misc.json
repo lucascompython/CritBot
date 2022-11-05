@@ -47,6 +47,25 @@
     "userinfo": {
         "command_name": "userinfo",
         "command_description": "Show information about a given user."
+    },
+
+    "bot_info": {
+        "command_name": "botinfo",
+        "command_description": "Show information about the bot.",
+        "embed": {
+            "title": "Bot's Information",
+            "description": "ola",
+            "guilds": "Servers",
+            "users": "Total Users",
+            "latency": "Ping",
+            "commands": "Nº of Commands",
+            "repository": "Repository",
+            "repository_link": "[Here]({repository_link})",
+            "invite": "Invite",
+            "invite_link": "[Here]({invite_link})",
+            "developer": "Developer",
+            "uptime": "Uptime"
+        }
     }
 
 

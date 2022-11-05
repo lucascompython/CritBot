@@ -5,8 +5,10 @@ from aiohttp import ClientSession
 from aiofiles import open as async_open
 
 
+import time
 import json
 import logging
+import datetime
 import logging.handlers
 
 
@@ -25,6 +27,7 @@ class CritBot(commands.Bot):
         default_prefix: str,
         default_language: str,
         testing_guild_id: int,
+        owner_id: int,
         lavalink: dict[str, str | int],
         **kwargs,
     ):
@@ -39,6 +42,8 @@ class CritBot(commands.Bot):
         self.invite_link = invite_link
         self.source_link = source_link
         self.lavalink = lavalink
+        self.owner_id = owner_id
+        self.__start_time = time.time()
         
         # i18n
         self.default_language = default_language
@@ -142,4 +147,10 @@ class CritBot(commands.Bot):
         self.i18n.command_name = ctx.command.qualified_name.replace(" ", "_")
         return True
             
+
+    @property
+    def uptime(self) -> str:
+        """Returns the bot's uptime"""
+        return str(datetime.timedelta(seconds=int(round(time.time() - self.__start_time))))
+    
         

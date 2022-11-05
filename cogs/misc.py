@@ -6,6 +6,7 @@ from discord.app_commands import locale_str as _T
 
 
 from typing import Optional
+from datetime import datetime
 
 
 class Misc(commands.Cog):
@@ -78,6 +79,26 @@ class Misc(commands.Cog):
         await ctx.send(self.t("cmd", "output", source_link=self.bot.source_link))
 
 
+    @commands.hybrid_command(name="bot_info")
+    async def _bot_info(self, ctx):
+        embed = discord.Embed(
+            title=self.t("embed", "title"),
+            color=discord.Color.blurple()
+        )
+        embed.set_author(name=self.bot.user, icon_url=self.bot.user.avatar.url)
+        embed.set_footer(text="ID: " + str(self.bot.user.id))
+
+        embed.add_field(name=self.t("embed", "guilds"), value=len(self.bot.guilds))
+        embed.add_field(name=self.t("embed", "users"), value=len(self.bot.users))
+        embed.add_field(name=self.t("embed", "latency"), value=str(round(self.bot.latency * 1000, 3)) + "ms")
+        embed.add_field(name=self.t("embed", "commands"), value=len(self.bot.commands))
+        embed.add_field(name=self.t("embed", "repository"), value=self.t("embed", "repository_link", repository_link=self.bot.source_link))
+        embed.add_field(name=self.t("embed", "invite"), value=self.t("embed", "invite_link", invite_link=self.bot.invite_link))
+        embed.add_field(name=self.t("embed", "developer"), value=self.bot.get_user(self.bot.owner_id))
+        embed.add_field(name=self.t("embed", "uptime"), value=self.bot.uptime)
+        embed.timestamp = datetime.now()
+
+        await ctx.send(embed=embed)
 
 
 
