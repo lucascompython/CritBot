@@ -6,7 +6,7 @@
         "cmd": {
             "connect": "Connecting to {channel}!",
             
-            "queued": "Queued {track}"
+            "queued": "Queued **{track}**"
         },
         "embed": {
             "title": "Now Playing from {source}",

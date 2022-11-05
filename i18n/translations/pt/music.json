@@ -4,7 +4,7 @@
         "command_description": "Toca uma musica",
         "cmd": {
             "connect": "Entrando em {channel}!",
-            "queued": "Enfileirado {track}"
+            "queued": "Enfileirado **{track}**"
         },
         "embed": {
             "title": "A tocar do {source}",
