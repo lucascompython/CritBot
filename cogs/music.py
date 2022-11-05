@@ -50,21 +50,10 @@ class Music(commands.Cog):
         self.ytdl = YoutubeDL(self.ytdl_options)
         
 
-    def check_lavalink(self) -> bool:
-        """Check if Lavalink is running."""
-        for p in psutil.process_iter():
-            if p.name() == "java":
-                if any("Lavalink" in string for string in p.cmdline()):
-                    return True
-        
-        return False
     
     async def connect_nodes(self):
         """Connect to Lavalink nodes."""
         await self.bot.wait_until_ready()
-        if not self.check_lavalink():
-            sys.stderr.write("Lavalink is not running! Please start it before starting the bot.\n")
-            exit(1)
 
         self.node = await wavelink.NodePool.create_node(
             bot=self.bot,
