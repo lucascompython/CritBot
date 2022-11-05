@@ -151,6 +151,9 @@ class Music(commands.Cog):
     @commands.hybrid_command(aliases=["p"])
     async def play(self, ctx, *, query: str) -> None:
 
+
+        if not ctx.author.voice:
+            return await ctx.reply(self.t("err", "not_in_voice"))
         if not ctx.voice_client:
             await ctx.send(self.t("cmd", "connect", channel=ctx.author.voice.channel.mention))
             vc: wavelink.Player = await ctx.author.voice.channel.connect(cls=wavelink.Player)
@@ -200,6 +203,35 @@ class Music(commands.Cog):
         await player.play(track)
 
 
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
+        print(after.channel)
+        
+        #if the bot is left alone in a channel disconnect
+        if not member.bot and after.channel is None:
+            print("DEU 1")
+            player: wavelink.Player = before.channel.guild.voice_client
+            if not [m for m in before.channel.members if not m.bot]:
+                print("DEU")
+                return await player.disconnect()
+        
+        
+
+        #if there are people on the channel but the bot is not playing wait 3 min and then disconnect
+        elif member.id != self.bot.user.id:
+            return
+        elif before.channel is None:
+            voice: wavelink.Player = after.channel.guild.voice_client
+            time = 0
+            while True:
+                await asyncio.sleep(1)
+                time += 1
+                if voice.is_playing() and not voice.is_paused():
+                    time = 0
+                if time == 180:
+                    await voice.disconnect()
+                if not voice.is_connected():
+                    break
 
 
 

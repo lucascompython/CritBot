@@ -8,6 +8,9 @@
             
             "queued": "Queued **{track}**"
         },
+        "err": {
+            "not_in_voice": "You are not in a voice channel!"
+        },
         "embed": {
             "title": "Now Playing from {source}",
             "author": "Requested by {user}",

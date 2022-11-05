@@ -6,6 +6,9 @@
             "connect": "Entrando em {channel}!",
             "queued": "Enfileirado **{track}**"
         },
+        "err": {
+            "not_in_voice": "Não estás num canal de voz!"
+        },
         "embed": {
             "title": "A tocar do {source}",
             "author": "Requisitado por {user}",
