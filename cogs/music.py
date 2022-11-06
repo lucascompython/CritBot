@@ -149,13 +149,13 @@ class Music(commands.Cog):
     async def play(self, ctx: commands.Context, *, query: str) -> None:
 
         vc: wavelink.Player = await self._join(ctx, _play="comesfromplaycommand")
-        if len(query.split("=")) > 1:
-            tracks = await self.node.get_tracks(wavelink.YouTubePlaylist, query="https://www.youtube.com/playlist?list=PLA4eNNilv6y0SgJzr2xKorWcxdoYGJ2_6")
-            track = tracks[0]
-        else:
-            track = await wavelink.YouTubeTrack.search(query=query, return_first=True)
-            track.info["context"] = ctx
-            track.info["start_time"] = time.time()
+        #if len(query.split("=")) > 1:
+            #tracks = await self.node.get_tracks(wavelink.YouTubePlaylist, query="https://www.youtube.com/playlist?list=PLA4eNNilv6y0SgJzr2xKorWcxdoYGJ2_6")
+            #track = tracks[0]
+        #else:
+        track = await wavelink.YouTubeTrack.search(query=query, return_first=True)
+        track.info["context"] = ctx
+        track.info["start_time"] = time.time()
 
         if not vc.is_playing():
             await ctx.send(embed=await self.embed_generator(track, ctx.author))
@@ -353,7 +353,25 @@ class Music(commands.Cog):
         return round(time.time() - track.info["start_time"])
 
 
+    #TODO Mess with this
+    #@commands.hybrid_command()
+    #async def filter(self, ctx, filter: str) -> None:
+        #vc: wavelink.Player = ctx.voice_client
+        #if filter in ["clear", "off", "reset"]:
+            #await vc.set_filter(wavelink.Filter())
+        ##if not vc:
+            ##return await ctx.send(self.t("err", "not_connected"))
+        ##if not vc.is_playing():
+            ##return await ctx.send(self.t("err", "empty"))
+        #await vc.set_filter(wavelink.Filter(equalizer=wavelink.Equalizer.boost), seek=True)
+        ##await ctx.send(self.t("cmd", "filter", filter=filter.name))
 
+
+    #TODO make this wiht buttons
+    @commands.hybrid_command()
+    async def seek(self, ctx, time: int) -> None:
+        vc: wavelink.Player = ctx.voice_client
+        await vc.seek(time)
 
 
 

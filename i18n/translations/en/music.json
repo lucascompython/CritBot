@@ -92,5 +92,13 @@
     "leave": {
         "command_name": "leave",
         "command_description": "Leave a voice channel"
+    },
+    "filter": {
+        "command_name": "filter",
+        "command_description": "Set a filter effect to the current song"
+    },
+    "seek": {
+        "command_name": "seek",
+        "command_description": "Seek to a specific time in the current song"
     }
 }

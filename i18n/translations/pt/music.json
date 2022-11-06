@@ -85,5 +85,13 @@
     "leave": {
         "command_name": "sai",
         "command_description": "Sai do canal de voz"
+    },
+    "filter": {
+        "command_name": "filtro",
+        "command_description": "Mete um filtro na música"
+    },
+    "seek": {
+        "command_name": "seek",
+        "command_description": "Vai para um tempo especifico na música"
     }
 }
