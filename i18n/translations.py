@@ -112,7 +112,7 @@ class I18n:
                     if e == TypeError:
                         pass
                     translated_string = keys[command_name]
-                    return translated_string["-" + "-".join(args)] if args else translated_string
+                    return translated_string["-".join(args)] if args else translated_string
 
     def get_keys_string(self, lang: str, cog: str) -> dict:
         return self.translations[lang + "." + cog]

@@ -148,19 +148,10 @@ class Music(commands.Cog):
     @commands.hybrid_command(aliases=["p"])
     async def play(self, ctx, *, query: str) -> None:
 
-
-        if not ctx.author.voice:
-            return await ctx.reply(self.t("err", "not_in_voice"))
-        if not ctx.voice_client:
-            await ctx.send(self.t("cmd", "connect", channel=ctx.author.voice.channel.mention))
-            vc: wavelink.Player = await ctx.author.voice.channel.connect(cls=wavelink.Player)
-        else:
-            vc: wavelink.Player = ctx.voice_client
+        vc: wavelink.Player = await self._join(ctx, _play="comesfromplaycommand")
         if len(query.split("=")) > 1:
             tracks = await self.node.get_tracks(wavelink.YouTubePlaylist, query="https://www.youtube.com/playlist?list=PLA4eNNilv6y0SgJzr2xKorWcxdoYGJ2_6")
             track = tracks[0]
-            #for i in tracks:
-                #await vc.queue.put_wait(i)
         else:
             track = await wavelink.YouTubeTrack.search(query=query, return_first=True)
             track.info["context"] = ctx
@@ -313,6 +304,31 @@ class Music(commands.Cog):
                     break
 
 
+    @commands.hybrid_command(aliases=["sai"])
+    async def leave(self, ctx) -> None:
+        vc: wavelink.Player = ctx.voice_client
+
+        if not vc:
+            return await ctx.send(self.t("not_connected"))
+
+        await vc.disconnect()
+        await ctx.message.add_reaction("👋")
+    
+    @commands.hybrid_command(name="join", aliases=["entra"])
+    async def _join(self, ctx, *, channel: discord.VoiceChannel = None, _play: str = None) -> wavelink.Player:
+        if not ctx.author.voice:
+            return await ctx.reply(self.t("err", "not_in_voice"))
+        if not ctx.voice_client and not channel:
+            channel = ctx.author.voice.channel
+            await ctx.send(self.t("cmd", "connect", channel=ctx.author.voice.channel.mention))
+            return await channel.connect(cls=wavelink.Player)
+            
+        else:
+            vc: wavelink.Player = ctx.voice_client
+            if not _play == "comesfromplaycommand":
+                await ctx.send(self.t("err", "already_connected"))
+            return vc
+
 
 
 
@@ -331,12 +347,11 @@ class Music(commands.Cog):
             embed.add_field(name=f"{i+1}. {track.title}", value=self.parse_duration(track.duration), inline=False)
         await ctx.send(embed=embed)
 
-
-
-
     @staticmethod
     def track_progress(track: wavelink.Track) -> int:
         return round(time.time() - track.info["start_time"])
+
+
         
 
 

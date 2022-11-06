@@ -5,11 +5,7 @@
         "command_name": "play",
         "command_description": "Toca uma musica",
         "cmd": {
-            "connect": "Entrando em {channel}!",
             "queued": "Enfileirado **{track}** por **{author}**"
-        },
-        "err": {
-            "not_in_voice": "Não estás num canal de voz!"
         },
         "embed": {
             "title": "A tocar do {source}",
@@ -74,5 +70,20 @@
         "embed": {
             "title": "Histórico"
         }
+    },
+    "join": {
+        "command_name": "entra",
+        "command_description": "Entra num canal de voz",
+        "cmd": {
+            "connect": "Entrando em {channel}!"
+        },
+        "err": {
+            "not_in_voice": "Não estás num canal de voz!",
+            "already_connected": "Já estou num canal de voz!"
+        }
+    },
+    "leave": {
+        "command_name": "sai",
+        "command_description": "Sai do canal de voz"
     }
 }

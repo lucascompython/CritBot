@@ -7,12 +7,8 @@
         "command_description": "Play a song",
 
         "cmd": {
-            "connect": "Connecting to {channel}!",
             
             "queued": "Queued **{track}** by **{author}**"
-        },
-        "err": {
-            "not_in_voice": "You are not in a voice channel!"
         },
         "embed": {
             "title": "Now Playing from {source}",
@@ -81,5 +77,20 @@
         "embed": {
             "title": "History"
         }
+    },
+    "join": {
+        "command_name": "join",
+        "command_description": "Join a voice channel",
+        "cmd": {
+            "connect": "Connecting to {channel}!"
+        },
+        "err": {
+            "not_in_voice": "You are not in a voice channel!",
+            "already_connected": "I'm already connected to a voice channel!"
+        }
+    },
+    "leave": {
+        "command_name": "leave",
+        "command_description": "Leave a voice channel"
     }
 }
