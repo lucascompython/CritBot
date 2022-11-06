@@ -33,7 +33,7 @@
             "empty": "The queue is empty!"
         },
         "embed": {
-            "title": "Queue",
+            "title": "|  Queue",
             "description": "Currently playing: `{track}` added by `{user}` `[{current_time}/{total_time}]`"
 
         }

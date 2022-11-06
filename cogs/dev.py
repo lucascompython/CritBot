@@ -236,6 +236,7 @@ class Dev(commands.Cog):
     @commands.is_owner()
     @commands.hybrid_command(alises=["reboot", "reiniciar"])
     async def restart(self, ctx):
+        # TODO FIX THIS
         await ctx.send(self.t("cmd", "output"))
         os.execv(sys.executable, ['python3'] + sys.argv)
 

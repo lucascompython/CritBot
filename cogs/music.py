@@ -4,7 +4,7 @@ from yt_dlp import YoutubeDL # for extra info TODO add shorts, stories and tikto
 from discord.ext import commands
 
 
-
+import time
 import asyncio
 import datetime
 import functools
@@ -156,8 +156,15 @@ class Music(commands.Cog):
             vc: wavelink.Player = await ctx.author.voice.channel.connect(cls=wavelink.Player)
         else:
             vc: wavelink.Player = ctx.voice_client
-        track = await wavelink.YouTubeTrack.search(query=query, return_first=True)
-        track.info["context"] = ctx
+        if len(query.split("=")) > 1:
+            tracks = await self.node.get_tracks(wavelink.YouTubePlaylist, query="https://www.youtube.com/playlist?list=PLA4eNNilv6y0SgJzr2xKorWcxdoYGJ2_6")
+            track = tracks[0]
+            #for i in tracks:
+                #await vc.queue.put_wait(i)
+        else:
+            track = await wavelink.YouTubeTrack.search(query=query, return_first=True)
+            track.info["context"] = ctx
+            track.info["start_time"] = time.time()
 
         if not vc.is_playing():
             await ctx.send(embed=await self.embed_generator(track, ctx.author))
@@ -297,6 +304,7 @@ class Music(commands.Cog):
             while True:
                 await asyncio.sleep(1)
                 time += 1
+                #TODO when paused it leaves 
                 if voice.is_playing() and not voice.is_paused():
                     time = 0
                 if time == 180:
@@ -316,9 +324,9 @@ class Music(commands.Cog):
         if not vc.is_playing():
             return await ctx.send(self.t("err", "empty"))
             
-        time = AudioSourceTracked(vc.track).progress
-        print(time)
-        embed = discord.Embed(title=self.t("embed", "title"), description=self.t("embed", "description", track=vc.track.title, user=vc.track.info["context"].author, current_time=time, total_time=self.parse_duration(vc.track.duration)))
+        progress = self.track_progress(vc.track)
+        embed = discord.Embed(description=self.t("embed", "description", track=vc.track.title, user=vc.track.info["context"].author, current_time=self.parse_duration(progress), total_time=self.parse_duration(vc.track.duration)))
+        embed.set_author(icon_url=ctx.author.avatar.url, name=self.t("embed", "title"))
         for i, track in enumerate(vc.queue._queue):
             embed.add_field(name=f"{i+1}. {track.title}", value=self.parse_duration(track.duration), inline=False)
         await ctx.send(embed=embed)
@@ -326,6 +334,10 @@ class Music(commands.Cog):
 
 
 
+    @staticmethod
+    def track_progress(track: wavelink.Track) -> int:
+        return round(time.time() - track.info["start_time"])
+        
 
 
 
