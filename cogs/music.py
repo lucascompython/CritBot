@@ -146,7 +146,7 @@ class Music(commands.Cog):
 
 
     @commands.hybrid_command(aliases=["p"])
-    async def play(self, ctx, *, query: str) -> None:
+    async def play(self, ctx: commands.Context, *, query: str) -> None:
 
         vc: wavelink.Player = await self._join(ctx, _play="comesfromplaycommand")
         if len(query.split("=")) > 1:
@@ -317,17 +317,18 @@ class Music(commands.Cog):
     @commands.hybrid_command(name="join", aliases=["entra"])
     async def _join(self, ctx, *, channel: discord.VoiceChannel = None, _play: str = None) -> wavelink.Player:
         if not ctx.author.voice:
-            return await ctx.reply(self.t("err", "not_in_voice"))
+            return await ctx.reply(self.t("err", "not_in_voice", mcommnand_name="join"))
         if not ctx.voice_client and not channel:
             channel = ctx.author.voice.channel
-            await ctx.send(self.t("cmd", "connect", channel=ctx.author.voice.channel.mention))
+            await ctx.send(self.t("cmd", "connect", channel=ctx.author.voice.channel.mention, mcommand_name="join"))
             return await channel.connect(cls=wavelink.Player)
             
         else:
             vc: wavelink.Player = ctx.voice_client
             if not _play == "comesfromplaycommand":
-                await ctx.send(self.t("err", "already_connected"))
+                await ctx.send(self.t("err", "already_connected", mcommand_name="join"))
             return vc
+        
 
 
 
@@ -351,8 +352,6 @@ class Music(commands.Cog):
     def track_progress(track: wavelink.Track) -> int:
         return round(time.time() - track.info["start_time"])
 
-
-        
 
 
 

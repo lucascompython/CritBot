@@ -110,7 +110,7 @@ class Dev(commands.Cog):
         await ctx.send(msg)
 
         if sync in ["sync", "sincronizar"]:
-            await ctx.invoke(self.bot.get_command("sync"), guild=None)
+            await ctx.invoke(self.sync, guild=None)
 
     @reload.command(name="translations", aliases=["traduções", "traducoes", "trans"])
     async def reload_trans(self, ctx):
@@ -141,7 +141,7 @@ class Dev(commands.Cog):
         await ctx.send(msg_queue)
 
         if sync in ["sync", "sincronizar"]:
-            await ctx.invoke(self.bot.get_command("sync"), guild=None)
+            await ctx.invoke(self.sync, guild=None)
 
 
 
@@ -174,9 +174,9 @@ class Dev(commands.Cog):
                     self.bot.tree.copy_global_to(guild=guild_obj)
                 await self.bot.tree.sync(guild=guild_obj)
             except app_commands.CommandSyncFailure:
-                await ctx.send(self.t("err", "command_sync_failure"))
+                await ctx.send(self.t("err", "command_sync_failure", mcommand_name="sync"))
 
-        await ctx.send(self.t("cmd", "output", guild=ctx.guild))
+        await ctx.send(self.t("cmd", "output", guild=ctx.guild, mcommand_name="sync"))
 
     @commands.is_owner()
     @sync.command(name=_T("global"))

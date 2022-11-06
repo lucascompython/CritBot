@@ -67,9 +67,9 @@ class I18n:
         """
         if ctx:
             self.guild_id = ctx.guild.id
-            self.cog_name = ctx.command.cog_name
-            self.command_name = ctx.command.name
-        if len(args) == 0:
+            self.cog_name = ctx.cog.__class__.__name__.lower()
+            self.command_name = ctx.command.qualified_name.replace(" ", "_")
+        if len(args) == 0: # for "global" translations (inside a given file)
             self.command_name = mode
         return self.get_key_string(
             self.get_lang(self.guild_id),
@@ -90,13 +90,14 @@ class I18n:
 
     def get_key_string(self, lang: str, mode: str, mcommand_name: Optional[str] = None, mcog_name: Optional[str] = None, *args) -> str:
         command_name = mcommand_name or self.command_name
+        command_name
         cog_name = mcog_name or self.cog_name
         keys = self.get_keys_string(lang, cog_name)
         try:
             translated_string = keys[command_name][mode]
             return translated_string["-".join(args)] if args else translated_string
         except (KeyError, TypeError) as e:
-            if e == TypeError:
+            if type(e) == TypeError:
                 pass
             try:
                 #if MODE and COMMAND not found try to get a "global" (inside file) translation
@@ -109,9 +110,10 @@ class I18n:
                     translated_string = keys[self.command_name][mode]
                     return translated_string["-".join(args)] if args else translated_string
                 except (KeyError, TypeError) as e:
-                    if e == TypeError:
+                    if type(e) == TypeError:
                         pass
                     translated_string = keys[command_name]
+                    print(translated_string)
                     return translated_string["-".join(args)] if args else translated_string
 
     def get_keys_string(self, lang: str, cog: str) -> dict:

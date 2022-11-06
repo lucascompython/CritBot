@@ -26,6 +26,8 @@ class Events(commands.Cog):
         self.bot.i18n.command_name = "on_command_error"
         self.bot.i18n.cog_name = "events"
 
+
+        #TODO add more errors like when the arguments are of the wrong type
         if isinstance(error, commands.NotOwner):
             await ctx.reply(self.t("err", "not_owner"))
         else:
