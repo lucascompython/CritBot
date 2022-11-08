@@ -36,7 +36,7 @@ class Music(commands.Cog):
         self.t = self.bot.i18n.t
         self.log = self.bot.logger.log
 
-        bot.loop.create_task(self.connect_nodes())
+        self.bot.loop.create_task(self.connect_nodes())
         self.node = None
         self.loop = asyncio.get_event_loop()
         self.ytdl_options = {
@@ -149,13 +149,11 @@ class Music(commands.Cog):
     async def play(self, ctx: commands.Context, *, query: str) -> None:
 
         vc: wavelink.Player = await self._join(ctx, _play="comesfromplaycommand")
-        #if len(query.split("=")) > 1:
-            #tracks = await self.node.get_tracks(wavelink.YouTubePlaylist, query="https://www.youtube.com/playlist?list=PLA4eNNilv6y0SgJzr2xKorWcxdoYGJ2_6")
-            #track = tracks[0]
-        #else:
+
         track = await wavelink.YouTubeTrack.search(query=query, return_first=True)
         track.info["context"] = ctx
         track.info["start_time"] = time.time()
+
 
         if not vc.is_playing():
             await ctx.send(embed=await self.embed_generator(track, ctx.author))
@@ -342,7 +340,7 @@ class Music(commands.Cog):
             return await ctx.send(self.t("err", "empty"))
             
         progress = self.track_progress(vc.track)
-        embed = discord.Embed(description=self.t("embed", "description", track=vc.track.title, user=vc.track.info["context"].author, current_time=self.parse_duration(progress), total_time=self.parse_duration(vc.track.duration)))
+        embed = discord.Embed(description=self.t("embed", "description", track=vc.track.title, user=vc.track.info["context"].author, current_time=self.parse_duration(self.track_progress(vc.track)), total_time=self.parse_duration(vc.track.duration)))
         embed.set_author(icon_url=ctx.author.avatar.url, name=self.t("embed", "title"))
         for i, track in enumerate(vc.queue._queue):
             embed.add_field(name=f"{i+1}. {track.title}", value=self.parse_duration(track.duration), inline=False)
