@@ -14,21 +14,6 @@ from aiohttp import ContentTypeError
 
 Provider = wavelink.YouTubeTrack | wavelink.YouTubePlaylist
 
-class AudioSourceTracked(discord.AudioSource):
-    def __init__(self, source):
-        self._source = source
-        self.count_20ms = 0
-
-    def read(self) -> bytes:
-        data = self._source.read()
-        if data:
-            self.count_20ms += 1
-        return data
-
-    @property
-    def progress(self) -> float:
-        return self.count_20ms * 0.02 # count_20ms * 20ms
-
 
 class Music(commands.Cog):
     def __init__(self, bot):
