@@ -4,11 +4,11 @@ from yt_dlp import YoutubeDL # for extra info TODO add shorts, stories and tikto
 from discord.ext import commands
 
 
-import time
 import asyncio
 import datetime
 import functools
 from typing import Union
+from aiohttp import ContentTypeError
 
 
 
@@ -91,8 +91,12 @@ class Music(commands.Cog):
             int: The dislikes.
         """
         async with self.bot.web_client.get(f"https://returnyoutubedislikeapi.com/votes?videoId={track_id}") as resp:
-            data = await resp.json()
-            return data["dislikes"]
+            try:
+                data = await resp.json()
+                return data["dislikes"]
+            except ContentTypeError:
+                return "N/A"
+
 
 
     async def embed_generator(self, track: wavelink.YouTubeTrack, author: discord.Member) -> discord.Embed:
@@ -119,7 +123,7 @@ class Music(commands.Cog):
         if subs: subs = self.human_format(subs)
         if views: views = self.human_format(views)
         if likes: likes = self.human_format(likes)
-        if dislikes: dislikes = self.human_format(dislikes)
+        if type(dislikes) != str: dislikes = self.human_format(dislikes)
         
         #TODO estimated time until play
 
@@ -152,7 +156,6 @@ class Music(commands.Cog):
 
         track = await wavelink.YouTubeTrack.search(query=query, return_first=True)
         track.info["context"] = ctx
-        track.info["start_time"] = time.time()
 
 
         if not vc.is_playing():
@@ -339,16 +342,14 @@ class Music(commands.Cog):
         if not vc.is_playing():
             return await ctx.send(self.t("err", "empty"))
             
-        progress = self.track_progress(vc.track)
-        embed = discord.Embed(description=self.t("embed", "description", track=vc.track.title, user=vc.track.info["context"].author, current_time=self.parse_duration(self.track_progress(vc.track)), total_time=self.parse_duration(vc.track.duration)))
+        #progress = self.track_progress(vc.track)
+        progress = round(vc.position)
+        embed = discord.Embed(description=self.t("embed", "description", track=vc.track.title, user=vc.track.info["context"].author, current_time=self.parse_duration(progress), total_time=self.parse_duration(vc.track.duration)))
         embed.set_author(icon_url=ctx.author.avatar.url, name=self.t("embed", "title"))
         for i, track in enumerate(vc.queue._queue):
             embed.add_field(name=f"{i+1}. {track.title}", value=self.parse_duration(track.duration), inline=False)
         await ctx.send(embed=embed)
 
-    @staticmethod
-    def track_progress(track: wavelink.Track) -> int:
-        return round(time.time() - track.info["start_time"])
 
 
     #TODO Mess with this
