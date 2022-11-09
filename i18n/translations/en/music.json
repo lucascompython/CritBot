@@ -8,7 +8,8 @@
 
         "cmd": {
             
-            "queued": "Queued **{track}** by **{author}**"
+            "queued": "Queued **{track}** by **{author}**",
+            "queued_playlist": "Queued **{playlist}** with **{length}** tracks"
         },
         "embed": {
             "title": "Now Playing from {source}",

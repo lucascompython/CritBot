@@ -4,16 +4,17 @@ from yt_dlp import YoutubeDL # for extra info TODO add shorts, stories and tikto
 from discord.ext import commands
 
 
+import re
 import asyncio
 import datetime
 import functools
-from typing import Union
+from typing import Union, Optional
 from aiohttp import ContentTypeError
 
 
 
-Provider = wavelink.YouTubeTrack | wavelink.YouTubePlaylist
 
+#TODO optimize errors for example: the error not connected can be in a global error handler
 
 class Music(commands.Cog):
     def __init__(self, bot):
@@ -132,25 +133,62 @@ class Music(commands.Cog):
 
 
 
+    async def _add_to_queue(self, tracks: wavelink.YouTubeTrack | wavelink.YouTubePlaylist, player: wavelink.Player, ctx: commands.Context, playlist: Optional[wavelink.YouTubePlaylist] = None) -> None:
+        self.bot.i18n.command_name = "play"
+        if playlist:
+            for track in tracks:
+                track.info["context"] = ctx
+                await player.queue.put_wait(track)
+                #TODO get the playlist author
+            return await ctx.send(self.t("cmd", "queued_playlist", length=len(tracks), playlist=playlist.name))
+
+        track = tracks
+
+
 
 
     @commands.hybrid_command(aliases=["p"])
     async def play(self, ctx: commands.Context, *, query: str) -> None:
+        #TODO see wavelink.SearchableTrack.convert
 
         vc: wavelink.Player = await self._join(ctx, _play="comesfromplaycommand")
 
-        track = await wavelink.YouTubeTrack.search(query=query, return_first=True)
-        track.info["context"] = ctx
+        query.strip("<>")
 
+        link_regex = "((http(s)*:[/][/]|www.)([a-z]|[A-Z]|[0-9]|[/.]|[~])*)"
+        pattern = re.compile(link_regex)
+        match_url = re.match(pattern, query)
+        query = query.replace("/", "%2F") if match_url is None else query
+
+        playlist_regex = r"watch\?v=.+&(list=[^&]+)"
+        matches = re.search(playlist_regex, query)
+
+        groups = matches.groups() if matches is not None else []
+        is_playlist = len(groups) > 0 or "playlist" in query
+
+        if not is_playlist:
+            track = await wavelink.YouTubeTrack.search(query=query, return_first=True)
+            track.info["context"] = ctx
+        else:
+            playlist = await wavelink.YouTubePlaylist.search(query=query)
+            tracks = playlist.tracks
 
         if not vc.is_playing():
+            if is_playlist:
+                track = tracks[0]
+                track.info["context"] = ctx
+
             await ctx.send(embed=await self.embed_generator(track, ctx.author))
             await vc.queue.put_wait(track)
             track = await vc.queue.get_wait()
             await vc.play(track)
+            if is_playlist: await self._add_to_queue(tracks, vc, ctx, playlist)
         else:
-            await vc.queue.put_wait(track)
-            await ctx.send(self.t("cmd", "queued", track=track.title, author=track.author))
+            if not is_playlist:
+                await vc.queue.put_wait(track)
+                return await ctx.send(self.t("cmd", "queued", track=track.title, author=track.author))
+            
+            await self._add_to_queue(tracks, vc, ctx, playlist)
     
 
 
@@ -216,7 +254,7 @@ class Music(commands.Cog):
         if not volume:
             return await ctx.reply(self.t("cmd", "volume", volume=vc.volume))
 
-        volume.replace("%", "")
+        volume.strip("%")
         volume = int(volume)
 
 
@@ -281,7 +319,7 @@ class Music(commands.Cog):
             while True:
                 await asyncio.sleep(1)
                 time += 1
-                #TODO when paused it leaves 
+                #TODO fix when paused it leaves 
                 if voice.is_playing() and not voice.is_paused():
                     time = 0
                 if time == 180:

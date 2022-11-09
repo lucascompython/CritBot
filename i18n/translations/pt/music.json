@@ -5,7 +5,8 @@
         "command_name": "play",
         "command_description": "Toca uma musica",
         "cmd": {
-            "queued": "Enfileirado **{track}** por **{author}**"
+            "queued": "Enfileirado **{track}** por **{author}**",
+            "queued_playlist": "Enfileirado **{playlist}** com **{length}** musicas"
         },
         "embed": {
             "title": "A tocar do {source}",
