@@ -8,3 +8,4 @@ Lavalink.jar
 application.yml
 *.log
 *.gz
+.vscode
