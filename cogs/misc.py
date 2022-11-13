@@ -52,6 +52,7 @@ class Misc(commands.Cog):
 
     async def show_info_interaction(self, interaction: discord.Interaction, member: discord.Member):
         member = interaction.guild.get_member(member.id)
+        self.bot.i18n.command_name = "show_info"
         embed = self.show_info_builder(member)
         await interaction.response.send_message(embed=embed)
 
@@ -79,7 +80,7 @@ class Misc(commands.Cog):
         await ctx.send(self.t("cmd", "output", source_link=self.bot.source_link))
 
 
-    @commands.hybrid_command(name="bot_info")
+    @commands.hybrid_command(name="bot_info", aliases=["botinfo", "bot"])
     async def _bot_info(self, ctx):
         embed = discord.Embed(
             title=self.t("embed", "title"),

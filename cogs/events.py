@@ -25,6 +25,7 @@ class Events(commands.Cog):
     async def on_command_error(self, ctx, error):
         self.bot.i18n.command_name = "on_command_error"
         self.bot.i18n.cog_name = "events"
+        self.bot.i18n.guild_id = ctx.guild.id
 
 
         #TODO add more errors like when the arguments are of the wrong type

@@ -57,6 +57,8 @@ class CritBot(commands.Bot):
             
         
 
+    #TODO if all the commands can be hybrid command check the new (2.1 feature) interaction.translate to translate per user locale instead of per guild locale
+
     async def setup_hook(self) -> None:
         
         self.logger.log(20, "Setting up the translator.")
