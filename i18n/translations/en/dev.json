@@ -115,5 +115,21 @@
         "cmd": {
             "output": "Restarting..."
         }
+    },
+    "clear": {
+        "command_name": "clear",
+        "command_description": "Clears the console.",
+
+        "cmd": {
+            "output": "Console was cleared."
+        }
+    },
+    "!!": {
+        "command_name": "!!",
+        "command_description": "Executes the last command.",
+        "err": {
+            "no_last_command": "There is no last command."
+        }
     }
+
 }

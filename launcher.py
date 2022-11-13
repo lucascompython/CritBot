@@ -41,7 +41,13 @@ class Colors:
 
 
 
-async def start_bot() -> None:
+async def start_bot(dev: bool) -> None:
+    if dev:
+        print("Running in development mode...")
+        data["dev"] = True
+    else:
+        print("Running in production mode...")
+        data["dev"] = False
 
     async def get_prefix(bot, message):
         return commands.when_mentioned_or(prefixes[str(message.guild.id)])(bot, message)
@@ -146,6 +152,7 @@ def arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="The launcher for the bot.")
     parser.add_argument("-l", "--lavalink", help=f"IP and Port to Lavalink: <ip>:<port>. Default: {Lavalink.default_lavalink}", type=str, required=False)
     parser.add_argument("-p", "--path", help=f"Path to Lavalink. Default: {Lavalink.default_lavalink_path}", type=str, required=False)
+    parser.add_argument("-d", "--dev", help="Run the bot in development mode.", action="store_true", required=False, default=False)
 
     return parser.parse_args()
 
@@ -161,7 +168,7 @@ async def main() -> None:
         print("Starting Lavalink...")
     lavalink = Lavalink(args.lavalink, args.path)
     lavalink.start_lavalink()
-    await start_bot()
+    await start_bot(args.dev)
 
 
 

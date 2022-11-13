@@ -107,5 +107,20 @@
         "cmd": {
             "output": "Reiniciando..."
         }
+    },
+    "clear": {
+        "command_name": "limpar",
+        "command_description": "Limpa o terminal.",
+
+        "cmd": {
+            "output": "Terminal limpo."
+        }
+    },
+    "!!": {
+        "command_name": "!!",
+        "command_description": "Executa o ultimo comando.",
+        "err": {
+            "no_last_command": "Não há nenhum comando para executar."
+        }
     }
 }

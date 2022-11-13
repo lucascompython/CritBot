@@ -10,6 +10,7 @@ import json
 import logging
 import datetime
 import logging.handlers
+from collections import deque
 
 
 from i18n import Translator
@@ -29,6 +30,7 @@ class CritBot(commands.Bot):
         testing_guild_id: int,
         owner_id: int,
         lavalink: dict[str, str | int],
+        dev: bool,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
@@ -44,10 +46,15 @@ class CritBot(commands.Bot):
         self.lavalink = lavalink
         self.owner_id = owner_id
         self.__start_time = time.time()
+        self.dev = dev
         
         # i18n
         self.default_language = default_language
         self.i18n = i18n
+
+        if self.dev:
+            self.last_cmds = deque(maxlen=10) # cache the 10 last commands
+            
         
 
     async def setup_hook(self) -> None:
@@ -60,6 +67,9 @@ class CritBot(commands.Bot):
         self.logger.log(20, "Loading the cogs.")
         # load all cogs in ./cogs
         for extension in self.initial_extensions:
+            if not self.dev and extension == "cogs.dev": # only load dev cog if the bot is in dev mode
+                continue
+
             await self.load_extension(extension)
             self.cogs_state["loaded"].append(extension.replace("cogs.", ""))
         self.logger.log(20, "Cogs loaded.")
@@ -146,6 +156,8 @@ class CritBot(commands.Bot):
         self.i18n.guild_id = ctx.guild.id
         self.i18n.cog_name = ctx.cog.__class__.__name__.lower()
         self.i18n.command_name = ctx.command.qualified_name.replace(" ", "_")
+        if self.dev and self.i18n.command_name != "!!": 
+            self.last_cmds.append(ctx.message.content)
         return True
             
 

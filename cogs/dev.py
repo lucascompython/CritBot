@@ -254,6 +254,35 @@ class Dev(commands.Cog):
         await self.bot.invoke(new_ctx)
 
 
+    @commands.is_owner()
+    @commands.command(name = "clear")
+    async def _clear (self, ctx):
+        """Clears the console."""
+        os.system('cls' if os.name == 'nt' else 'clear')
+        await ctx.send(self.t("cmd", "output"))
+
+    @commands.is_owner()
+    @commands.command(name="!!")
+    async def do_last_cmd(self, ctx, *, args: str = ""):
+        """Do the last command."""
+
+        if args == "list":
+            cmds_name = map(lambda s: s.strip(ctx.prefix), self.bot.last_cmds)
+            return await ctx.send(", ".join(cmds_name))
+        
+        if not self.bot.last_cmds:
+            return await ctx.send(self.t("err", "no_last_cmd"))
+
+
+        last_cmd = self.bot.last_cmds[-1]
+        
+        msg = ctx.message
+        msg.content = last_cmd
+        new_ctx = await self.bot.get_context(msg, cls=type(ctx))
+        await self.bot.invoke(new_ctx)
+
+
+
 
     #loader and unloader
     async def cog_load(self) -> None:

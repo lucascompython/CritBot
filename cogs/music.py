@@ -151,6 +151,7 @@ class Music(commands.Cog):
     async def play(self, ctx: commands.Context, *, query: str) -> None:
         #TODO see wavelink.SearchableTrack.convert
 
+
         vc: wavelink.Player = await self._join(ctx, _play="comesfromplaycommand")
 
         query.strip("<>")
