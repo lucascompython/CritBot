@@ -42,6 +42,7 @@ class Misc(commands.Cog):
         embed.add_field(name=self.t("embed", "premium"), value=discord.utils.format_dt(member.premium_since) if member.premium_since else self.t("embed", "false"))
         embed.add_field(name=self.t("embed", "top_role"), value=member.top_role.mention)
         embed.add_field(name="Bot", value=self.t("embed", "true") if member.bot else self.t("embed", "false"))
+        embed.timestamp = datetime.now()
 
         return embed
 

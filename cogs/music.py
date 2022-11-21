@@ -127,6 +127,7 @@ class Music(commands.Cog):
         embed.add_field(name=self.t("embed", "views"), value=views)
         embed.add_field(name=self.t("embed", "likes_dislikes"), value=f"{likes} / {dislikes}")
         embed.add_field(name=self.t("embed", "subs"), value=subs)
+        embed.timestamp = datetime.datetime.now()
 
 
         return embed
