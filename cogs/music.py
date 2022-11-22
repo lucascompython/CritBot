@@ -10,9 +10,9 @@ import datetime
 import functools
 from typing import Union, Optional
 from aiohttp import ContentTypeError
+from itertools import islice
 
-
-
+from Utils import Paginator
 
 #TODO optimize errors for example: the error not connected can be in a global error handler
 
@@ -53,7 +53,7 @@ class Music(commands.Cog):
 
 
     @staticmethod
-    def parse_duration(duration: int) -> str:
+    def parse_duration(duration: float | int) -> str:
         value = str(datetime.timedelta(seconds = duration))
         return value
     
@@ -67,7 +67,7 @@ class Music(commands.Cog):
         return '{}{}'.format('{:f}'.format(num).rstrip('0').rstrip('.'), ['', 'K', 'M', 'B', 'T'][magnitude])
 
 
-    async def get_dislikes(self, track_id: str) -> int | None:
+    async def get_dislikes(self, track_id: str) -> int | str | None:
         """Get the dislikes of a video.
 
         Args:
@@ -184,7 +184,7 @@ class Music(commands.Cog):
             await vc.queue.put_wait(track)
             track = await vc.queue.get_wait()
             await vc.play(track)
-            if is_playlist: await self._add_to_queue(tracks, vc, ctx, playlist)
+            if is_playlist: await self._add_to_queue(tracks[1:], vc, ctx, playlist)
         else:
             if not is_playlist:
                 await vc.queue.put_wait(track)
@@ -356,7 +356,18 @@ class Music(commands.Cog):
             return vc
         
 
+    def _estimate_time_until(self, track: wavelink.abc.Playable, player: wavelink.Player) -> str:
+        """Estimate the time until the given position."""
+        index = player.queue._queue.index(track)
+        queue_until_track = list(player.queue._queue)[:index]
+        estimated_time = sum(track.length for track in queue_until_track)
+        for i in queue_until_track:
+            estimated_time += i.length
 
+        if player.is_playing:
+            estimated_time += player.track.length - player.position
+        
+        return self.parse_duration(round(estimated_time))
 
 
     @commands.hybrid_command(aliases=["q"])
@@ -367,13 +378,39 @@ class Music(commands.Cog):
         if not vc.is_playing():
             return await ctx.send(self.t("err", "empty"))
             
-        #progress = self.track_progress(vc.track)
         progress = round(vc.position)
-        embed = discord.Embed(description=self.t("embed", "description", track=vc.track.title, user=vc.track.info["context"].author, current_time=self.parse_duration(progress), total_time=self.parse_duration(vc.track.duration)))
-        embed.set_author(icon_url=ctx.author.avatar.url, name=self.t("embed", "title"))
+        # if only 1 track is in the queue (the one that is playing)
+        if len(vc.queue._queue) == 0:
+            embed = discord.Embed(description=self.t("embed", "description", track=vc.track.title, user=vc.track.info["context"].author, current_time=self.parse_duration(progress), total_time=self.parse_duration(vc.track.duration)))
+            embed.set_author(icon_url=ctx.author.avatar.url, name=self.t("embed", "title"))
+            return await ctx.send(embed=embed)
+
+        # paginator
+        embeds = []
+        j = 0
+        embed = None
         for i, track in enumerate(vc.queue._queue):
-            embed.add_field(name=f"{i+1}. {track.title}", value=self.parse_duration(track.duration), inline=False)
-        await ctx.send(embed=embed)
+            if j ==  0: # reset embed
+                embed = discord.Embed(description=self.t("embed", "description", track=vc.track.title, user=vc.track.info["context"].author, current_time=self.parse_duration(progress), total_time=self.parse_duration(vc.track.duration)))
+                embed.set_author(icon_url=ctx.author.avatar.url, name=self.t("embed", "title"))
+            if j < 9:
+                embed.add_field(name=f"{i+1}. {track.title}", value=f"{self.parse_duration(track.duration)} / Est. {self._estimate_time_until(track, vc)}", inline=False)
+            else:
+                embed.add_field(name=f"{i+1}. {track.title}", value=f"{self.parse_duration(track.duration)} / Est. {self._estimate_time_until(track, vc)}", inline=False)
+                embeds.append(embed)
+                j = 0
+                continue
+            if i == len(vc.queue._queue) -1:
+                embeds.append(embed)
+            j += 1
+        
+        await Paginator.Simple(ephemeral=True).start(ctx, pages=embeds)
+
+
+
+
+
+        
 
 
 
