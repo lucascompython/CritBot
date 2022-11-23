@@ -17,9 +17,9 @@ class I18n:
     """
     This class is responsible for internationalization and localization of most of the bot's messages.
     """
-    __slots__ = ("path_to_langs", "path_to_translations", "langs", "translations", "guild_id", "cog_name", "command_name", "accepted_langs", "default_lang")
+    __slots__ = ("path_to_langs", "path_to_translations", "langs", "translations", "guild_id", "cog_name", "command_name", "accepted_langs", "default_lang", "isdev")
 
-    def __init__(self, default_lang) -> None:
+    def __init__(self, default_lang: str, isdev: bool) -> None:
         self.path_to_langs = "./i18n/langs.json"
         self.path_to_translations = "./i18n/translations/"
         self.translations = {}
@@ -47,7 +47,10 @@ class I18n:
                 continue
             for file_name in [file for file in os.listdir(os.path.join(self.path_to_translations, dir_name)) if file.endswith('.json')]:
                 with open(os.path.join(self.path_to_translations, dir_name, file_name)) as json_file:
-                    self.translations[dir_name + "." + file_name[:-5]] = orjson.loads(json_file.read())
+                    if isdev and ((file_name := file_name[:-5]) == "dev"):
+                        continue
+
+                    self.translations[dir_name + "." + file_name] = orjson.loads(json_file.read())
 
 
     def check_lang(self, lang: str) -> bool:
