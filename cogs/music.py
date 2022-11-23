@@ -10,7 +10,6 @@ import datetime
 import functools
 from typing import Union, Optional
 from aiohttp import ContentTypeError
-from itertools import islice
 
 from Utils import Paginator
 
