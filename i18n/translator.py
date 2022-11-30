@@ -5,29 +5,15 @@ from discord.app_commands import TranslationContextLocation
 from typing import Optional
 
 
-from .translations import i18n
-
-
-class Tree(app_commands.CommandTree):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-
-    async def interaction_check(self, interaction, /) -> bool:
-        if not "hybrid" in str(interaction.command):
-            i18n.guild_id = interaction.guild_id
-            i18n.cog_name = interaction.command.extras["cog_name"]
-            i18n.command_name = interaction.command.qualified_name.replace(" ", "_")
-        return True
-
 
 
 class Translator(app_commands.Translator):
     """
     This class is responsable for translating everything interaction related.
     """
-    def __init__(self) -> None:
+    def __init__(self, i18n) -> None:
         super().__init__()
+        self.i18n = i18n
 
 
     @staticmethod
@@ -40,32 +26,32 @@ class Translator(app_commands.Translator):
 
         return None 
 
-    @staticmethod
-    def get_translated(mode: str, context: app_commands.TranslationContext, locale: Locale) -> str | None:
+    def get_translated(self, mode: str, context: app_commands.TranslationContext, locale: Locale) -> str | None:
         if mode not in ["command_name", "command_description", "group_name", "group_description"]:
             return None
         
         cog = context.data.module.replace("cogs.", "")
         name = context.data.qualified_name.replace(" ", "_")
+        return self.i18n.get_app_commands_translation(name, cog, locale, mode)
 
-        match mode:
-            case "command_name":
-                return i18n.get_command_name(name, cog, locale)
-            case "command_description":
-                return i18n.get_command_description(name, cog, locale)
-            case "group_name":
-                return i18n.get_group_name(name, cog, locale)
-            case "group_description":
-                return i18n.get_group_description(name, cog, locale)
-            case _:
-                return None
+        #match mode:
+            #case "command_name":
+                #return self.i18n.get_command_name(name, cog, locale)
+            #case "command_description":
+                #return self.i18n.get_command_description(name, cog, locale)
+            #case "group_name":
+                #return self.i18n.get_group_name(name, cog, locale)
+            #case "group_description":
+                #return self.i18n.get_group_description(name, cog, locale)
+            #case _:
+                #return None
 
     async def translate(self, string: app_commands.locale_str, locale: Locale, context: app_commands.TranslationContext) -> Optional[str]:
         # translate
         locale = self.__get_locale(locale)
 
 
-        if not i18n.check_lang(locale):
+        if not self.i18n.check_lang(locale):
             return None
 
         match context.location:

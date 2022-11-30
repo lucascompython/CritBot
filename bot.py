@@ -60,9 +60,9 @@ class CritBot(commands.Bot):
     #TODO if all the commands can be hybrid command check the new (2.1 feature) interaction.translate to translate per user locale instead of per guild locale
 
     async def setup_hook(self) -> None:
-        
+        translator = Translator(i18n=self.i18n)
         self.logger.log(20, "Setting up the translator.")
-        await self.tree.set_translator(Translator)
+        await self.tree.set_translator(translator)
         self.logger.log(20, "Translator set up")
 
 
@@ -168,4 +168,9 @@ class CritBot(commands.Bot):
         """Returns the bot's uptime"""
         return str(datetime.timedelta(seconds=int(round(time.time() - self.__start_time))))
     
+
+
+
+
+
         

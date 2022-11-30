@@ -9,3 +9,4 @@ application.yml
 *.log
 *.gz
 .vscode
+auto_slots*

@@ -1,4 +1,2 @@
-from .translations import i18n
-from .translator import Translator, Tree
-
-Translator = Translator()
+from .translations import I18n
+from .translator import Translator

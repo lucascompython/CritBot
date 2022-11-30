@@ -3,6 +3,7 @@
 import uvloop
 import discord
 from discord.ext import commands
+from discord import app_commands
 from colorlog import ColoredFormatter
 from aiohttp import ClientSession
 
@@ -13,10 +14,7 @@ import subprocess, argparse, os, logging
 
 from config import data, prefixes
 from bot import CritBot
-from i18n import (
-    i18n,
-    Tree
-)
+from i18n import I18n
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
@@ -83,6 +81,19 @@ async def start_bot(dev: bool) -> None:
     console.setFormatter(formatter)
     logger.addHandler(console)
     
+    i18n = I18n(data["default_language"], data["dev"])
+
+    class CritTree(app_commands.CommandTree):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+
+
+        async def interaction_check(self, interaction, /) -> bool:
+            if not "hybrid" in str(interaction.command):
+                i18n.guild_id = interaction.guild_id
+                i18n.cog_name = interaction.command.extras["cog_name"]
+                i18n.command_name = interaction.command.qualified_name.replace(" ", "_")
+            return True
 
     async with ClientSession() as our_client:
         
@@ -90,7 +101,7 @@ async def start_bot(dev: bool) -> None:
         for filename in os.listdir("./cogs"):
             if filename.endswith(".py"):
                 exts.append(f"cogs.{filename[:-3]}")
-    
+
         async with CritBot(
                 i18n=i18n,
                 prefixes=prefixes,
@@ -101,7 +112,7 @@ async def start_bot(dev: bool) -> None:
                 command_prefix=get_prefix,
                 case_insensitive=True,
                 strip_after_prefix=True,
-                tree_cls=Tree
+                tree_cls=CritTree
             ) as bot:
                 await bot.start(data["discord_token"], reconnect=True)
 
@@ -125,7 +136,7 @@ class Lavalink:
             self.port = lavalink.split(":")[1]
 
 
-
+        #TODO fix run lavalink 
         self.run_lavalink_command = lambda p = None: ["java", "-jar", self.default_lavalink_path] if not p else ["java", "-jar", p]
 
 

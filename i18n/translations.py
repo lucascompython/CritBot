@@ -6,9 +6,6 @@ from aiofiles import open as async_open
 import orjson
 from discord import Locale
 
-from sys import path
-path.append("..")
-from config import data
 
 from lru import LRU
 
@@ -47,10 +44,10 @@ class I18n:
                 continue
             for file_name in [file for file in os.listdir(os.path.join(self.path_to_translations, dir_name)) if file.endswith('.json')]:
                 with open(os.path.join(self.path_to_translations, dir_name, file_name)) as json_file:
-                    if isdev and ((file_name := file_name[:-5]) == "dev"):
+                    if not isdev and file_name[:-5] == "dev":
                         continue
 
-                    self.translations[dir_name + "." + file_name] = orjson.loads(json_file.read())
+                    self.translations[dir_name + "." + file_name[:-5]] = orjson.loads(json_file.read())
 
 
     def check_lang(self, lang: str) -> bool:
@@ -116,7 +113,6 @@ class I18n:
                     if type(e) == TypeError:
                         pass
                     translated_string = keys[command_name]
-                    print(translated_string)
                     return translated_string["-".join(args)] if args else translated_string
 
     def get_keys_string(self, lang: str, cog: str) -> dict:
@@ -125,18 +121,9 @@ class I18n:
     def get_lang(self, guild_id: int) -> str:
         return self.langs[str(guild_id)]
     
-
-    def get_command_name(self, command_name: str, cog: str, lang: str) -> str:
-        return self.get_keys_string(lang, cog)[command_name]["command_name"]
-
-    def get_command_description(self, command_description: str, cog: str, lang: str) -> str:
-        return self.get_keys_string(lang, cog)[command_description]["command_description"]
-
-    def get_group_name(self, group_name: str, cog: str, lang: str) -> str:
-        return self.get_keys_string(lang, cog)[group_name]["group_name"]
-
-    def get_group_description(self, group_description: str, cog: str, lang: str) -> str:
-        return self.get_keys_string(lang, cog)[group_description]["group_description"]
+    
+    def get_app_commands_translation(self, thing: str, cog: str, lang: str, mode: str) -> str:
+        return self.get_keys_string(lang, cog)[thing][mode]
 
 
     @staticmethod
@@ -169,7 +156,11 @@ class I18n:
         except KeyError:
             pass
 
-        self.langs[str(guild_id)] = lang
+        if lang in self.accepted_langs:
+            self.langs[str(guild_id)] = lang
+        elif any(lang in sublist for sublist in self.accepted_langs.values()):
+            self.langs[str(guild_id)] = [key for key, value in self.accepted_langs.items() if lang in value][0]
+
         async with async_open("./i18n/langs.json", "w") as f:
             await f.write(json.dumps(self.langs, indent=4))
 
@@ -181,4 +172,4 @@ class I18n:
 
 
 
-i18n = I18n(data["default_language"])
+#i18n = I18n(data["default_language"], data["dev"])
