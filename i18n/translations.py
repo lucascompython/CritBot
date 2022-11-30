@@ -169,7 +169,3 @@ class I18n:
         self.langs.pop(str(guild_id))
         async with async_open("./i18n/langs.json", "w") as f:
             await f.write(json.dumps(self.langs, indent=4))
-
-
-
-#i18n = I18n(data["default_language"], data["dev"])
