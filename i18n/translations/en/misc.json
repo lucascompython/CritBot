@@ -66,6 +66,13 @@
             "developer": "Developer",
             "uptime": "Uptime"
         }
+    },
+
+    "help": {
+        "command_name": "help",
+        "command_description": "Shows the help command.",
+
+        "title": "|  Command list"
     }
 
 

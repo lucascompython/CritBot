@@ -32,7 +32,7 @@ class Fun(commands.Cog):
         await ctx.send(self.t("cmd", "output", user=member))
 
 
-    @commands.hybrid_command(name=_T("wake"))
+    @commands.hybrid_command(aliases=["acorda"])
     async def wake(self, ctx, member: discord.Member | discord.User, channel: discord.VoiceChannel | discord.StageChannel, number: int, *, reason: Optional[str]) -> None:
         if number > 50:
             return await ctx.send(self.t("err", "dont_be_a_dick"))

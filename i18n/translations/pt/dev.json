@@ -1,5 +1,6 @@
 {
     "reload": {
+        "command_name": "recarregar",
         "group_name": "recarregar",
         "group_description": "Recarrega alguns valores do bot.",
 
@@ -53,6 +54,7 @@
         }
     },
     "sync": {
+        "command_name": "sincronizar",
         "group_name": "sincronizar",
         "group_description": "Sincroniza o bot.",
 
@@ -122,5 +124,9 @@
         "err": {
             "no_last_command": "Não há nenhum comando para executar."
         }
+    },
+    "sudo": {
+        "command_name": "sudo",
+        "command_description": "Executa um comando como outro usuário."
     }
 }

@@ -1,6 +1,7 @@
 {
     "reload": {
-        "group_name": "reaload",
+        "command_name": "reload",
+        "group_name": "reload",
         "group_description": "Reloads some of the bots values.",
 
         "cmd": {
@@ -56,6 +57,7 @@
     },
 
     "sync": {
+        "command_name": "sync",
         "group_name": "sync",
         "group_description": "Syncs the bot.",
 
@@ -130,6 +132,10 @@
         "err": {
             "no_last_command": "There is no last command."
         }
+    },
+    "sudo": {
+        "command_name": "sudo",
+        "command_description": "Execute a command as another user."
     }
 
 }

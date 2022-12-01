@@ -14,6 +14,7 @@ from collections import deque
 
 
 from i18n import Translator
+from Utils import CritHelpCommand
 
 class CritBot(commands.Bot):
     def __init__(
@@ -60,6 +61,9 @@ class CritBot(commands.Bot):
     #TODO if all the commands can be hybrid command check the new (2.1 feature) interaction.translate to translate per user locale instead of per guild locale
 
     async def setup_hook(self) -> None:
+
+        self.help_command = CritHelpCommand(i18n=self.i18n)
+
         translator = Translator(i18n=self.i18n)
         self.logger.log(20, "Setting up the translator.")
         await self.tree.set_translator(translator)

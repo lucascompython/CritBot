@@ -31,7 +31,8 @@ class I18n:
         }
         self.default_lang = default_lang
         # IMPORTANT UPDATE THIS NUMBER WHEN ADDING ANOTHER TRANSLATION FILE
-        self.translations = LRU(14)
+        #self.translations = LRU(14)
+        self.translations = {}
 
         #load the file that contains the guilds and their languages
         with open(self.path_to_langs, "r") as f:
@@ -66,9 +67,9 @@ class I18n:
             str: The translated string
         """
         if ctx:
-            self.guild_id = ctx.guild.id
-            self.cog_name = ctx.cog.__class__.__name__.lower()
-            self.command_name = ctx.command.qualified_name.replace(" ", "_")
+            self.guild_id = ctx.guild.id 
+            self.cog_name = ctx.cog.__class__.__name__.lower() if not mcog_name else mcog_name
+            self.command_name = ctx.command.qualified_name.replace(" ", "_") if not mcommand_name else mcommand_name
         if len(args) == 0: # for "global" translations (inside a given file)
             self.command_name = mode
         return self.get_key_string(

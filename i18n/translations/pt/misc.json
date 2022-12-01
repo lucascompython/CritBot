@@ -65,6 +65,12 @@
             "developer": "Desenvolvedor",
             "uptime": "Tempo de atividade"
         }
+    },
+
+    "help": {
+        "command_name": "ajuda",
+        "command_description": "Mostra a lista de comandos.",
+        "title": "|  Lista de Comandos"
     }
     
 }
