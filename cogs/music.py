@@ -311,6 +311,7 @@ class Music(commands.Cog):
         
         
 
+        #TODO fix this
         #if there are people on the channel but the bot is not playing wait 3 min and then disconnect
         #elif member.id != self.bot.user.id:
             #return

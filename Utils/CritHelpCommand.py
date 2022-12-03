@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 
-class CritHelpCommand(commands.MinimalHelpCommand):
+class CritHelpCommand(commands.DefaultHelpCommand):
     __slots__ = ("i18n")
     def __init__(self, i18n) -> None:
         super().__init__()
