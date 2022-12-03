@@ -67,16 +67,16 @@ class Misc(commands.Cog):
 
 
 
-    @commands.hybrid_command()
+    @commands.hybrid_command(aliases=["latency", "latencia"])
     async def ping(self, ctx):
         latency = round(self.bot.latency * 1000, 3)
         await ctx.send(self.t("cmd", "output", latency=latency))
 
-    @commands.hybrid_command()
+    @commands.hybrid_command(aliases=["convite"])
     async def invite(self, ctx):
         await ctx.send(self.t("cmd", "output", invite=self.bot.invite_link))
     
-    @commands.hybrid_command()
+    @commands.hybrid_command(aliases=["repository", "repo", "repositorio", "github", "git"])
     async def source_code(self, ctx):
         await ctx.send(self.t("cmd", "output", source_link=self.bot.source_link))
 
