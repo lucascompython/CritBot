@@ -31,6 +31,9 @@ class Events(commands.Cog):
         #TODO add more errors like when the arguments are of the wrong type
         if isinstance(error, commands.NotOwner):
             await ctx.reply(self.t("err", "not_owner"))
+        
+        if isinstance(error, commands.CommandNotFound):
+            pass
         else:
             await ctx.reply(self.t("err", "unknown"))
             self.log(40, error)

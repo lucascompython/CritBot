@@ -103,5 +103,9 @@
     "stop": {
         "command_name": "stop",
         "command_description": "Stop the current song"
+    },
+    "loop": {
+        "command_name": "loop",
+        "command_description": "Loop the current song"
     }
 }

@@ -14,6 +14,7 @@ from aiohttp import ContentTypeError
 from Utils import Paginator
 
 #TODO optimize errors for example: the error not connected can be in a global error handler
+#TODO see if it is worth making a decorator for the commands that need the voice player and have the same checks for example: if not vc.is_playing: await ctx.send(self.t("not_playing"))
 
 class Music(commands.Cog):
     def __init__(self, bot):
@@ -168,7 +169,8 @@ class Music(commands.Cog):
 
         if not is_playlist:
             track = await wavelink.YouTubeTrack.search(query=query, return_first=True)
-            track.info["context"] = ctx
+            #track.info["context"] = ctx
+            #track.info["loop"] = False
         else:
             playlist = await wavelink.YouTubePlaylist.search(query=query)
             tracks = playlist.tracks
@@ -176,15 +178,19 @@ class Music(commands.Cog):
         if not vc.is_playing():
             if is_playlist:
                 track = tracks[0]
-                track.info["context"] = ctx
+            track.info["context"] = ctx
+            track.info["loop"] = False
 
             await ctx.send(embed=await self.embed_generator(track, ctx.author))
             await vc.queue.put_wait(track)
             track = await vc.queue.get_wait()
             await vc.play(track)
-            if is_playlist: await self._add_to_queue(tracks[1:], vc, ctx, playlist)
+            if is_playlist:
+                await self._add_to_queue(tracks[1:], vc, ctx, playlist)
         else:
             if not is_playlist:
+                track.info["context"] = ctx
+                track.info["loop"] = False
                 await vc.queue.put_wait(track)
                 return await ctx.send(self.t("cmd", "queued", track=track.title, author=track.author))
             
@@ -290,6 +296,9 @@ class Music(commands.Cog):
             return
         
         track = await player.queue.get_wait()
+
+        if track.info["loop"]:
+            return await player.seek(0)
 
         ctx = track.info["context"]
         requester = ctx.author
@@ -419,7 +428,21 @@ class Music(commands.Cog):
         await ctx.message.add_reaction("⏹️")
 
 
-        
+    @commands.hybrid_command()
+    async def loop(self, ctx) -> None:
+        vc: wavelink.Player = ctx.voice_client
+        track = await vc.queue.get_wait()
+        if not vc:
+            return await ctx.send(self.t("not_connected"))
+        if not vc.is_playing():
+            return await ctx.send(self.t("queue_empty"))
+
+        if track.info["loop"]:
+            track.info["loop"] = False
+            await ctx.message.add_reaction("🔁")
+        else:
+            track.info["loop"] = True
+            await ctx.message.add_reaction("🔂")
 
 
 
@@ -441,7 +464,7 @@ class Music(commands.Cog):
     @commands.hybrid_command()
     async def seek(self, ctx, time: int) -> None:
         vc: wavelink.Player = ctx.voice_client
-        await vc.seek(time)
+        await vc.seek(time * 1000)
 
 
 

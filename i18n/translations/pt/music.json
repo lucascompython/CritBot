@@ -95,5 +95,9 @@
     "stop": {
         "command_name": "stop",
         "command_description": "Para a música"
+    },
+    "loop": {
+        "command_name": "loop",
+        "command_description": "Repete a música"
     }
 }
