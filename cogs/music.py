@@ -275,18 +275,19 @@ class Music(commands.Cog):
         await ctx.send(self.t("cmd", "output", volume=volume))
 
 
-    @commands.hybrid_command(aliases=["h"])
+    @commands.hybrid_command(aliases=["h", "historico", "histórico"])
     async def history(self, ctx) -> None:
         vc: wavelink.Player = ctx.voice_client
 
-        if not vc:
-            return await ctx.send(self.t("not_connected"))
-        
-        if not vc.queue.history:
+
+        #embed = discord.Embed(title=self.t("embed", "title", user=ctx.author.name), description="\n".join([f'[{i+1}]({track.uri}) - {track.title} - {track.author}' for i, track in enumerate(vc.queue.history)]))
+        try:
+            embed = discord.Embed(description="\n".join([f'[{i+1}]({track.uri}) - {track.title} - {track.author}' for i, track in enumerate(vc.queue.history)]))
+            embed.set_author(name=self.t("embed", "title", user=ctx.author.name), icon_url=ctx.author.avatar.url)
+            await ctx.send(embed=embed)
+        except AttributeError:
             return await ctx.reply(self.t("err", "no_history"))
 
-        embed = discord.Embed(title=self.t("embed", "title", user=ctx.author.name), description="\n".join([f'[{i+1}]({track.uri}) - {track.title} - {track.author}' for i, track in enumerate(vc.queue.history)]))
-        await ctx.send(embed=embed)
 
 
     @commands.Cog.listener()
