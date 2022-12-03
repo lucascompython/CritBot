@@ -1,6 +1,7 @@
 {
     "not_playing": "Não estou a tocar nada!",
     "not_connected": "Não estou num canal de voz!",
+    "queue_empty": "A fila está vazia!",
     "play": {
         "command_name": "play",
         "command_description": "Toca uma musica",
@@ -23,10 +24,6 @@
     "queue": {
         "command_name": "fila",
         "command_description": "Mostra a fila",
-        "err": {
-            "empty": "A fila está vazia!",
-            "not_connected": "Não estou conectado a um canal de voz!"
-        },
         "embed": {
             "title": "|  Fila",
             "description": "Tocando agora: `{track}` adicionado por `{user}` `[{current_time}/{total_time}]`"
@@ -94,5 +91,9 @@
     "seek": {
         "command_name": "seek",
         "command_description": "Vai para um tempo especifico na música"
+    },
+    "stop": {
+        "command_name": "stop",
+        "command_description": "Para a música"
     }
 }

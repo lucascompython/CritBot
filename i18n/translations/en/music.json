@@ -1,6 +1,7 @@
 {
     "not_playing": "I'm not playing anything!",
     "not_connected": "I'm not connected to a voice channel!",
+    "queue_empty": "The queue is empty!",
 
     "play": {
         "command_name": "play",
@@ -26,9 +27,6 @@
     "queue": {
         "command_name": "queue",
         "command_description": "Show the queue",
-        "err": {
-            "empty": "The queue is empty!"
-        },
         "embed": {
             "title": "|  Queue",
             "description": "Currently playing: `{track}` added by `{user}` `[{current_time}/{total_time}]`"
@@ -101,5 +99,9 @@
     "seek": {
         "command_name": "seek",
         "command_description": "Seek to a specific time in the current song"
+    },
+    "stop": {
+        "command_name": "stop",
+        "command_description": "Stop the current song"
     }
 }

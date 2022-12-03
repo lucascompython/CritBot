@@ -142,7 +142,6 @@ class Music(commands.Cog):
                 #TODO get the playlist author
             return await ctx.send(self.t("cmd", "queued_playlist", length=len(tracks), playlist=playlist.name))
 
-        track = tracks
 
 
 
@@ -374,9 +373,9 @@ class Music(commands.Cog):
     async def queue(self, ctx) -> None:
         vc: wavelink.Player = ctx.voice_client
         if not vc:
-            return await ctx.send(self.t("err", "not_connected"))
+            return await ctx.send(self.t("not_connected"))
         if not vc.is_playing():
-            return await ctx.send(self.t("err", "empty"))
+            return await ctx.send(self.t("queue_empty"))
             
         progress = round(vc.position)
         # if only 1 track is in the queue (the one that is playing)
@@ -408,6 +407,16 @@ class Music(commands.Cog):
 
 
 
+    @commands.hybrid_command()
+    async def stop(self, ctx) -> None:
+        vc: wavelink.Player = ctx.voice_client
+        if not vc:
+            return await ctx.send(self.t("not_connected"))
+        if not vc.is_playing():
+            return await ctx.send(self.t("queue_empty"))
+        vc.queue.clear()
+        await vc.stop()
+        await ctx.message.add_reaction("⏹️")
 
 
         
