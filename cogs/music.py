@@ -312,21 +312,21 @@ class Music(commands.Cog):
         
 
         #if there are people on the channel but the bot is not playing wait 3 min and then disconnect
-        elif member.id != self.bot.user.id:
-            return
-        elif before.channel is None:
-            voice: wavelink.Player = after.channel.guild.voice_client
-            time = 0
-            while True:
-                await asyncio.sleep(1)
-                time += 1
-                #TODO fix when paused it leaves 
-                if voice.is_playing() and not voice.is_paused():
-                    time = 0
-                if time == 180:
-                    await voice.disconnect()
-                if not voice.is_connected():
-                    break
+        #elif member.id != self.bot.user.id:
+            #return
+        #elif before.channel is None:
+            #voice: wavelink.Player = after.channel.guild.voice_client
+            #time = 0
+            #while True:
+                #await asyncio.sleep(1)
+                #time += 1
+                ##TODO fix when paused it leaves 
+                #if voice.is_playing() and not voice.is_paused():
+                    #time = 0
+                #if time == 180:
+                    #await voice.disconnect()
+                #if not voice.is_connected():
+                    #break
 
 
     @commands.hybrid_command(aliases=["sai"])
