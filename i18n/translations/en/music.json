@@ -64,7 +64,8 @@
         },
         "err": {
             "too_high": "The volume can't be higher than 100%!",
-            "too_low": "The volume can't be lower than 0%!"
+            "too_low": "The volume can't be lower than 0%!",
+            "not_int": "The volume must be an integer!"
         }
     },
     "history": {

@@ -260,6 +260,9 @@ class Music(commands.Cog):
 
         if not volume:
             return await ctx.reply(self.t("cmd", "volume", volume=vc.volume))
+        
+        if not volume.isdigit():
+            return await ctx.reply(self.t("err", "not_int"))
 
         volume.strip("%")
         volume = int(volume)
