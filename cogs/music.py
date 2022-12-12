@@ -168,6 +168,7 @@ class Music(commands.Cog):
         is_playlist = len(groups) > 0 or "playlist" in query
 
         if not is_playlist:
+            #TODO check this, seach function apparently can return a playlist
             track = await wavelink.YouTubeTrack.search(query=query, return_first=True)
             #track.info["context"] = ctx
             #track.info["loop"] = False
@@ -275,11 +276,12 @@ class Music(commands.Cog):
         await ctx.send(self.t("cmd", "output", volume=volume))
 
 
+    #TODO add paginator
     @commands.hybrid_command(aliases=["h", "historico", "histórico"])
     async def history(self, ctx) -> None:
         vc: wavelink.Player = ctx.voice_client
         try:
-            embed = discord.Embed(description="\n".join([f'[{i+1}]({track.uri}) -- `{track.title}` {self.t("embed", "by")} `{track.info["context"].author}`' for i, track in enumerate(vc.queue.history)]))
+            embed = discord.Embed(description="\n".join([f'[{i+1}]({track.uri}) -- `{track.title}` {self.t("embed", "by")} `{track.info["context"].author}`' for i, track in enumerate(reversed(vc.queue.history))]))
             embed.set_author(name=self.t("embed", "title", user=ctx.author.name), icon_url=ctx.author.avatar.url)
             await ctx.send(embed=embed)
         except AttributeError:
@@ -290,13 +292,15 @@ class Music(commands.Cog):
     @commands.Cog.listener()
     async def on_wavelink_track_end(self, player: wavelink.Player, track: wavelink.Track, reason: str):
         """Play the next song in the queue."""
+        if player.queue.history[-1].info["loop"]:
+            track.info["loop"] = True
+            return await player.play(track)
+
         if player.queue.is_empty:
             return
-        
+
         track = await player.queue.get_wait()
 
-        if track.info["loop"]:
-            return await player.seek(0)
 
         ctx = track.info["context"]
         requester = ctx.author
@@ -309,6 +313,13 @@ class Music(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
+
+        #Handle bot being kicked from the channel
+        if member.id == self.bot.user.id and after.channel is None:
+            player: wavelink.Player = before.channel.guild.voice_client
+            return await player.disconnect() if player else None
+
+
         #if the bot is left alone in a channel disconnect
         if not member.bot and after.channel is None:
             player: wavelink.Player = before.channel.guild.voice_client
@@ -426,21 +437,21 @@ class Music(commands.Cog):
         await ctx.message.add_reaction("⏹️")
 
 
-    @commands.hybrid_command()
-    async def loop(self, ctx) -> None:
+    @commands.hybrid_command(name="loop", aliases=["repeat"])
+    async def _loop(self, ctx) -> None:
         vc: wavelink.Player = ctx.voice_client
-        track = await vc.queue.get_wait()
         if not vc:
             return await ctx.send(self.t("not_connected"))
         if not vc.is_playing():
             return await ctx.send(self.t("queue_empty"))
+        track = vc.track
 
-        if track.info["loop"]:
-            track.info["loop"] = False
-            await ctx.message.add_reaction("🔁")
-        else:
+        if not track.info["loop"]:
             track.info["loop"] = True
             await ctx.message.add_reaction("🔂")
+        else:
+            vc.queue.history[-1].info["loop"] = False
+            await ctx.message.add_reaction("🔁")
 
 
 
@@ -458,11 +469,15 @@ class Music(commands.Cog):
         ##await ctx.send(self.t("cmd", "filter", filter=filter.name))
 
 
-    #TODO make this wiht buttons
+    #TODO make this wiht buttons, and add a better portuguese name to this
     @commands.hybrid_command()
     async def seek(self, ctx, time: int) -> None:
         vc: wavelink.Player = ctx.voice_client
-        await vc.seek(time * 1000)
+        time = time * 1000
+        await vc.seek(time)
+        position = self.parse_duration(round(vc.position))
+        time_so_seek_to = self.parse_duration(time / 1000)
+        await ctx.send(self.t("cmd", "output", position=position, time=time_so_seek_to))
 
 
 

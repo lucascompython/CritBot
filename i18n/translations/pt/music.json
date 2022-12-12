@@ -91,7 +91,10 @@
     },
     "seek": {
         "command_name": "seek",
-        "command_description": "Vai para um tempo especifico na música"
+        "command_description": "Vai para um tempo especifico na música",
+        "cmd": {
+            "output": "Posição alterada de `{position}` para `{time}`!"
+        }
     },
     "stop": {
         "command_name": "stop",

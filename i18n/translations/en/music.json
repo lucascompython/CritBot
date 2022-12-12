@@ -99,7 +99,10 @@
     },
     "seek": {
         "command_name": "seek",
-        "command_description": "Seek to a specific time in the current song"
+        "command_description": "Seek to a specific time in the current song",
+        "cmd": {
+            "output": "Seeked from `{position}` to `{time}`!"
+        }
     },
     "stop": {
         "command_name": "stop",
