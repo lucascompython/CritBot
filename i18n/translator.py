@@ -34,20 +34,8 @@ class Translator(app_commands.Translator):
         name = context.data.qualified_name.replace(" ", "_")
         return self.i18n.get_app_commands_translation(name, cog, locale, mode)
 
-        #match mode:
-            #case "command_name":
-                #return self.i18n.get_command_name(name, cog, locale)
-            #case "command_description":
-                #return self.i18n.get_command_description(name, cog, locale)
-            #case "group_name":
-                #return self.i18n.get_group_name(name, cog, locale)
-            #case "group_description":
-                #return self.i18n.get_group_description(name, cog, locale)
-            #case _:
-                #return None
 
     async def translate(self, string: app_commands.locale_str, locale: Locale, context: app_commands.TranslationContext) -> Optional[str]:
-        # translate
         locale = self.__get_locale(locale)
 
 

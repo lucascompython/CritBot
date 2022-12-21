@@ -73,6 +73,22 @@
         "command_description": "Shows the help command.",
 
         "title": "|  Command list"
+    },
+
+    "bug_report": {
+        "command_name": "bug",
+        "command_description": "Report a bug to the developer.",
+        "modal": {
+            "title": "Title",
+            "description": "Description",
+            "title_placeholder": "A simplified title of the bug",
+            "description_placeholder": "Please describe the bug as detailed as possible.",
+            "modal_title": "Bug Report",
+            "thank_you": "Thank you for your report!"
+        },
+        "err": {
+            "oops": "Oops something went wrong."
+        }
     }
 
 

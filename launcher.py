@@ -81,7 +81,7 @@ async def start_bot(dev: bool) -> None:
     console.setFormatter(formatter)
     logger.addHandler(console)
     
-    i18n = I18n(data["default_language"], data["dev"])
+    i18n = I18n(data["default_language"], data["dev"], data["testing_guild_id"])
 
     class CritTree(app_commands.CommandTree):
         def __init__(self, *args, **kwargs):

@@ -10,3 +10,4 @@ application.yml
 *.gz
 .vscode
 auto_slots*
+bug_reports.json

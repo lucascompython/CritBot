@@ -2,22 +2,84 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 from discord.app_commands import locale_str as _T
-
-
+from aiofiles import open as async_open
+import orjson
 
 from typing import Optional
 from datetime import datetime
+import traceback
+
+async def save_bug_report(user_id: int, guild: discord.Guild, title: str, message: str, timestamp: datetime):
+    data = None
+
+    async with async_open("./logs/bug_reports.json", "r") as f:
+        try:
+            data = orjson.loads(await f.read())
+        except orjson.JSONDecodeError:
+            data = {}
+
+
+    data[timestamp.isoformat()] = {
+        "user_id": user_id,
+        "user_name": discord.utils.get(guild.members, id=user_id).name,
+        "guild_name": guild.name,
+        "guild_id": guild.id,
+        "title": title,
+        "message": message
+    }
+
+    async with async_open("./logs/bug_reports.json", "wb") as f:
+        await f.write(orjson.dumps(data, option=orjson.OPT_INDENT_2))
 
 
 class Misc(commands.Cog):
 
+
+
     def __init__(self, bot) -> None:
         self.bot = bot
         self.t = self.bot.i18n.t
+        I18N = [self.bot.i18n]
+
         self.log = self.bot.logger.log
 
-        self.show_info_cm = app_commands.ContextMenu(name="show_info", callback=self.show_info_interaction, extras={"cog_name": "misc"})
-        self.bot.tree.add_command(self.show_info_cm)
+        self.show_info_cmd = app_commands.ContextMenu(name="show_info", callback=self.show_info_interaction, extras={"cog_name": "misc"})
+        self.bug_report_cmd= app_commands.Command(name="bug_report", description="command_description" , callback=self.bug_report, extras={"cog_name": "misc", "command_name": "bug_report"})
+        self.bot.tree.add_command(self.show_info_cmd)
+        self.bot.tree.add_command(self.bug_report_cmd)
+
+        #TODO fix this, this only works if the testing_guild is already in the database
+        class BugReport(discord.ui.Modal, title="Bugs" if not I18N[0].guild_id else self.t("modal", "modal_title", mcommand_name="bug_report", mcog_name="misc")):
+
+
+            def __init__(self, *args, guild_id: int, **kwargs) -> None:
+                super().__init__(*args, **kwargs)
+                I18N[0].guild_id = guild_id
+
+            
+
+            _title = discord.ui.TextInput(label=I18N[0].t("modal", "title", mcommand_name="bug_report", mcog_name="misc"), placeholder=I18N[0].t("modal", "title_placeholder", mcommand_name="bug_report", mcog_name="misc"))
+            description = discord.ui.TextInput(label=I18N[0].t("modal", "description", mcommand_name="bug_report", mcog_name="misc"), placeholder=I18N[0].t("modal", "description_placeholder", mcommand_name="bug_report", mcog_name="misc"), style=discord.TextStyle.long, max_length=300)
+                
+
+            async def on_submit(self, interaction: discord.Interaction):
+                await save_bug_report(interaction.user.id, interaction.guild, self._title.value, self.description.value, datetime.now())
+                await interaction.response.send_message(I18N[0].t("modal", "thank_you", mcommand_name="bug_report", mcog_name="misc"), ephemeral=True)
+
+            async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
+                await interaction.response.send_message(I18N[0].t("modal", "oops", mcommand_name="bug_report", mcog_name="misc"), ephemeral=True)
+
+                traceback.print_exception(type(error), error, error.__traceback__)
+
+        self.bug_report_modal = BugReport
+
+
+
+
+
+
+
+
 
 
 
@@ -103,6 +165,8 @@ class Misc(commands.Cog):
         await ctx.send(embed=embed)
 
 
+    async def bug_report(self, interaction: discord.Interaction):
+        await interaction.response.send_modal(self.bug_report_modal(guild_id=interaction.guild_id))
 
 
     async def cog_load(self) -> None:

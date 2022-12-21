@@ -71,6 +71,21 @@
         "command_name": "ajuda",
         "command_description": "Mostra a lista de comandos.",
         "title": "|  Lista de Comandos"
+    },
+    "bug_report": {
+        "command_name": "bug",
+        "command_description": "Reporta um bug.",
+        "modal": {
+            "title": "Titulo",
+            "description": "Descrição",
+            "title_placeholder": "Um titulo simples para o bug",
+            "description_placeholder": "Porfavor descreva o bug o mais detalhadamente possivel",
+            "modal_title": "Reportar Bug",
+            "thank_you": "Obrigado por reportar o bug!"
+        },
+        "err": {
+            "oops": "Ocorreu um erro"
+        }
     }
     
 }

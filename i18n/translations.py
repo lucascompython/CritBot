@@ -14,14 +14,14 @@ class I18n:
     """
     This class is responsible for internationalization and localization of most of the bot's messages.
     """
-    __slots__ = ("path_to_langs", "path_to_translations", "langs", "translations", "guild_id", "cog_name", "command_name", "accepted_langs", "default_lang", "isdev")
+    __slots__ = ("testing_guild_id", "path_to_langs", "path_to_translations", "langs", "translations", "guild_id", "cog_name", "command_name", "accepted_langs", "default_lang", "isdev")
 
-    def __init__(self, default_lang: str, isdev: bool) -> None:
+    def __init__(self, default_lang: str, isdev: bool, testing_guild_id: int) -> None:
         self.path_to_langs = "./i18n/langs.json"
         self.path_to_translations = "./i18n/translations/"
         self.translations = {}
 
-        self.guild_id = None
+        self.guild_id = testing_guild_id
         self.cog_name = None
         self.command_name = None
 
