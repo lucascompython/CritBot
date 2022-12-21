@@ -33,6 +33,7 @@ cd CritBot
 
 ## Known "bugs"
 
+- URGENT - Probably on commands that more time to execute, if another command is invoked while the other is executing the translations might get mixed up. Probably will need to inplement a sort of message queue linked to a guild's channel.  
 - The interaction name, description, choices, etc. are set per user locale while everything else is set per guild language.
 
 ## Contributions
