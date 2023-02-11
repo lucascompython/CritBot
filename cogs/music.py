@@ -182,6 +182,7 @@ class Music(commands.Cog):
                 track = tracks[0]
             track.info["context"] = ctx
             track.info["loop"] = False
+            track.info["time"] = datetime.datetime.now()
 
             await ctx.send(embed=await self.embed_generator(track, ctx.author))
             await vc.queue.put_wait(track)
@@ -193,6 +194,7 @@ class Music(commands.Cog):
             if not is_playlist:
                 track.info["context"] = ctx
                 track.info["loop"] = False
+                track.info["time"] = datetime.datetime.now()
                 await vc.queue.put_wait(track)
                 return await ctx.send(self.t("cmd", "queued", track=track.title, author=track.author))
             
@@ -287,7 +289,7 @@ class Music(commands.Cog):
     async def history(self, ctx) -> None:
         vc: wavelink.Player = ctx.voice_client
         try:
-            embed = discord.Embed(description="\n".join([f'[{i+1}]({track.uri}) -- `{track.title}` {self.t("embed", "by")} `{track.info["context"].author}` {self.t("embed", "at")} {discord.utils.format_dt(datetime.datetime.now(), "t")}' for i, track in enumerate(reversed(vc.queue.history))]))
+            embed = discord.Embed(description="\n".join([f'[{i+1}]({track.uri}) -- `{track.title}` {self.t("embed", "by")} `{track.info["context"].author}` {self.t("embed", "at")} {discord.utils.format_dt(track.info["time"], "t")}' for i, track in enumerate(reversed(vc.queue.history))]))
             embed.set_author(name=self.t("embed", "title", user=ctx.author.name), icon_url=ctx.author.avatar.url)
             await ctx.send(embed=embed)
         except AttributeError:
@@ -298,8 +300,9 @@ class Music(commands.Cog):
     @commands.Cog.listener()
     async def on_wavelink_track_end(self, player: wavelink.Player, track: wavelink.Track, reason: str):
         """Play the next song in the queue."""
-        if player.queue.history[-1].info["loop"]:
+        if player.queue.history[-1].info["loop"]: #if the last song is in loop, play it again
             track.info["loop"] = True
+            track.info["time"] = datetime.datetime.now()
             return await player.play(track)
 
         if player.queue.is_empty:
@@ -313,7 +316,7 @@ class Music(commands.Cog):
         embed = await self.embed_generator(track, requester)
         await ctx.send(embed=embed)
 
-        
+        player.queue.history[-1].info["time"] = datetime.datetime.now()
         await player.play(track)
 
 
