@@ -6,6 +6,7 @@ import logging
 import os
 import subprocess
 from dataclasses import dataclass
+from time import sleep
 from typing import Optional
 
 import discord
@@ -21,7 +22,7 @@ from i18n import I18n
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
-lavalink_proc = None
+lavalink_proc: subprocess.Popen[bytes] = None
 
 
 
@@ -154,6 +155,7 @@ class Lavalink:
             if self.lavalink:
                 return
             lavalink_proc = subprocess.Popen(self.run_lavalink_command(self.path), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            sleep(2.5) # Make sure Lavalink has time to start up
         
         data["lavalink"]["path"] = self.path
         data["lavalink"]["ip"] = self.ip if self.ip else self.default_lavalink_ip
