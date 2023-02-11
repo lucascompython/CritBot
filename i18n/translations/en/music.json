@@ -114,5 +114,23 @@
     "loop": {
         "command_name": "loop",
         "command_description": "Loop the current song"
-    }
+    },
+    "now_playing": {
+        "command_name": "now_playing",
+        "command_description": "Show the information about the current song being played",
+
+        "embed": {
+            "title": "|  Now Playing",
+            "currently_playing": "Currently playing:",
+            "by": "By",
+            "views": "Views",
+            "subs": "Subscribers",
+            "requested_by": "Requested by",
+            "progress": "Playback Position",
+            "uploaded": "Uploaded",
+            "next": "Playing next",
+            "no_next": ":no_entry_sign: `Nothing next in queue`",
+            "ago": "*({time}s ago)*"
+        }
+    } 
 }

@@ -106,5 +106,23 @@
     "loop": {
         "command_name": "loop",
         "command_description": "Repete a música"
-    }
+    },
+    "now_playing": {
+        "command_name": "tocando_agora",
+        "command_description": "Mostra informações sobre a música que está a tocar",
+
+        "embed": {
+            "title": "|  A tocar",
+            "currently_playing": "Tocando Atualmente:",
+            "by": "Por",
+            "views": "Visualizações",
+            "subs": "Inscritos",
+            "requested_by": "Requisitado por",
+            "progress": "Progresso",
+            "uploaded": "Data de Upload",
+            "next": "Tocando a seguir",
+            "no_next": ":no_entry_sign: `Não há nada a seguir`",
+            "ago": "*({time}s atrás)*"
+        }
+    } 
 }

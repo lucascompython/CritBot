@@ -56,6 +56,8 @@ class Music(commands.Cog):
     @staticmethod
     def parse_duration(duration: float | int) -> str:
         value = str(datetime.timedelta(seconds = duration))
+        if value.startswith("0:"):
+            value = value[2:]
         return value
     
     @staticmethod
@@ -112,6 +114,13 @@ class Music(commands.Cog):
         if likes: likes = self.human_format(likes)
         if type(dislikes) != str: dislikes = self.human_format(dislikes)
         
+        track.info["uploader_url"] = uploader_url
+        track.info["thumbnail"] = thumbnail
+        track.info["likes"] = likes
+        track.info["dislikes"] = dislikes
+        track.info["views"] = views
+        track.info["subs"] = subs
+        track.info["upload_date"] = upload_date
         #TODO estimated time until play
 
         self.bot.i18n.command_name = "play"
@@ -461,6 +470,57 @@ class Music(commands.Cog):
         else:
             vc.queue.history[-1].info["loop"] = False
             await ctx.message.add_reaction("🔁")
+
+    @staticmethod
+    def make_progress_bar(progress: int, total: int, length: int = 10) -> str:
+        num_hash = int((progress / total) * length)
+        return "⎯" * num_hash + ":radio_button:" + "⎯" * (length - num_hash - 1)
+    
+    @commands.hybrid_command(aliases=["np", "tocando", "playing", "tocandoagora", "tocando_agora", "nowplaying", "now", "agora"])
+    async def now_playing(self, ctx) -> None:
+        vc: wavelink.Player = ctx.voice_client
+        if not vc:
+            return await ctx.send(self.t("not_connected"))
+        if not vc.is_playing():
+            return await ctx.send(self.t("not_playing"))
+        
+        track = vc.track
+
+        progress = round(vc.position)
+        total = track.duration
+        progress_bar = self.make_progress_bar(progress, total)
+        print(track.info)
+
+        embed = discord.Embed()
+        embed.set_author(icon_url=ctx.author.avatar.url, name=self.t("embed", "title"))
+        embed.add_field(name=self.t("embed", "currently_playing"), value=f"[{track.title}]({track.uri}) - *({self.parse_duration(track.duration)})*", inline=False)
+        embed.add_field(name=self.t("embed", "by"), value=f"[{track.author}]({track.info['uploader_url']})", inline=False)
+        embed.add_field(name="Likes", value=f"<:likeemoji:1074046790237700097> {track.info['likes']}")
+        embed.add_field(name="Dislikes", value=f"<:dislikeemoji:1074052963649200198> {track.info['dislikes']}")
+        embed.add_field(name=self.t("embed", "views"), value=f"<:views:1074047661759528990> {track.info['views']}")
+        embed.add_field(name=self.t("embed", "subs"), value=track.info["subs"])
+        embed.add_field(name=self.t("embed", "uploaded"), value=f":calendar_spiral: {track.info['upload_date']}", inline=False)
+        embed.add_field(name=self.t("embed", "requested_by"), value=f"{track.info['context'].author.mention} {self.t('embed', 'ago', time=(datetime.datetime.now() - track.info['time']).seconds)}", inline=False)
+        embed.add_field(
+            name=self.t("embed", "progress"),
+            value=f"{':arrow_forward:' if not vc.is_paused() else ':pause_button:'} {self.parse_duration(round(vc.position))} - {progress_bar} - {self.parse_duration(track.duration)}",
+            inline=False
+        )
+        volume_emoji = ":sound:" if vc.volume <= 50 else ":loud_sound:"
+        if vc.volume == 0:
+            volume_emoji = ":mute:"
+        embed.add_field(name="Volume", value=f"{volume_emoji} {vc.volume}%")
+        embed.add_field(name=self.t("embed", "next"), value=f":track_next: `{vc.queue[0].info['title']} - {self.parse_duration(vc.queue[0].duration)}`" if vc.queue else self.t("embed", "no_next"))
+        embed.timestamp = datetime.datetime.now()
+
+
+
+
+        embed.set_thumbnail(url=track.info["thumbnail"])
+        await ctx.send(embed=embed)
+
+
+    
 
 
 
