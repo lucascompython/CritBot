@@ -267,6 +267,8 @@ class Music(commands.Cog):
         volume.strip("%")
         volume = int(volume)
 
+        if volume == vc.volume:
+            return await ctx.reply(self.t("err", "same_volume", volume=vc.volume))
 
         if volume > 100:
             return await ctx.reply(self.t("err", "too_high"))

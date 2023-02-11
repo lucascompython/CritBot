@@ -57,7 +57,8 @@
         "err": {
             "too_high": "O volume não pode ser maior que 100!",
             "too_low": "O volume não pode ser menor que 0!",
-            "not_int": "O volume tem de ser um número inteiro!"
+            "not_int": "O volume tem de ser um número inteiro!",
+            "same_volume": "O volume já é {volume}%!"
         }
     },
     "history": {
