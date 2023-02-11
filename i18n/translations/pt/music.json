@@ -69,7 +69,8 @@
         },
         "embed": {
             "title": "|  Histórico",
-            "by": "por"
+            "by": "por",
+            "at": "às"
         }
     },
     "join": {

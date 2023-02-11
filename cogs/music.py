@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import functools
 import re
+import time
 from typing import Optional, Union
 
 import discord
@@ -286,7 +287,7 @@ class Music(commands.Cog):
     async def history(self, ctx) -> None:
         vc: wavelink.Player = ctx.voice_client
         try:
-            embed = discord.Embed(description="\n".join([f'[{i+1}]({track.uri}) -- `{track.title}` {self.t("embed", "by")} `{track.info["context"].author}`' for i, track in enumerate(reversed(vc.queue.history))]))
+            embed = discord.Embed(description="\n".join([f'[{i+1}]({track.uri}) -- `{track.title}` {self.t("embed", "by")} `{track.info["context"].author}` {self.t("embed", "at")} {discord.utils.format_dt(datetime.datetime.now(), "t")}' for i, track in enumerate(reversed(vc.queue.history))]))
             embed.set_author(name=self.t("embed", "title", user=ctx.author.name), icon_url=ctx.author.avatar.url)
             await ctx.send(embed=embed)
         except AttributeError:

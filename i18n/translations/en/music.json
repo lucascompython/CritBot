@@ -77,7 +77,8 @@
         },
         "embed": {
             "title": "History",
-            "by": "by"
+            "by": "by",
+            "at": "at"
         }
     },
     "join": {
