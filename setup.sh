@@ -16,3 +16,4 @@ mkdir logs
 echo "{}" > prefixes.json
 echo "{}" > ./i18n/langs.json
 echo "Done!"
+echo "Don't forget to edit the config files! (config/appsettings.yaml, config/application.yml)"
