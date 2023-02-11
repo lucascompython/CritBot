@@ -9,7 +9,7 @@ class Config(commands.Cog):
         self.log = self.bot.logger.log
         
 
-    @commands.hybrid_command(aliases=["mudar_prefixo"])
+    @commands.hybrid_command(aliases=["mudar_prefixo", "prefixo"])
     async def change_prefix(self, ctx, prefix) -> None:
         try:
             await self.bot.update_prefixes(ctx.guild.id, prefix)
@@ -17,7 +17,7 @@ class Config(commands.Cog):
         except ValueError:
             await ctx.send(self.t("err", "same_prefix", prefix=prefix))
 
-    @commands.hybrid_command(aliases=["change_lang", "mudar_idioma", "mudar_linguagem", "mudar_lingua", "mudar_língua"])
+    @commands.hybrid_command(aliases=["change_lang", "mudar_idioma", "mudar_linguagem", "mudar_lingua", "mudar_língua", "idioma"])
     async def change_language(self, ctx, lang) -> None:
         """Change the bot language."""
         if self.bot.i18n.check_lang(lang):
