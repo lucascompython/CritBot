@@ -10,8 +10,8 @@ wget "https://github.com/freyacodes/Lavalink/releases/download/3.6.2/Lavalink.ja
 echo "Done!"
 
 echo "Installing config files..."
-cp ./config/example_appsettings.yaml ./config/appsettings.yaml
-cp ./config/example_application.yml ./config/application.yml
+cp ./config/appsettings.example.yaml ./config/appsettings.yaml
+cp ./config/application.example.yml ./config/application.yml
 mkdir logs
 echo "{}" > prefixes.json
 echo "{}" > ./i18n/langs.json

@@ -1,0 +1,32 @@
+discord_token: ""
+
+# Guild for syncing the app_commands (slash commands and discord interactions) when starting the bot
+# If you wish to sync globaly between all your guild use the command "sync global" this will take a long time
+testing_guild_id: 0
+
+owner_id: 0
+
+description: ""
+
+default_prefix: ""
+
+# Check the translations folder to see the available languages.
+# When the bot enters a new guild it will use this language as default.
+# You can also change the language of the bot with the change_language command.
+# If the bot fails to find a translation in one other language it will use the translation from the default language if that fails it will use the english translation.
+# Everything is translated acording to the guild language except interactions name descriptions, etc.
+default_language: ""
+
+invite_link: ""
+
+# For souece code command and you are legally required to open source this bot (check the GPL3 license).
+source_link: ""
+# Yes I am fun at parties, I promise.
+
+
+# The same info that is in application.yml
+lavalink: 
+  ip: "0.0.0.0"
+  port: 2333
+  password: ""
+  path: "./config/Lavalink.jar"
