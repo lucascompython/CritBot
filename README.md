@@ -14,7 +14,7 @@ I would prefer if you don't run an instance of my bot. <!---You can just invite 
 Nevertheless, the installation steps are as follows:
 
 ```bash
-git clone https:/github.com/lucascompython/CritBot.git
+git clone https://github.com/lucascompython/CritBot.git
 cd CritBot
 ./setup.sh
 #change the appsettings.yaml file with your token and information
@@ -33,7 +33,7 @@ cd CritBot
 
 ## Known "bugs"
 
-- URGENT - Probably on commands that more time to execute, if another command is invoked while the other is executing the translations might get mixed up. Probably will need to inplement a sort of message queue linked to a guild's channel.  
+- URGENT - Probably on commands that take more time to execute, if another command is invoked while the other is executing the translations might get mixed up. Probably will need to inplement a sort of message queue linked to a guild's channel.  
 - The interaction name, description, choices, etc. are set per user locale while everything else is set per guild language.
 
 ## Contributions
