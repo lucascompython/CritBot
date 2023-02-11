@@ -1,10 +1,7 @@
-from discord import Locale
-from discord import app_commands
-from discord.app_commands import TranslationContextLocation
-
 from typing import Optional
 
-
+from discord import Locale, app_commands
+from discord.app_commands import TranslationContextLocation
 
 
 class Translator(app_commands.Translator):

@@ -1,13 +1,14 @@
+import traceback
+from datetime import datetime
+from typing import Optional
+
 import discord
-from discord.ext import commands
+import orjson
+from aiofiles import open as async_open
 from discord import app_commands
 from discord.app_commands import locale_str as _T
-from aiofiles import open as async_open
-import orjson
+from discord.ext import commands
 
-from typing import Optional
-from datetime import datetime
-import traceback
 
 async def save_bug_report(user_id: int, guild: discord.Guild, title: str, message: str, timestamp: datetime):
     data = None

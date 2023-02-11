@@ -1,8 +1,8 @@
 #/usr/bin/env python3
 
-import os
-import json
 import argparse
+import json
+import os
 
 
 class SafeDict(dict):

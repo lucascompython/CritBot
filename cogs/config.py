@@ -1,5 +1,6 @@
 from discord.ext import commands
 
+
 class Config(commands.Cog):
     """Manage the bot's configuration."""
     def __init__(self, bot) -> None:

@@ -1,10 +1,11 @@
+import os
+import sys
+from typing import Optional
+
 import discord
 from discord import app_commands
-from discord.ext import commands
 from discord.app_commands import locale_str as _T
-
-import os, sys
-from typing import Optional
+from discord.ext import commands
 
 
 #command_attres=dict(hidden=True)

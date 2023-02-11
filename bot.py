@@ -1,20 +1,19 @@
-import orjson
-import discord
-from discord.ext import commands
-from aiohttp import ClientSession
-from aiofiles import open as async_open
-
-
-import time
+import datetime
 import json
 import logging
-import datetime
 import logging.handlers
+import time
 from collections import deque
 
+import discord
+import orjson
+from aiofiles import open as async_open
+from aiohttp import ClientSession
+from discord.ext import commands
 
 from i18n import Translator
 from Utils import CritHelpCommand
+
 
 class CritBot(commands.Bot):
     def __init__(

@@ -1,6 +1,7 @@
+import traceback
+
 from discord.ext import commands
 
-import traceback
 
 class Events(commands.Cog):
     def __init__(self, bot) -> None:

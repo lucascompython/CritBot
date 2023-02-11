@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 
-import uvloop
-import discord
-from discord.ext import commands
-from discord import app_commands
-from colorlog import ColoredFormatter
-from aiohttp import ClientSession
-
+import argparse
 import asyncio
-from typing import Optional
+import logging
+import os
+import subprocess
 from dataclasses import dataclass
-import subprocess, argparse, os, logging
+from typing import Optional
 
-from config import data, prefixes
+import discord
+import uvloop
+from aiohttp import ClientSession
+from colorlog import ColoredFormatter
+from discord import app_commands
+from discord.ext import commands
+
 from bot import CritBot
+from config import data, prefixes
 from i18n import I18n
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())

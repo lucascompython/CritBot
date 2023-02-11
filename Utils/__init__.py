@@ -1,2 +1,2 @@
-from .CritHelpCommand import CritHelpCommand
 from . import Paginator
+from .CritHelpCommand import CritHelpCommand
