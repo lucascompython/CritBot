@@ -498,7 +498,7 @@ class Music(commands.Cog):
         embed.add_field(name="Likes", value=f"<:likeemoji:1074046790237700097> {track.info['likes']}")
         embed.add_field(name="Dislikes", value=f"<:dislikeemoji:1074052963649200198> {track.info['dislikes']}")
         embed.add_field(name=self.t("embed", "views"), value=f"<:views:1074047661759528990> {track.info['views']}")
-        embed.add_field(name=self.t("embed", "subs"), value=track.info["subs"])
+        embed.add_field(name=self.t("embed", "subs"), value=f':envelope: {track.info["subs"]}')
         embed.add_field(name=self.t("embed", "uploaded"), value=f":calendar_spiral: {track.info['upload_date']}", inline=False)
         embed.add_field(name=self.t("embed", "requested_by"), value=f"{track.info['context'].author.mention} {self.t('embed', 'ago', time=(datetime.datetime.now() - track.info['time']).seconds)}", inline=False)
         embed.add_field(
