@@ -489,7 +489,6 @@ class Music(commands.Cog):
         progress = round(vc.position)
         total = track.duration
         progress_bar = self.make_progress_bar(progress, total)
-        print(track.info)
 
         embed = discord.Embed()
         embed.set_author(icon_url=ctx.author.avatar.url, name=self.t("embed", "title"))
