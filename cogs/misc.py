@@ -182,7 +182,7 @@ class Misc(commands.Cog):
         match type(out):
             case discord.Embed:
                 await interaction.response.send_message(embed=out)
-            case list:
+            case _:
                 for page in out:
                     await interaction.response.send_message(page)
 
