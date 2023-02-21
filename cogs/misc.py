@@ -72,7 +72,7 @@ class Misc(commands.Cog):
                 await interaction.response.send_message(I18N[0].t("modal", "thank_you", mcommand_name="bug_report", mcog_name="misc"), ephemeral=True)
 
             async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
-                await interaction.response.send_message(I18N[0].t("modal", "oops", mcommand_name="bug_report", mcog_name="misc"), ephemeral=True)
+                await interaction.response.send_message(I18N[0].t("err", "oops", mcommand_name="bug_report", mcog_name="misc"), ephemeral=True)
 
                 traceback.print_exception(type(error), error, error.__traceback__)
 
