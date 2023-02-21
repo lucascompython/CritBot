@@ -32,6 +32,7 @@ class Music(commands.Cog):
             "quiet": True
         }
         self.ytdl = YoutubeDL(self.ytdl_options)
+        self.filter: bool = None
         
 
     
@@ -535,6 +536,25 @@ class Music(commands.Cog):
             ##return await ctx.send(self.t("err", "empty"))
         #await vc.set_filter(wavelink.Filter(equalizer=wavelink.Equalizer.boost), seek=True)
         ##await ctx.send(self.t("cmd", "filter", filter=filter.name))
+
+    @commands.hybrid_command()
+    async def boost(self, ctx) -> None:
+        vc: wavelink.Player = ctx.voice_client
+
+        if not vc:
+            return await ctx.send(self.t("err", "not_connected"))
+        
+        if not vc.is_playing():
+            return await ctx.send(self.t("err", "empty"))
+
+        if self.filter:
+            await vc.set_filter(wavelink.Filter())
+            self.filter = False
+            return await ctx.send(self.t("cmd", "removed"))
+
+        await vc.set_filter(wavelink.Filter(equalizer=wavelink.Equalizer.boost()), seek=True)
+        self.filter = True
+        await ctx.send(self.t("cmd", "output"))
 
 
     #TODO make this wiht buttons, and add a better portuguese name to this

@@ -132,5 +132,13 @@
             "no_next": ":no_entry_sign: `Nothing next in queue`",
             "ago": "*({time}s ago)*"
         }
+    },
+    "boost": {
+        "command_name": "boost",
+        "command_description": "Set the boost effect to the current song",
+        "cmd": {
+            "output": "`Boost` applied!",
+            "removed": "`Boost` effect removed!"
+        }
     } 
 }

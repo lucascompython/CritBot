@@ -124,5 +124,13 @@
             "no_next": ":no_entry_sign: `Não há nada a seguir`",
             "ago": "*({time}s atrás)*"
         }
+    },
+    "boost": {
+        "command_name": "boost",
+        "command_description": "Mete um filtro de boost na música",
+        "cmd": {
+            "output": "`Boost` aplicado!",
+            "removed": "`Boost` removido!"
+        }
     } 
 }
