@@ -177,7 +177,6 @@ class Misc(commands.Cog):
     async def help_slash(self, interaction: discord.Interaction, *, command: Optional[str] = None):
         myhelp = CritHelpCommand(i18n=self.bot.i18n, slash=True)
         myhelp.context = await self.bot.get_context(interaction)
-        myhelp.bot = self.bot
         out = await myhelp.command_callback(myhelp.context, command=command)
         
         match type(out):
