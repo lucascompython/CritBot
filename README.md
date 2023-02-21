@@ -4,7 +4,7 @@ This is discord bot written with discord.py v2.0 that aims at exploring the poss
 Right now the bot is quite simple and most of the code aims at extensibility.  
 The bot has a custom implementation of [i18n](i18n/).  
 The only supported languages for now are Portuguese and English.  
-Shoutout to the team behind <https://returnyoutubedislike.com> for making their API public.
+Shoutout to the team behind <https://returnyoutubedislike.com> for being awesome.
 
 ## Installation & Execution
 
