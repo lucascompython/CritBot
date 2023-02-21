@@ -89,6 +89,10 @@
         "err": {
             "oops": "Oops something went wrong."
         }
+    },
+    "help_slash": {
+        "command_name": "help",
+        "command_description": "Shows the help command."
     }
 
 

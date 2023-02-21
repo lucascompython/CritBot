@@ -61,7 +61,7 @@ class CritBot(commands.Bot):
 
     async def setup_hook(self) -> None:
 
-        self.help_command = CritHelpCommand(i18n=self.i18n)
+        self.help_command = CritHelpCommand(i18n=self.i18n, slash=False)
 
         translator = Translator(i18n=self.i18n)
         self.logger.log(20, "Setting up the translator.")

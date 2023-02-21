@@ -86,6 +86,10 @@
         "err": {
             "oops": "Ocorreu um erro"
         }
+    },
+    "help_slash": {
+        "command_name": "help",
+        "command_description": "Mostra a lista de comandos."
     }
     
 }

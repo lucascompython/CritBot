@@ -9,6 +9,8 @@ from discord import app_commands
 from discord.app_commands import locale_str as _T
 from discord.ext import commands
 
+from Utils import CritHelpCommand
+
 
 async def save_bug_report(user_id: int, guild: discord.Guild, title: str, message: str, timestamp: datetime):
     data = None
@@ -46,8 +48,10 @@ class Misc(commands.Cog):
 
         self.show_info_cmd = app_commands.ContextMenu(name="show_info", callback=self.show_info_interaction, extras={"cog_name": "misc"})
         self.bug_report_cmd= app_commands.Command(name="bug_report", description="command_description" , callback=self.bug_report, extras={"cog_name": "misc", "command_name": "bug_report"})
+        self.help_test_cmd = app_commands.Command(name="help_slash", description="command_description", callback=self.help_slash, extras={"cog_name": "misc", "command_name": "help_slash"})
         self.bot.tree.add_command(self.show_info_cmd)
         self.bot.tree.add_command(self.bug_report_cmd)
+        self.bot.tree.add_command(self.help_test_cmd)
 
         #TODO fix this, this only works if the testing_guild is already in the database
         class BugReport(discord.ui.Modal, title="Bugs" if not I18N[0].guild_id else self.t("modal", "modal_title", mcommand_name="bug_report", mcog_name="misc")):
@@ -168,6 +172,21 @@ class Misc(commands.Cog):
 
     async def bug_report(self, interaction: discord.Interaction):
         await interaction.response.send_modal(self.bug_report_modal(guild_id=interaction.guild_id))
+
+
+    async def help_slash(self, interaction: discord.Interaction, *, command: Optional[str] = None):
+        myhelp = CritHelpCommand(i18n=self.bot.i18n, slash=True)
+        myhelp.context = await self.bot.get_context(interaction)
+        myhelp.bot = self.bot
+        out = await myhelp.command_callback(myhelp.context, command=command)
+        
+        match type(out):
+            case discord.Embed:
+                await interaction.response.send_message(embed=out)
+            case list:
+                for page in out:
+                    await interaction.response.send_message(page)
+
 
 
     async def cog_load(self) -> None:
