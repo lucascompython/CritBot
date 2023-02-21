@@ -6,9 +6,9 @@ import logging
 import os
 import subprocess
 from dataclasses import dataclass
+from sys import version_info
 from time import sleep
 from typing import Optional
-from sys import version_info
 
 import discord
 import uvloop
@@ -20,7 +20,6 @@ from discord.ext import commands
 from bot import CritBot
 from config import data, prefixes
 from i18n import I18n
-
 
 lavalink_proc: subprocess.Popen[bytes] = None
 
