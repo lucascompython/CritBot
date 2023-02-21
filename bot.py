@@ -106,7 +106,7 @@ class CritBot(commands.Bot):
         await self.change_presence(
             activity=discord.Activity(
                 type=discord.ActivityType.listening,
-                name=f"{self.default_prefix}help",
+                name="/help",
             )
         )
         self.add_check(self.set_guild_and_cog_and_command) # adds a fake check to all commands to set the guild id and the cog name
