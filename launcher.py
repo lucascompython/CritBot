@@ -8,6 +8,7 @@ import subprocess
 from dataclasses import dataclass
 from time import sleep
 from typing import Optional
+from sys import version_info
 
 import discord
 import uvloop
@@ -20,7 +21,6 @@ from bot import CritBot
 from config import data, prefixes
 from i18n import I18n
 
-asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 lavalink_proc: subprocess.Popen[bytes] = None
 
@@ -190,7 +190,12 @@ async def main() -> None:
 
 if __name__ == "__main__":
     try:
-        asyncio.run(main())
+        if version_info >= (3, 11):
+            with asyncio.Runner(loop_factory=uvloop.new_event_loop) as runner:
+                runner.run(main())
+        else:
+            uvloop.install()
+            asyncio.run(main())
     except KeyboardInterrupt:
         if lavalink_proc:
             print("\nKilling Lavalink...")
