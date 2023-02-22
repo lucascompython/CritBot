@@ -52,6 +52,8 @@ class GeniusLyrics():
         index = lyrics.find(thing)
 
         lyrics = lyrics[:index]
+        index = lyrics.find("Lyrics")
+        lyrics = lyrics[index + 6:]
         return lyrics, lyrics_url
 
 
