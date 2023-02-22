@@ -132,5 +132,19 @@
             "output": "`Boost` aplicado!",
             "removed": "`Boost` removido!"
         }
-    } 
+    },
+    "lyrics": {
+        "command_name": "letras",
+        "command_description": "Mostra as letras da música que está a tocar ou de uma música especifica",
+
+        "cmd": {
+            "searching_lyrics": "A procurar letras para `{query}`...",
+            "truncated": "Devido a limitações do Discord as letras foram truncadas. Clica aqui para ver as letras completas <{url}>."
+        },
+        "err": {
+            "nothing_to_search": "Não há nada para procurar!",
+            "no_lyrics": "Sem letras encontradas para `{query}`!",
+            "song_not_found": "Não foi possivel encontrar a musica em <https://genius.com/>"
+        }
+    }
 }

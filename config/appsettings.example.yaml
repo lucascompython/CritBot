@@ -30,3 +30,7 @@ lavalink:
   port: 2333
   password: ""
   path: "./config/Lavalink.jar"
+
+
+# Genius access token for lyrics command (https://genius.com/api-clients)
+genius_token: ""

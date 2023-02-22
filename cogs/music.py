@@ -2,8 +2,7 @@ import asyncio
 import datetime
 import functools
 import re
-import time
-from typing import Optional, Union
+from typing import Optional
 
 import discord
 import wavelink
@@ -12,7 +11,7 @@ from discord.ext import commands
 from yt_dlp import \
     YoutubeDL  # for extra info TODO add shorts, stories and tiktok
 
-from Utils import Paginator
+from Utils import Paginator, GeniusLyrics, SongNotFound
 
 #TODO optimize errors for example: the error not connected can be in a global error handler
 #TODO see if it is worth making a decorator for the commands that need the voice player and have the same checks for example: if not vc.is_playing: await ctx.send(self.t("not_playing"))
@@ -33,6 +32,7 @@ class Music(commands.Cog):
         }
         self.ytdl = YoutubeDL(self.ytdl_options)
         self.filter: bool = None
+        self.genius_lyrics = GeniusLyrics(self.bot.genius_token, self.bot.web_client)
         
 
     
@@ -213,7 +213,7 @@ class Music(commands.Cog):
 
 
     @commands.hybrid_command(aliases=["s"])
-    async def skip(self, ctx) -> None:
+    async def skip(self, ctx: commands.Context) -> None:
         vc: wavelink.Player = ctx.voice_client
 
         if not vc:
@@ -228,7 +228,7 @@ class Music(commands.Cog):
 
 
     @commands.hybrid_command(aliases=["pausa"])
-    async def pause(self, ctx) -> None:
+    async def pause(self, ctx: commands.Context) -> None:
         vc: wavelink.Player = ctx.voice_client
 
         if not vc:
@@ -245,7 +245,7 @@ class Music(commands.Cog):
 
 
     @commands.hybrid_command(aliases=["resuma"])
-    async def resume(self, ctx) -> None:
+    async def resume(self, ctx: commands.Context) -> None:
         vc: wavelink.Player = ctx.voice_client
 
         if not vc:
@@ -262,7 +262,7 @@ class Music(commands.Cog):
 
 
     @commands.hybrid_command(aliases=["vol"])
-    async def volume(self, ctx, volume: str | None) -> None:
+    async def volume(self, ctx: commands.Context, volume: str | None) -> None:
         vc: wavelink.Player = ctx.voice_client
 
         if not vc:
@@ -296,7 +296,7 @@ class Music(commands.Cog):
 
     #TODO add paginator
     @commands.hybrid_command(aliases=["h", "historico", "histórico"])
-    async def history(self, ctx) -> None:
+    async def history(self, ctx: commands.Context) -> None:
         vc: wavelink.Player = ctx.voice_client
         try:
             embed = discord.Embed(description="\n".join([f'[{i+1}]({track.uri}) -- `{track.title}` {self.t("embed", "by")} `{track.info["context"].author}` {self.t("embed", "at")} {discord.utils.format_dt(track.info["time"], "t")}' for i, track in enumerate(reversed(vc.queue.history))]))
@@ -367,7 +367,7 @@ class Music(commands.Cog):
 
 
     @commands.hybrid_command(aliases=["sai"])
-    async def leave(self, ctx) -> None:
+    async def leave(self, ctx: commands.Context) -> None:
         vc: wavelink.Player = ctx.voice_client
 
         if not vc:
@@ -377,7 +377,7 @@ class Music(commands.Cog):
         await ctx.message.add_reaction("👋")
     
     @commands.hybrid_command(name="join", aliases=["entra"])
-    async def _join(self, ctx, *, channel: discord.VoiceChannel = None, _play: str = None) -> wavelink.Player:
+    async def _join(self, ctx: commands.Context, *, channel: discord.VoiceChannel = None, _play: str = None) -> wavelink.Player:
         if not ctx.author.voice:
             return await ctx.reply(self.t("err", "not_in_voice", mcommnand_name="join"))
         if not ctx.voice_client and not channel:
@@ -407,7 +407,7 @@ class Music(commands.Cog):
 
 
     @commands.hybrid_command(aliases=["q"])
-    async def queue(self, ctx) -> None:
+    async def queue(self, ctx: commands.Context) -> None:
         vc: wavelink.Player = ctx.voice_client
         if not vc:
             return await ctx.send(self.t("not_connected"))
@@ -445,7 +445,7 @@ class Music(commands.Cog):
 
 
     @commands.hybrid_command()
-    async def stop(self, ctx) -> None:
+    async def stop(self, ctx: commands.Context) -> None:
         vc: wavelink.Player = ctx.voice_client
         if not vc:
             return await ctx.send(self.t("not_connected"))
@@ -457,7 +457,7 @@ class Music(commands.Cog):
 
 
     @commands.hybrid_command(name="loop", aliases=["repeat"])
-    async def _loop(self, ctx) -> None:
+    async def _loop(self, ctx: commands.Context) -> None:
         vc: wavelink.Player = ctx.voice_client
         if not vc:
             return await ctx.send(self.t("not_connected"))
@@ -478,7 +478,7 @@ class Music(commands.Cog):
         return "⎯" * num_hash + ":radio_button:" + "⎯" * (length - num_hash - 1)
     
     @commands.hybrid_command(aliases=["np", "tocando", "playing", "tocandoagora", "tocando_agora", "nowplaying", "now", "agora"])
-    async def now_playing(self, ctx) -> None:
+    async def now_playing(self, ctx: commands.Context) -> None:
         vc: wavelink.Player = ctx.voice_client
         if not vc:
             return await ctx.send(self.t("not_connected"))
@@ -538,7 +538,7 @@ class Music(commands.Cog):
         ##await ctx.send(self.t("cmd", "filter", filter=filter.name))
 
     @commands.hybrid_command()
-    async def boost(self, ctx) -> None:
+    async def boost(self, ctx: commands.Context) -> None:
         vc: wavelink.Player = ctx.voice_client
 
         if not vc:
@@ -559,7 +559,7 @@ class Music(commands.Cog):
 
     #TODO make this wiht buttons, and add a better portuguese name to this
     @commands.hybrid_command()
-    async def seek(self, ctx, time: int) -> None:
+    async def seek(self, ctx: commands.Context, time: int) -> None:
         vc: wavelink.Player = ctx.voice_client
         time = time * 1000
         await vc.seek(time)
@@ -567,6 +567,58 @@ class Music(commands.Cog):
         time_so_seek_to = self.parse_duration(time / 1000)
         await ctx.send(self.t("cmd", "output", position=position, time=time_so_seek_to))
 
+
+    @commands.hybrid_command(aliases=["letras"])
+    async def lyrics(self, ctx: commands.Context, *, song: str = None):
+        vc: wavelink.Player = ctx.voice_client
+        lyrics = None
+        if vc:
+            is_playing = vc.is_playing()
+        else:
+            is_playing = False
+
+        if not song and not is_playing:
+            return await ctx.send(self.t("err", "nothing_to_search"))
+
+        if not song and is_playing:
+            async with ctx.typing():
+                song = vc.track.title
+                filtered = self._get_filtered_song(song)
+                print(f"song: {song} | filtered: {filtered}")
+                await ctx.send(self.t("cmd", "searching_lyrics", query=filtered))
+                try:
+                    lyrics, lyrics_url = await self.genius_lyrics.get_lyrics(filtered)
+                except SongNotFound:
+                    return await ctx.send(self.t("err", "song_not_found"))
+            
+        elif song:
+            async with ctx.typing():
+                await ctx.send(self.t("cmd", "searching_lyrics", query=song))
+                try:
+                    lyrics, lyrics_url = await self.genius_lyrics.get_lyrics(song)
+                except SongNotFound:
+                    return await ctx.send(self.t("err", "song_not_found"))
+
+
+        if not lyrics:
+            return await ctx.send(self.t("err", "no_lyrics", query=song))
+        if len(lyrics) > 1820: # 1820 = 2000 (discord's limit) - 180 (aprox. length of the rest of the message)
+            length = 0
+            splited = lyrics.splitlines()
+            for i, line in enumerate(splited):
+                length += len(line) + 1
+                if length > 1820:
+                    lyrics = "\n".join(splited[:i])
+
+                    return await ctx.send(lyrics + "\n\n" + self.t("cmd", "truncated", url=lyrics_url))
+        await ctx.send(lyrics + "\n\n" + self.t("cmd", "truncated", url=lyrics_url))    
+
+
+    @staticmethod
+    def _get_filtered_song(song: str) -> str:
+        song = song.replace("video", "").replace("lyrics", "").replace("official", "").replace("audio", "").replace("Video", "").replace("Lyrics", "").replace("Official", "").replace("Audio", "").replace("VIDEO", "").replace("LYRICS", "").replace("OFFICIAL", "").replace("AUDIO", "")
+        song = re.sub("[\(\[].*?[\)\]]", "", song)
+        return song
 
 
 

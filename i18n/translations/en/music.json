@@ -140,5 +140,19 @@
             "output": "`Boost` applied!",
             "removed": "`Boost` effect removed!"
         }
+    },
+    "lyrics": {
+        "command_name": "lyrics",
+        "command_description": "Gets the lyrics of the current song or a song you specify",
+
+        "cmd": {
+            "searching_lyrics": "Searching lyrics for `{query}`...",
+            "truncated": "Due to Discord limitations, the lyrics are truncated. Click here to see the full lyrics <{url}>."
+        },
+        "err": {
+            "nothing_to_search": "You didn't specify a song to search for and the bot wasn't playing anything!",
+            "no_lyrics": "No lyrics found for `{query}`!",
+            "song_not_found": "Couldn't find song in <https://genius.com>"
+        }
     } 
 }

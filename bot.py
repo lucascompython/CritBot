@@ -1,5 +1,4 @@
 import datetime
-import json
 import logging
 import logging.handlers
 import time
@@ -31,6 +30,7 @@ class CritBot(commands.Bot):
         owner_id: int,
         lavalink: dict[str, str | int],
         dev: bool,
+        genius_token: str,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
@@ -47,6 +47,7 @@ class CritBot(commands.Bot):
         self.owner_id = owner_id
         self.__start_time = time.time()
         self.dev = dev
+        self.genius_token = genius_token
         
         # i18n
         self.default_language = default_language
