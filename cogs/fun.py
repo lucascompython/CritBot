@@ -1,9 +1,9 @@
 import asyncio
+import random
 from typing import Optional
 
 import discord
 from discord import errors
-from discord.app_commands import locale_str as _T
 from discord.ext import commands
 
 
@@ -45,6 +45,17 @@ class Fun(commands.Cog):
         
         await ctx.send(self.t("cmd", "output", user=member))
 
+
+    @commands.hybrid_command(aliases=["memes"])
+    async def meme(self, ctx):
+        submission = random.choice(self.bot.submissions)
+
+        embed = discord.Embed(title=submission.title, color=discord.Color.blurple(), url="https://reddit.com" + submission.permalink)
+        embed.set_image(url=submission.url)
+
+        await ctx.send(embed=embed)
+
+        
 
 
 

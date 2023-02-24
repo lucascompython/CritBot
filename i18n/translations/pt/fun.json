@@ -21,5 +21,9 @@
         "err": {
             "dont_be_a_dick": "O maxímo de vezes a acordar um utilizador é 50."
         }
+    },
+    "meme": {
+        "command_name": "meme",
+        "command_description": "Envia um meme aleatório de r/memes"
     }
 }

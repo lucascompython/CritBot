@@ -26,5 +26,9 @@
             "dont_be_a_dick": "The max number of times waking up a user is 50."
         }
 
+    },
+    "meme": {
+        "command_name": "meme",
+        "command_description": "Send a random meme from r/memes"
     }
 }

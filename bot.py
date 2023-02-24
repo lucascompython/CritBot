@@ -4,6 +4,7 @@ import logging.handlers
 import time
 from collections import deque
 
+import asyncpraw
 import discord
 import orjson
 from aiofiles import open as async_open
@@ -32,6 +33,7 @@ class CritBot(commands.Bot):
         dev: bool,
         genius_token: str,
         spotify_cred: dict[str, str],
+        reddit_cred: dict[str, str],
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
@@ -50,6 +52,11 @@ class CritBot(commands.Bot):
         self.dev = dev
         self.genius_token = genius_token
         self.spotify_cred = spotify_cred
+        self.reddit_cred = reddit_cred
+
+        self.submissions = []
+        self.reddit: asyncpraw.Reddit = None
+
         
         # i18n
         self.default_language = default_language
@@ -63,6 +70,24 @@ class CritBot(commands.Bot):
     #TODO if all the commands can be hybrid command check the new (2.1 feature) interaction.translate to translate per user locale instead of per guild locale
 
     async def setup_hook(self) -> None:
+
+
+        self.logger.log(20, "Setting up the Reddit submissions.")
+        async with asyncpraw.Reddit(
+            client_id=self.reddit_cred["client_id"],
+            client_secret=self.reddit_cred["client_secret"],
+            user_agent=self.reddit_cred["user_agent"]
+        ) as reddit:
+            reddit.read_only = True
+
+            subreddit = await reddit.subreddit("memes")
+
+            async for submission in subreddit.top(limit=100, time_filter="week"):
+                self.submissions.append(submission)
+        self.reddit = reddit
+        self.logger.log(20, "Reddit submissions set up.")
+
+
 
         self.help_command = CritHelpCommand(i18n=self.i18n, slash=False)
 

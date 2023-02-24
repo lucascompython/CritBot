@@ -39,3 +39,11 @@ genius_token: ""
 spotify_cred:
   client_id: ""
   client_secret: ""
+
+
+
+# For Reddit support (https://www.reddit.com/prefs/apps)
+reddit_cred:
+  client_id: ""
+  client_secret: ""
+  user_agent: ""
