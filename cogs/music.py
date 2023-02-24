@@ -215,6 +215,10 @@ class Music(commands.Cog):
                             vc.track.info["loop"] = False
                             vc.track.info["time"] = datetime.datetime.now()
 
+                            track.info["context"] = ctx
+                            track.info["loop"] = False
+                            track.info["time"] = datetime.datetime.now()
+
                             await ctx.send(embed=await self.embed_generator(track, ctx.author))
                             first_track = False
 
