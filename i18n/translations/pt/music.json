@@ -7,7 +7,8 @@
         "command_description": "Toca uma musica",
         "cmd": {
             "queued": "Enfileirado **{track}** por **{author}**",
-            "queued_playlist": "Enfileirado **{playlist}** com **{length}** musicas"
+            "queued_playlist": "Enfileirado **{playlist}** com **{length}** musicas",
+            "queued_spotify_playlist": "Enfileirado **{length}** musicas"
         },
         "embed": {
             "title": "A tocar do {source}",
@@ -19,6 +20,9 @@
             "likes_dislikes": "Likes / Dislikes",
             "footer": "Data de upload: {upload_date}",
             "subs": "Inscritos"
+        },
+        "err": {
+            "somthing_went_wrong": "Algo correu com o Spotify!"
         }
     },
     "queue": {

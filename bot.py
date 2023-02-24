@@ -31,6 +31,7 @@ class CritBot(commands.Bot):
         lavalink: dict[str, str | int],
         dev: bool,
         genius_token: str,
+        spotify_cred: dict[str, str],
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
@@ -48,6 +49,7 @@ class CritBot(commands.Bot):
         self.__start_time = time.time()
         self.dev = dev
         self.genius_token = genius_token
+        self.spotify_cred = spotify_cred
         
         # i18n
         self.default_language = default_language

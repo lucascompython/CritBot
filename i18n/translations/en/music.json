@@ -10,7 +10,8 @@
         "cmd": {
             
             "queued": "Queued **{track}** by **{author}**",
-            "queued_playlist": "Queued **{playlist}** with **{length}** tracks"
+            "queued_playlist": "Queued **{playlist}** with **{length}** tracks",
+            "queued_spotify_playlist": "Queued **{length}** tracks"
         },
         "embed": {
             "title": "Now Playing from {source}",
@@ -22,6 +23,9 @@
             "likes_dislikes": "Likes / Dislikes",
             "footer": "Upload date: {upload_date}",
             "subs": "Subscribers"
+        },
+        "err": {
+            "something_went_wrong": "Something went wrong while tying to get data from Spotify!"
         }
     },
     "queue": {

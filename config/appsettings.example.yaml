@@ -34,3 +34,8 @@ lavalink:
 
 # Genius access token for lyrics command (https://genius.com/api-clients)
 genius_token: ""
+
+# For Spotify support (https://developer.spotify.com/dashboard/)
+spotify_cred:
+  client_id: ""
+  client_secret: ""

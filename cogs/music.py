@@ -8,10 +8,11 @@ import discord
 import wavelink
 from aiohttp import ContentTypeError
 from discord.ext import commands
+from wavelink.ext import spotify
 from yt_dlp import \
     YoutubeDL  # for extra info TODO add shorts, stories and tiktok
 
-from Utils import Paginator, GeniusLyrics, SongNotFound
+from Utils import GeniusLyrics, Paginator, SongNotFound
 
 #TODO optimize errors for example: the error not connected can be in a global error handler
 #TODO see if it is worth making a decorator for the commands that need the voice player and have the same checks for example: if not vc.is_playing: await ctx.send(self.t("not_playing"))
@@ -44,7 +45,11 @@ class Music(commands.Cog):
             bot=self.bot,
             host=self.bot.lavalink["ip"],
             port=self.bot.lavalink["port"],
-            password=self.bot.lavalink["password"]
+            password=self.bot.lavalink["password"],
+            spotify_client=spotify.SpotifyClient(
+                client_id=self.bot.spotify_cred["client_id"],
+                client_secret=self.bot.spotify_cred["client_secret"]
+            )
         )
         
     
@@ -150,6 +155,8 @@ class Music(commands.Cog):
         if playlist:
             for track in tracks:
                 track.info["context"] = ctx
+                track.info["loop"] = False
+                track.info["time"] = datetime.datetime.now()
                 await player.queue.put_wait(track)
                 #TODO get the playlist author
             return await ctx.send(self.t("cmd", "queued_playlist", length=len(tracks), playlist=playlist.name))
@@ -161,11 +168,65 @@ class Music(commands.Cog):
     @commands.hybrid_command(aliases=["p"])
     async def play(self, ctx: commands.Context, *, query: str) -> None:
         #TODO see wavelink.SearchableTrack.convert
-
-
+        #TODO see wavelink.SearchableTrack.seach, probably can remake this whole function with that
         vc: wavelink.Player = await self._join(ctx, _play="comesfromplaycommand")
 
-        query.strip("<>")
+        query = query.strip("<>")
+
+
+        if query.startswith("https://open.spotify.com"): # if it is actually a spotify link the function ends in this if statement
+            decoded = spotify.decode_url(query)
+            type: spotify.SpotifySearchType = decoded["type"]
+            id: str = decoded["id"]
+
+            match type:
+                case spotify.SpotifySearchType.track:
+                    track = await spotify.SpotifyTrack.search(query=id, return_first=True)
+                    track.info["context"] = ctx
+                    track.info["loop"] = False
+                    track.info["time"] = datetime.datetime.now()
+
+                    await vc.queue.put_wait(track)
+
+                    if vc.is_playing():
+                        return await ctx.send(self.t("cmd", "queued", track=track.title, author=track.author))
+
+                    track = await vc.queue.get_wait()
+                    await vc.play(track)
+                    await ctx.send(embed=await self.embed_generator(track, ctx.author))
+                    return
+                
+                case spotify.SpotifySearchType.album | spotify.SpotifySearchType.playlist:
+                    first_track = True 
+                    iterator = spotify.SpotifyTrack.iterator(query=id, type=type, partial_tracks=True)
+                    async for track in iterator:
+                        setattr(track, "info", {})
+                        track.info["context"] = ctx
+                        track.info["loop"] = False
+                        track.info["time"] = datetime.datetime.now()
+                        await vc.queue.put_wait(track)
+
+                        if first_track and not vc.is_playing():
+                            track = await vc.queue.get_wait()
+                            track = await vc.play(track)
+
+                            vc.track.info["context"] = ctx
+                            vc.track.info["loop"] = False
+                            vc.track.info["time"] = datetime.datetime.now()
+
+                            track.info["context"] = ctx
+                            track.info["loop"] = False
+                            track.info["time"] = datetime.datetime.now()
+
+                            await ctx.send(embed=await self.embed_generator(track, ctx.author))
+                            first_track = False
+
+                    count = iterator._count if not vc.is_playing() else iterator._count - 1
+
+                    return await ctx.send(self.t("cmd", "queued_spotify_playlist", length=count))
+                
+                case _:
+                    return await ctx.send(self.t("err", "something_went_wrong"))
 
         link_regex = "((http(s)*:[/][/]|www.)([a-z]|[A-Z]|[0-9]|[/.]|[~])*)"
         pattern = re.compile(link_regex)
@@ -194,10 +255,10 @@ class Music(commands.Cog):
             track.info["loop"] = False
             track.info["time"] = datetime.datetime.now()
 
-            await ctx.send(embed=await self.embed_generator(track, ctx.author))
             await vc.queue.put_wait(track)
             track = await vc.queue.get_wait()
             await vc.play(track)
+            await ctx.send(embed=await self.embed_generator(track, ctx.author))
             if is_playlist:
                 await self._add_to_queue(tracks[1:], vc, ctx, playlist)
         else:
@@ -302,7 +363,8 @@ class Music(commands.Cog):
             embed = discord.Embed(description="\n".join([f'[{i+1}]({track.uri}) -- `{track.title}` {self.t("embed", "by")} `{track.info["context"].author}` {self.t("embed", "at")} {discord.utils.format_dt(track.info["time"], "t")}' for i, track in enumerate(reversed(vc.queue.history))]))
             embed.set_author(name=self.t("embed", "title", user=ctx.author.name), icon_url=ctx.author.avatar.url)
             await ctx.send(embed=embed)
-        except AttributeError:
+        except AttributeError as e:
+            print(e)
             return await ctx.reply(self.t("err", "no_history"))
 
 
@@ -321,13 +383,20 @@ class Music(commands.Cog):
         track = await player.queue.get_wait()
 
 
-        ctx = track.info["context"]
+
+        player.queue.history[-1].info["time"] = datetime.datetime.now()
+        ctx = player.queue.history[-1].info["context"]
         requester = ctx.author
+        track = await player.play(track)
         embed = await self.embed_generator(track, requester)
         await ctx.send(embed=embed)
 
-        player.queue.history[-1].info["time"] = datetime.datetime.now()
-        await player.play(track)
+        #player.track.info["context"] = ctx
+        #player.track.info["loop"] = False
+        #player.queue.history[-1].info["context"] = ctx
+        #player.queue.history[-1].info["loop"] = False
+
+
 
 
     @commands.Cog.listener()
@@ -430,9 +499,15 @@ class Music(commands.Cog):
                 embed = discord.Embed(description=self.t("embed", "description", track=vc.track.title, user=vc.track.info["context"].author, current_time=self.parse_duration(progress), total_time=self.parse_duration(vc.track.duration)))
                 embed.set_author(icon_url=ctx.author.avatar.url, name=self.t("embed", "title"))
             if j < 9:
-                embed.add_field(name=f"{i+1}. {track.title}", value=f"{self.parse_duration(track.duration)} / Est. {self._estimate_time_until(track, vc)}", inline=False)
+                if hasattr(track, "duration"):
+                    embed.add_field(name=f"{i+1}. {track.title}", value=f"{self.parse_duration(track.duration)} / Est. {self._estimate_time_until(track, vc)}", inline=False)
+                else:
+                    embed.add_field(name=f"{i+1}. {track.title}", value=".", inline=False)
             else:
-                embed.add_field(name=f"{i+1}. {track.title}", value=f"{self.parse_duration(track.duration)} / Est. {self._estimate_time_until(track, vc)}", inline=False)
+                if hasattr(track, "duration"):
+                    embed.add_field(name=f"{i+1}. {track.title}", value=f"{self.parse_duration(track.duration)} / Est. {self._estimate_time_until(track, vc)}", inline=False)
+                else:
+                    embed.add_field(name=f"{i+1}. {track.title}", value=".", inline=False)
                 embeds.append(embed)
                 j = 0
                 continue
@@ -611,7 +686,7 @@ class Music(commands.Cog):
                     lyrics = "\n".join(splited[:i])
 
                     return await ctx.send(lyrics + "\n\n" + self.t("cmd", "truncated", url=lyrics_url))
-        await ctx.send(lyrics + "\n\n" + self.t("cmd", "truncated", url=lyrics_url))    
+        await ctx.send(lyrics)    
 
 
     @staticmethod
