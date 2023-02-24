@@ -150,5 +150,12 @@
             "no_lyrics": "Sem letras encontradas para `{query}`!",
             "song_not_found": "Não foi possivel encontrar a musica em <https://genius.com/>"
         }
+    },
+    "shuffle": {
+        "command_name": "shuffle",
+        "command_description": "Embaralha a fila",
+        "cmd": {
+            "output": "A fila foi embaralhada!"
+        }
     }
 }

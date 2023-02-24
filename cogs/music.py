@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import functools
+import random
 import re
 from typing import Optional
 
@@ -691,9 +692,25 @@ class Music(commands.Cog):
 
     @staticmethod
     def _get_filtered_song(song: str) -> str:
+        # WTF IS THIS SHIT RIGHT HERE LOL
         song = song.replace("video", "").replace("lyrics", "").replace("official", "").replace("audio", "").replace("Video", "").replace("Lyrics", "").replace("Official", "").replace("Audio", "").replace("VIDEO", "").replace("LYRICS", "").replace("OFFICIAL", "").replace("AUDIO", "")
-        song = re.sub("[\(\[].*?[\)\]]", "", song)
+        song = re.sub("[\(\[].*?[\)\]]", "", song) # remove everything between brackets and parenthesis including them
         return song
+
+
+    @commands.hybrid_command()
+    async def shuffle(self, ctx: commands.Context) -> None:
+        vc: wavelink.Player = ctx.voice_client
+        if not vc:
+            return await ctx.send(self.t("not_connected"))
+        if not vc.is_playing():
+            return await ctx.send(self.t("not_playing"))
+        if not vc.queue:
+            return await ctx.send(self.t("queue_empty"))
+        
+        random.shuffle(vc.queue._queue)
+
+        await ctx.send(self.t("cmd", "output"))
 
 
 

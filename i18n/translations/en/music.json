@@ -158,5 +158,12 @@
             "no_lyrics": "No lyrics found for `{query}`!",
             "song_not_found": "Couldn't find song in <https://genius.com>"
         }
+    },
+    "shuffle": {
+        "command_name": "shuffle",
+        "command_description": "Shuffle the queue",
+        "cmd": {
+            "output": "Shuffled the queue!"
+        }
     } 
 }
