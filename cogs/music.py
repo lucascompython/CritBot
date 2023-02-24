@@ -390,6 +390,7 @@ class Music(commands.Cog):
         requester = ctx.author
         track = await player.play(track)
         embed = await self.embed_generator(track, requester)
+        setattr(player.queue.history[-1], "uri", track.uri)
         await ctx.send(embed=embed)
 
         #player.track.info["context"] = ctx
