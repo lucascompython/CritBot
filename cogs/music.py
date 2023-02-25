@@ -393,8 +393,8 @@ class Music(commands.Cog):
         setattr(player.queue.history[-1], "uri", track.uri)
         await ctx.send(embed=embed)
 
-        #player.track.info["context"] = ctx
-        #player.track.info["loop"] = False
+        player.track.info["context"] = ctx
+        player.track.info["loop"] = False
         #player.queue.history[-1].info["context"] = ctx
         #player.queue.history[-1].info["loop"] = False
 
