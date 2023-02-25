@@ -661,7 +661,6 @@ class Music(commands.Cog):
             async with ctx.typing():
                 song = vc.track.title
                 filtered = self._get_filtered_song(song)
-                print(f"song: {song} | filtered: {filtered}")
                 await ctx.send(self.t("cmd", "searching_lyrics", query=filtered))
                 try:
                     lyrics, lyrics_url = await self.genius_lyrics.get_lyrics(filtered)
