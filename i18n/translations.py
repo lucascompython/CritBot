@@ -1,4 +1,3 @@
-import json
 import os
 from typing import Optional
 
@@ -161,10 +160,10 @@ class I18n:
             self.langs[str(guild_id)] = [key for key, value in self.accepted_langs.items() if lang in value][0]
 
         async with async_open("./i18n/langs.json", "wb") as f:
-            await f.write(json.dumps(self.langs, indent=4))
+            await f.write(orjson.dumps(self.langs, indent=4))
 
 
     async def delete_lang(self, guild_id: int) -> None:
         self.langs.pop(str(guild_id))
         async with async_open("./i18n/langs.json", "wb") as f:
-            await f.write(json.dumps(self.langs, indent=4))
+            await f.write(orjson.dumps(self.langs, indent=4))
