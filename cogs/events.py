@@ -16,7 +16,7 @@ class Events(commands.Cog):
         await self.bot.i18n.update_langs(guild.id, self.bot.default_language)
         self.log(20, f"Joined {guild.name} ({guild.id})")
         self.bot.tree.copy_global_to(guild=guild)
-        await self.tree.sync(guild=guild)
+        await self.bot.tree.sync(guild=guild)
     
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
