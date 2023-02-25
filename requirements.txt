@@ -10,3 +10,4 @@ psutil==5.9.4
 yt_dlp==2023.2.17
 lru-dict==1.1.8
 lxml==4.9.2
+asyncpraw==7.6.1
