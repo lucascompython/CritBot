@@ -395,8 +395,8 @@ class Music(commands.Cog):
 
         player.track.info["context"] = ctx
         player.track.info["loop"] = False
-        #player.queue.history[-1].info["context"] = ctx
-        #player.queue.history[-1].info["loop"] = False
+        player.queue.history[-1].info["context"] = ctx
+        player.queue.history[-1].info["loop"] = False
 
 
 
