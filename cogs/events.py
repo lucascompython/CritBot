@@ -15,7 +15,7 @@ class Events(commands.Cog):
         await self.bot.update_prefixes(guild.id, self.bot.default_prefix)
         await self.bot.i18n.update_langs(guild.id, self.bot.default_language)
         self.log(20, f"Joined {guild.name} ({guild.id})")
-        self.tree.copy_global_to(guild=guild)
+        self.bot.tree.copy_global_to(guild=guild)
         await self.tree.sync(guild=guild)
     
     @commands.Cog.listener()
