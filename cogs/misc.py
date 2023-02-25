@@ -54,7 +54,7 @@ class Misc(commands.Cog):
         self.bot.tree.add_command(self.help_test_cmd)
 
         #TODO fix this, this only works if the testing_guild is already in the database
-        class BugReport(discord.ui.Modal, title="Bugs" if not I18N[0].guild_id else self.t("modal", "modal_title", mcommand_name="bug_report", mcog_name="misc")):
+        class BugReport(discord.ui.Modal, title="Bugs"):
 
 
             def __init__(self, *args, guild_id: int, **kwargs) -> None:
@@ -63,16 +63,18 @@ class Misc(commands.Cog):
 
             
 
-            _title = discord.ui.TextInput(label=I18N[0].t("modal", "title", mcommand_name="bug_report", mcog_name="misc"), placeholder=I18N[0].t("modal", "title_placeholder", mcommand_name="bug_report", mcog_name="misc"))
-            description = discord.ui.TextInput(label=I18N[0].t("modal", "description", mcommand_name="bug_report", mcog_name="misc"), placeholder=I18N[0].t("modal", "description_placeholder", mcommand_name="bug_report", mcog_name="misc"), style=discord.TextStyle.long, max_length=300)
+            #_title = discord.ui.TextInput(label=I18N[0].t("modal", "title", mcommand_name="bug_report", mcog_name="misc"), placeholder=I18N[0].t("modal", "title_placeholder", mcommand_name="bug_report", mcog_name="misc"))
+            _title = discord.ui.TextInput(label="Title",  placeholder="A simplefied title of the bug")
+            #description = discord.ui.TextInput(label=I18N[0].t("modal", "description", mcommand_name="bug_report", mcog_name="misc"), placeholder=I18N[0].t("modal", "description_placeholder", mcommand_name="bug_report", mcog_name="misc"), style=discord.TextStyle.long, max_length=300)
+            description = discord.ui.TextInput(label="Description", placeholder="A detailed description of the bug", style=discord.TextStyle.long, max_length=300)
                 
 
             async def on_submit(self, interaction: discord.Interaction):
                 await save_bug_report(interaction.user.id, interaction.guild, self._title.value, self.description.value, datetime.now())
-                await interaction.response.send_message(I18N[0].t("modal", "thank_you", mcommand_name="bug_report", mcog_name="misc"), ephemeral=True)
+                await interaction.response.send_message("Thank you for your report!", ephemeral=True)
 
             async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
-                await interaction.response.send_message(I18N[0].t("err", "oops", mcommand_name="bug_report", mcog_name="misc"), ephemeral=True)
+                await interaction.response.send_message("Oops something went wrong", ephemeral=True)
 
                 traceback.print_exception(type(error), error, error.__traceback__)
 
