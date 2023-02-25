@@ -48,7 +48,7 @@ class GeniusLyrics():
         lyrics = str(div[0].text_content())
         lyrics = lyrics[1:-1] 
 
-        thing = "You might also likeEmbe"
+        thing = "You might also like"
         index = lyrics.find(thing)
 
         lyrics = lyrics[:index]
