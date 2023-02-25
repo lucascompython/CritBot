@@ -160,11 +160,11 @@ class I18n:
         elif any(lang in sublist for sublist in self.accepted_langs.values()):
             self.langs[str(guild_id)] = [key for key, value in self.accepted_langs.items() if lang in value][0]
 
-        async with async_open("./i18n/langs.json", "w") as f:
+        async with async_open("./i18n/langs.json", "wb") as f:
             await f.write(json.dumps(self.langs, indent=4))
 
 
     async def delete_lang(self, guild_id: int) -> None:
         self.langs.pop(str(guild_id))
-        async with async_open("./i18n/langs.json", "w") as f:
+        async with async_open("./i18n/langs.json", "wb") as f:
             await f.write(json.dumps(self.langs, indent=4))

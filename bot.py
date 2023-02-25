@@ -167,14 +167,14 @@ class CritBot(commands.Bot):
             pass
 
         self.prefixes[str(guild_id)] = new_prefix
-        async with async_open("./prefixes.json", mode="w") as f:
+        async with async_open("./prefixes.json", mode="wb") as f:
             # write json async
             await f.write(orjson.dumps(self.prefixes, option=orjson.OPT_INDENT_2))
         
     async def delete_prefix(self, guild_id: int) -> None:
         """Deletes the prefix for the guild"""
         self.prefixes.pop(str(guild_id))
-        async with async_open("./prefixes.json", "w") as f:
+        async with async_open("./prefixes.json", "wb") as f:
             await f.write(orjson.dumps(self.prefixes, option=orjson.OPT_INDENT_2))
 
     async def reload_prefixes(self) -> None:
