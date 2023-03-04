@@ -175,6 +175,7 @@ class Music(commands.Cog):
         query = query.strip("<>")
 
 
+
         if query.startswith("https://open.spotify.com"): # if it is actually a spotify link the function ends in this if statement
             decoded = spotify.decode_url(query)
             type: spotify.SpotifySearchType = decoded["type"]
@@ -238,7 +239,7 @@ class Music(commands.Cog):
         matches = re.search(playlist_regex, query)
 
         groups = matches.groups() if matches is not None else []
-        is_playlist = len(groups) > 0 or "playlist" in query
+        is_playlist = len(groups) > 0 or "/playlist?list=" in query
 
         if not is_playlist:
             #TODO check this, seach function apparently can return a playlist
@@ -503,7 +504,6 @@ class Music(commands.Cog):
                 embed.set_author(icon_url=ctx.author.avatar.url, name=self.t("embed", "title"))
             if j < 9:
                 if hasattr(track, "duration"): 
-                    print(f"track: {track.title} -> type: {type(track)}")
                     embed.add_field(name=f"{i+1}. {track.title}", value=f"{self.parse_duration(track.duration)} / Est. {self._estimate_time_until(track, vc)}", inline=False)
                 else:
                     embed.add_field(name=f"{i+1}. {track.title}", value=".", inline=False)
