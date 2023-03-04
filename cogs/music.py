@@ -467,9 +467,10 @@ class Music(commands.Cog):
         """Estimate the time until the given position."""
         index = player.queue._queue.index(track)
         queue_until_track = list(player.queue._queue)[:index]
-        estimated_time = sum(track.length for track in queue_until_track)
-        for i in queue_until_track:
-            estimated_time += i.length
+        estimated_time = sum(track.length if hasattr(track, "length") else 0 for track in queue_until_track) # PartialTracks don't have a length attribute
+        if hasattr(player, "length"):
+            for i in queue_until_track:
+                estimated_time += i.length
 
         if player.is_playing:
             estimated_time += player.track.length - player.position
@@ -501,7 +502,8 @@ class Music(commands.Cog):
                 embed = discord.Embed(description=self.t("embed", "description", track=vc.track.title, user=vc.track.info["context"].author, current_time=self.parse_duration(progress), total_time=self.parse_duration(vc.track.duration)))
                 embed.set_author(icon_url=ctx.author.avatar.url, name=self.t("embed", "title"))
             if j < 9:
-                if hasattr(track, "duration"):
+                if hasattr(track, "duration"): 
+                    print(f"track: {track.title} -> type: {type(track)}")
                     embed.add_field(name=f"{i+1}. {track.title}", value=f"{self.parse_duration(track.duration)} / Est. {self._estimate_time_until(track, vc)}", inline=False)
                 else:
                     embed.add_field(name=f"{i+1}. {track.title}", value=".", inline=False)
