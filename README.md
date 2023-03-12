@@ -36,11 +36,10 @@ cd CritBot
 
 - [X] add internationalization with i18n
 - [X] add i18n to app_commands and on commands descriptions
-- [ ] add Music
-- [ ] get a real database probably PostgreSql
+- [X] add Music
+- [X] get a real database probably PostgreSql
 - [ ] add support for other languages with Google Translate
 - [ ] add Docker support
-- [ ] add most of the Discord API
 
 ## Known "bugs"
 
