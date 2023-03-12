@@ -10,6 +10,7 @@ from sys import version_info
 from time import sleep
 from typing import Optional
 
+import asyncpg
 import discord
 import uvloop
 from aiohttp import ClientSession
@@ -98,7 +99,7 @@ async def start_bot(dev: bool) -> None:
                 i18n.command_name = interaction.command.qualified_name.replace(" ", "_")
             return True
 
-    async with ClientSession() as our_client:
+    async with ClientSession() as our_client, asyncpg.create_pool(**data["postgres"]) as pool:
         
         exts = []
         for filename in os.listdir("./cogs"):
@@ -110,6 +111,7 @@ async def start_bot(dev: bool) -> None:
                 prefixes=prefixes,
                 web_client=our_client,
                 initial_extensions=exts,
+                db_pool=pool,
                 **data,
                 intents=discord.Intents.all(),
                 command_prefix=get_prefix,

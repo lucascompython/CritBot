@@ -47,3 +47,12 @@ reddit_cred:
   client_id: ""
   client_secret: ""
   user_agent: ""
+
+
+
+postgres:
+  host: "localhost"
+  port: 5432
+  user: ""
+  password: ""
+  database: "crit" # default database name

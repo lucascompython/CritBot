@@ -4,6 +4,7 @@ import logging.handlers
 import time
 from collections import deque
 
+import asyncpg
 import asyncpraw
 import discord
 import orjson
@@ -23,6 +24,7 @@ class CritBot(commands.Bot):
         prefixes: dict[str, str],
         web_client: ClientSession,
         initial_extensions: list[str],
+        db_pool: asyncpg.Pool, 
         source_link: str,
         invite_link: str,
         default_prefix: str,
@@ -56,6 +58,8 @@ class CritBot(commands.Bot):
 
         self.submissions = []
         self.reddit: asyncpraw.Reddit = None
+
+        self.db_pool = db_pool
 
         
         # i18n

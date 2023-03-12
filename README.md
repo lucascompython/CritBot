@@ -13,6 +13,17 @@ Python 3.10+ is required.
 I would prefer if you don't run an instance of my bot. You can just invite him [here](https://discord.com/api/oauth2/authorize?client_id=931322447117053972&permissions=8&scope=bot).  
 Nevertheless, the installation steps are as follows:
 
+I have only teste PostgreSQL 15.2 but it should work with other versions.
+
+Create a database and a user with the `psql` tool:
+
+```pgsql
+CREATE ROLE user WITH LOGIN PASSWORD 'yourpw';
+CREATE DATABASE crit OWNER user;
+```
+
+And then
+
 ```bash
 git clone https://github.com/lucascompython/CritBot.git
 cd CritBot
