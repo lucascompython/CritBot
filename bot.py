@@ -78,9 +78,7 @@ class CritBot(commands.Bot):
 
         self.logger.log(20, "Setting up the Reddit submissions.")
         async with asyncpraw.Reddit(
-            client_id=self.reddit_cred["client_id"],
-            client_secret=self.reddit_cred["client_secret"],
-            user_agent=self.reddit_cred["user_agent"]
+            **self.reddit_cred
         ) as reddit:
             reddit.read_only = True
 
