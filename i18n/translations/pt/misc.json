@@ -2,7 +2,6 @@
     "ping": {
         "command_name": "ping",
         "command_description": "Mostra o ping do bot.",
-
         "cmd": {
             "output": "O meu ping é {latency}ms."
         }
@@ -10,7 +9,6 @@
     "invite": {
         "command_name": "convidar",
         "command_description": "Mostra o link de convite do bot.",
-
         "cmd": {
             "output": "O meu convite é {invite}."
         }
@@ -18,13 +16,10 @@
     "source_code": {
         "command_name": "codigo",
         "command_description": "Mostra o link do codigo fonte do bot.",
-
         "cmd": {
             "output": "O meu código fonte está disponível em {source_link}."
         }
     },
-
-
     "show_info": {
         "command_name": "Mostar Informações",
         "command_description": "Mostra informções sobre um utilizador.",
@@ -40,10 +35,8 @@
             "premium": "Premium/Nitro",
             "activity": "Atividade",
             "top_role": "Cargo principal"
-
         }
     },
-
     "userinfo": {
         "command_name": "userinfo",
         "command_description": "Mostra informções sobre um membro."
@@ -66,7 +59,6 @@
             "uptime": "Tempo de atividade"
         }
     },
-
     "help": {
         "command_name": "ajuda",
         "command_description": "Mostra a lista de comandos.",
@@ -90,6 +82,13 @@
     "help_slash": {
         "command_name": "help",
         "command_description": "Mostra a lista de comandos."
+    },
+    "top_cmds": {
+        "command_name": "topcmds",
+        "command_description": "Mostra os comandos mais usados.",
+        "embed": {
+            "title": "Top Comandos",
+            "description": "Usado {value} vezes"
+        }
     }
-    
 }

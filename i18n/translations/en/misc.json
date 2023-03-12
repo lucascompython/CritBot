@@ -2,7 +2,6 @@
     "ping": {
         "command_name": "ping",
         "command_description": "Get the bot's ping",
-
         "cmd": {
             "output": "My ping is {latency}ms."
         }
@@ -10,7 +9,6 @@
     "invite": {
         "command_name": "invite",
         "command_description": "Get the bot's invite link",
-
         "cmd": {
             "output": "You can invite me to your server with this link: {invite}"
         }
@@ -18,13 +16,10 @@
     "source_code": {
         "command_name": "source",
         "command_description": "Get the bot's source code",
-
         "cmd": {
             "output": "You can find my source code on GitHub: {source_link}"
         }
     },
-
-
     "show_info": {
         "command_name": "Show Info",
         "command_description": "Show information about a given user.",
@@ -40,15 +35,12 @@
             "premium": "Premium/Nitro",
             "activity": "Activity",
             "top_role": "Top Role"
-
         }
     },
-
     "userinfo": {
         "command_name": "userinfo",
         "command_description": "Show information about a given user."
     },
-
     "bot_info": {
         "command_name": "botinfo",
         "command_description": "Show information about the bot.",
@@ -67,14 +59,11 @@
             "uptime": "Uptime"
         }
     },
-
     "help": {
         "command_name": "help",
         "command_description": "Shows the help command.",
-
         "title": "|  Command list"
     },
-
     "bug_report": {
         "command_name": "bug",
         "command_description": "Report a bug to the developer.",
@@ -93,7 +82,13 @@
     "help_slash": {
         "command_name": "help",
         "command_description": "Shows the help command."
+    },
+    "top_cmds": {
+        "command_name": "topcmds",
+        "command_description": "Shows the top commands used.",
+        "embed": {
+            "title": "Top Commands",
+            "description": "Used {value} times"
+        }
     }
-
-
 }

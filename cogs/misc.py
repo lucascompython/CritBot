@@ -86,6 +86,32 @@ class Misc(commands.Cog):
 
 
 
+    @commands.hybrid_command(aliases=["topcmds", "topcommands", "top_commands", "top"])
+    async def top_cmds(self, ctx: commands.Context):
+        # TODO make this command work per guild
+        pool = self.bot.db_pool
+
+        async with pool.acquire() as conn:
+            values = await conn.fetch("SELECT name, number FROM commands;")
+        
+
+        values: list[dict[str, int]] = [dict(x) for x in values] 
+        sorted_values = sorted(values, key=lambda x: x["number"], reverse=True)
+
+        embed = discord.Embed(title=self.t("embed", "title") )
+        for i, value in enumerate(sorted_values):
+            if i == 10:
+                break
+            embed.add_field(name=f"{i+1}. {value['name']}", value=self.t("embed", "description", value=value["number"]), inline=False)
+
+
+
+
+        await ctx.send(embed=embed)
+
+        
+
+
 
 
 
