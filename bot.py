@@ -215,8 +215,7 @@ class CritBot(commands.Bot):
         return True
             
 
-    #@tasks.loop(minutes=5.0)
-    @tasks.loop(seconds=5.0)
+    @tasks.loop(minutes=5.0)
     async def batch_update_commands(self) -> None:
         """Updates the number of time a command has been used to the database"""
         if any(value for value in self.used_commands.values()):
