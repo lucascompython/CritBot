@@ -18,3 +18,4 @@ echo "{}" > ./i18n/langs.json
 echo "{}" > ./logs/bug_reports.json
 echo "Done!"
 echo "Don't forget to edit the config files! (config/appsettings.yaml, config/application.yml)"
+echo "And don't forget to install PostgreSQL if you don't already have it!"
