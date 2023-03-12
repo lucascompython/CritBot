@@ -103,14 +103,11 @@ class CritBot(commands.Bot):
 
     async def setup_hook(self) -> None:
 
-        await asyncio.gather(self.apply_migrations(), self.get_reddit_submissions())
+        translator = Translator(i18n=self.i18n)
+        await asyncio.gather(self.apply_migrations(), self.get_reddit_submissions(), self.tree.set_translator(translator))
 
         self.help_command = CritHelpCommand(i18n=self.i18n, slash=False)
 
-        translator = Translator(i18n=self.i18n)
-        self.logger.log(20, "Setting up the translator.")
-        await self.tree.set_translator(translator)
-        self.logger.log(20, "Translator set up")
 
 
         self.logger.log(20, "Loading the cogs.")
