@@ -98,7 +98,7 @@ class CritBot(commands.Bot):
             async for submission in subreddit.top(limit=100, time_filter="week"):
                 self.submissions.append(submission)
         
-        return reddit
+        self.reddit = reddit
 
 
     async def setup_hook(self) -> None:
