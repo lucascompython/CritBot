@@ -8,6 +8,7 @@ owner_id: 0
 
 description: ""
 
+# The prefix of the bot when it joins a new guild.
 default_prefix: ""
 
 # Check the translations folder to see the available languages.
