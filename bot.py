@@ -132,18 +132,6 @@ class CritBot(commands.Bot):
         self.batch_update_commands.start()
 
 
-    async def change_activity(self) -> None:
-        """Changes the bot's activity"""
-        await self.change_presence(
-            activity=discord.Activity(
-                type=discord.ActivityType.listening,
-                name=f"{self.default_prefix}help",
-            )
-        )
-
-
-
-
 
     async def on_ready(self) -> None:
         await self.change_presence(
