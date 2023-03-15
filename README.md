@@ -38,6 +38,7 @@ cd CritBot
 - [X] add i18n to app_commands and on commands descriptions
 - [X] add Music
 - [X] get a real database probably PostgreSql
+- [ ] update to wavelink 2.0
 - [ ] add support for other languages with Google Translate
 - [ ] add Docker support
 
