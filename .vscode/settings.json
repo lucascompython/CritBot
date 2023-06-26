@@ -1,0 +1,15 @@
+{
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "python.formatting.provider": "none",
+  "python.linting.mypyEnabled": true,
+  "python.linting.mypyArgs": [
+    "--follow-imports=silent",
+    "--show-column-numbers",
+    "--allow-subclassing-any",
+    "--allow-untyped-calls",
+    //"--strict"
+  ],
+  "python.linting.enabled": true
+}

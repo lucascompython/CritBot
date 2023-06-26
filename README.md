@@ -10,8 +10,8 @@ Shoutout to the team behind <https://returnyoutubedislike.com> for being awesome
 
 This bot was only tested on Linux.  
 Python 3.10+ is required.  
-I would prefer if you don't run an instance of my bot. You can just invite him [here](https://discord.com/api/oauth2/authorize?client_id=931322447117053972&permissions=8&scope=bot).  
-Nevertheless, the installation steps are as follows:
+You can invite him [here](https://discord.com/api/oauth2/authorize?client_id=931322447117053972&permissions=8&scope=bot).  
+The installation steps are as follows:
 
 I have only tested PostgreSQL 15.2 but it should work with other versions.
 
@@ -27,9 +27,16 @@ And then
 ```bash
 git clone https://github.com/lucascompython/CritBot.git
 cd CritBot
-./setup.sh
+# install PDM (build tool)
+pip install pdm
+
+# install dependencies
+pdm install
+
+pdm run setup
+pdm run start --help
+
 #change the appsettings.yaml file with your token and information
-./launcher.py --help
 ```
 
 ## Todo's (mostly by order)
@@ -39,6 +46,7 @@ cd CritBot
 - [X] add Music
 - [X] get a real database probably PostgreSql
 - [ ] update to wavelink 2.0
+- [ ] follow ruff's and mypy's suggestions
 - [ ] add support for other languages with Google Translate
 - [ ] add Docker support
 
@@ -51,7 +59,8 @@ cd CritBot
 ## Contributions
 
 Feel free to help.  
-If you have any questions on the code you can send me a DM on my Discord (Lucas cheio da drip#0230)
+If you have any questions on the code you can send me a DM on my Discord (Lucas cheio da drip#0230)  
+I recommend using [PDM](https://pdm.fming.dev/) as the build tool. [Ruff](https://beta.ruff.rs/docs/) as a linter and [Mypy](https://mypy.readthedocs.io/en/stable/) as a type checker.
 
 # License
 
