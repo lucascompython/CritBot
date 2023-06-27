@@ -28,7 +28,10 @@ And then
 git clone https://github.com/lucascompython/CritBot.git
 cd CritBot
 # install PDM (build tool)
-pip install pdm
+pip install pdm # Also, fuck PEP 668
+
+# activate virtual environmet
+eval $(pdm venv activate)
 
 # install dependencies
 pdm install
