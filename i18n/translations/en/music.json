@@ -2,13 +2,10 @@
     "not_playing": "I'm not playing anything!",
     "not_connected": "I'm not connected to a voice channel!",
     "queue_empty": "The queue is empty!",
-
     "play": {
         "command_name": "play",
         "command_description": "Play a song",
-
         "cmd": {
-            
             "queued": "Queued **{track}** by **{author}**",
             "queued_playlist": "Queued **{playlist}** with **{length}** tracks",
             "queued_spotify_playlist": "Queued **{length}** tracks"
@@ -34,10 +31,8 @@
         "embed": {
             "title": "|  Queue",
             "description": "Currently playing: `{track}` added by `{user}` `[{current_time}/{total_time}]`"
-
         }
     },
-
     "skip": {
         "command_name": "skip",
         "command_description": "Skip the current song"
@@ -45,7 +40,6 @@
     "pause": {
         "command_name": "pause",
         "command_description": "Pause the current song",
-        
         "err": {
             "already_paused": "The song is already paused!"
         }
@@ -53,7 +47,6 @@
     "resume": {
         "command_name": "resume",
         "command_description": "Resume the current song",
-        
         "err": {
             "not_paused": "The song is not paused!"
         }
@@ -61,7 +54,6 @@
     "volume": {
         "command_name": "volume",
         "command_description": "Change the volume",
-        
         "cmd": {
             "output": "Changed the volume to {volume}%!",
             "volume": "The volume is {volume}%!"
@@ -93,7 +85,7 @@
         },
         "err": {
             "not_in_voice": "You are not in a voice channel!",
-            "already_connected": "I'm already connected to a voice channel!"
+            "already_connected": "I'm already connected to your voice channel!"
         }
     },
     "leave": {
@@ -122,7 +114,6 @@
     "now_playing": {
         "command_name": "now_playing",
         "command_description": "Show the information about the current song being played",
-
         "embed": {
             "title": "|  Now Playing",
             "currently_playing": "Currently playing:",
@@ -148,7 +139,6 @@
     "lyrics": {
         "command_name": "lyrics",
         "command_description": "Gets the lyrics of the current song or a song you specify",
-
         "cmd": {
             "searching_lyrics": "Searching lyrics for `{query}`...",
             "truncated": "Due to Discord limitations, the lyrics are truncated. Click here to see the full lyrics <{url}>."
@@ -165,5 +155,5 @@
         "cmd": {
             "output": "Shuffled the queue!"
         }
-    } 
+    }
 }

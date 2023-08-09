@@ -17,7 +17,7 @@ from aiofiles import open as async_open
 from aiohttp import ClientSession
 from discord.ext import commands, tasks
 
-from i18n import Translator
+from i18n import Translator, I18n
 from Utils import CritHelpCommand
 
 
@@ -25,7 +25,7 @@ class CritBot(commands.Bot):
     def __init__(
         self,
         *args,
-        i18n,
+        i18n: I18n,
         prefixes: dict[str, str],
         web_client: ClientSession,
         initial_extensions: list[str],

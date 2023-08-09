@@ -6,7 +6,7 @@ echo "Done!"
 
 
 echo "Downloading Lavalink..."
-wget "https://github.com/freyacodes/Lavalink/releases/download/3.7.5/Lavalink.jar" -O ./config/Lavalink.jar
+wget "https://github.com/freyacodes/Lavalink/releases/download/3.7.7/Lavalink.jar" -O ./config/Lavalink.jar
 echo "Done!"
 
 echo "Installing config files..."

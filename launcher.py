@@ -211,6 +211,9 @@ if __name__ == "__main__":
         else:
             uvloop.install()
             asyncio.run(main())
+    except KeyboardInterrupt:
+        print("\nInterrupted by user.")
+        exit(0)
     finally:
         if lavalink_proc:
             print("\nKilling Lavalink...")
