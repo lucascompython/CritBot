@@ -12,7 +12,6 @@ import asyncpraw
 import discord
 import orjson
 import wavelink
-from wavelink.ext import spotify
 from aiofiles import open as async_open
 from aiohttp import ClientSession
 from discord.ext import commands, tasks
@@ -107,17 +106,17 @@ class CritBot(commands.Bot):
         self.help_command = CritHelpCommand(i18n=self.i18n, slash=False)
 
         # Initiate the lavalink client
-        node: wavelink.Node = wavelink.Node(
-            uri=self.lavalink["ip"] + ":" + self.lavalink["port"],
-            password=self.lavalink["password"],
-        )
-        spotify_client = spotify.SpotifyClient(
-            client_id=self.spotify_cred["client_id"],
-            client_secret=self.spotify_cred["client_secret"],
-        )
-        await wavelink.NodePool.connect(
-            client=self, nodes=[node], spotify=spotify_client
-        )
+        # node: wavelink.Node = wavelink.Node(
+        #     uri=self.lavalink["ip"] + ":" + self.lavalink["port"],
+        #     password=self.lavalink["password"],
+        # )
+        # spotify_client = spotify.SpotifyClient(
+        #     client_id=self.spotify_cred["client_id"],
+        #     client_secret=self.spotify_cred["client_secret"],
+        # )
+        # await wavelink.NodePool.connect(
+        #     client=self, nodes=[node], spotify=spotify_client
+        # )
 
         self.logger.log(20, "Loading the cogs.")
         # load all cogs in ./cogs

@@ -7,6 +7,7 @@ import os
 import subprocess
 from dataclasses import dataclass
 from sys import version_info
+from argparse import ArgumentParser
 from time import sleep
 
 import asyncpg
@@ -190,9 +191,7 @@ def arg_parser() -> argparse.ArgumentParser:
     return parser.parse_args()
 
 
-async def main() -> None:
-    args = arg_parser()
-
+async def main(args: ArgumentParser) -> None:
     print("Starting bot...")
     if args.lavalink:
         print(f"Connecting to Lavalink at {args.lavalink}")
@@ -205,12 +204,15 @@ async def main() -> None:
 
 if __name__ == "__main__":
     try:
-        if version_info >= (3, 11):
+        args = arg_parser()
+        if int(uvloop.__version__.split(".")[1]) >= 18:
+            uvloop.run(main(args), debug=args.dev)
+        elif version_info >= (3, 11):
             with asyncio.Runner(loop_factory=uvloop.new_event_loop) as runner:
                 runner.run(main())
         else:
             uvloop.install()
-            asyncio.run(main())
+            asyncio.run(main(), debug=args.dev)
     except KeyboardInterrupt:
         print("\nInterrupted by user.")
         exit(0)
