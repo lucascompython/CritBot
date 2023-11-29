@@ -85,7 +85,7 @@
         },
         "err": {
             "not_in_voice": "Não estás num canal de voz!",
-            "already_connected": "Já estou num canal de voz!"
+            "already_connected": "Já estou no teu canal de voz!"
         }
     },
     "leave": {
@@ -114,7 +114,6 @@
     "now_playing": {
         "command_name": "tocando_agora",
         "command_description": "Mostra informações sobre a música que está a tocar",
-
         "embed": {
             "title": "|  A tocar",
             "currently_playing": "Tocando Atualmente:",
@@ -140,7 +139,6 @@
     "lyrics": {
         "command_name": "letras",
         "command_description": "Mostra as letras da música que está a tocar ou de uma música especifica",
-
         "cmd": {
             "searching_lyrics": "A procurar letras para `{query}`...",
             "truncated": "Devido a limitações do Discord as letras foram truncadas. Clica aqui para ver as letras completas <{url}>."

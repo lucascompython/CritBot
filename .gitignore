@@ -5,6 +5,7 @@ langs.json
 test.py
 .idea
 Lavalink.jar
+Lavalink
 application.yml
 *.log
 *.gz
