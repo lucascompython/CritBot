@@ -35,6 +35,16 @@ class Music(commands.Cog):
         self.t = self.bot.i18n.t
         self.log = self.bot.logger.log
 
+    @commands.Cog.listener()
+    async def on_wavelink_node_ready(
+        self, payload: wavelink.NodeReadyEventPayload
+    ) -> None:
+        self.log(
+            20,
+            f"Wavelink node <{payload.node.identifier}> ready! "
+            f"({payload.node.players} players)",
+        )
+
     async def cog_load(self) -> None:
         print("Loaded {name} cog!".format(name=self.__class__.__name__))
 

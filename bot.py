@@ -106,6 +106,16 @@ class CritBot(commands.Bot):
         self.help_command = CritHelpCommand(i18n=self.i18n, slash=False)
 
         # Initiate the lavalink client
+
+        nodes = [
+            wavelink.Node(
+                uri=self.lavalink["ip"] + ":" + self.lavalink["port"],
+                password=self.lavalink["password"],
+            )
+        ]
+
+        await wavelink.Pool.connect(nodes=nodes, client=self, cache_capacity=100)
+
         # node: wavelink.Node = wavelink.Node(
         #     uri=self.lavalink["ip"] + ":" + self.lavalink["port"],
         #     password=self.lavalink["password"],
