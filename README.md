@@ -9,7 +9,7 @@ Shoutout to the team behind <https://returnyoutubedislike.com> for being awesome
 ## Installation & Execution
 
 This bot was only tested on Linux.  
-Python 3.10+ is required.  
+Python 3.12+ is required.  
 You can invite him [here](https://discord.com/api/oauth2/authorize?client_id=931322447117053972&permissions=8&scope=bot).  
 The installation steps are as follows:
 
