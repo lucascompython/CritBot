@@ -1,6 +1,6 @@
 [project]
 name = "CritBot"
-version = "0.1.0"
+version = "0.2.0"
 description = "A really cool Discord Bot"
 authors = [{ name = "Lucas de Linhares", email = "lucasdelinhares@gmail.com" }]
 dependencies = [
@@ -19,7 +19,7 @@ dependencies = [
     "lxml==4.9.3",
     "asyncpraw==7.7.1",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 license = { text = "GPL-3.0" }
 
 [build-system]

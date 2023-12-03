@@ -4,9 +4,8 @@ echo "Installing dependencies..."
 pip3 install -r requirements.txt
 echo "Done!"
 
-
 echo "Downloading Lavalink..."
-wget "https://github.com/freyacodes/Lavalink/releases/download/3.7.7/Lavalink.jar" -O ./config/Lavalink.jar
+wget "https://github.com/freyacodes/Lavalink/releases/download/4.0.0/Lavalink.jar" -O ./config/Lavalink.jar
 echo "Done!"
 
 echo "Installing config files..."
