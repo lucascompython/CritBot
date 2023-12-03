@@ -2,6 +2,8 @@
     "not_playing": "Não estou a tocar nada!",
     "not_connected": "Não estou num canal de voz!",
     "queue_empty": "A fila está vazia!",
+    "not_in_voice": "Não estás num canal de voz!",
+    "not_in_same_voice": "Não estás no mesmo canal de voz que eu!",
     "play": {
         "command_name": "play",
         "command_description": "Toca uma musica",
@@ -22,6 +24,7 @@
             "subs": "Inscritos"
         },
         "err": {
+            "no_tracks_found": "Nenhuma musica encontrada para `{query}`!",
             "somthing_went_wrong": "Algo correu com o Spotify!"
         }
     },
@@ -92,10 +95,6 @@
         "command_name": "sai",
         "command_description": "Sai do canal de voz"
     },
-    "filter": {
-        "command_name": "filtro",
-        "command_description": "Mete um filtro na música"
-    },
     "seek": {
         "command_name": "seek",
         "command_description": "Vai para um tempo especifico na música",
@@ -154,6 +153,49 @@
         "command_description": "Embaralha a fila",
         "cmd": {
             "output": "A fila foi embaralhada!"
+        }
+    },
+    "filter_nightcore": {
+        "command_name": "nightcore",
+        "command_description": "Mete um filtro de nightcore na música",
+        "cmd": {
+            "nightcore_off": "O filtro de `nightcore` foi desligado!"
+        }
+    },
+    "filter_clear": {
+        "command_name": "limpar",
+        "command_description": "Limpa todos os filtros"
+    },
+    "filter": {
+        "command_name": "lista_filtros",
+        "group_name": "filter",
+        "group_description": "Show the list of filters",
+        "command_description": "Mostra todos os filtros",
+        "embed": {
+            "title": "|  Lista de Filtros",
+            "filters": "Filtros",
+            "description": "Para usar um filtro usa `filter <filtro>`"
+        }
+    },
+    "filter_bass_boost": {
+        "command_name": "bassboost",
+        "command_description": "Mete um filtro de `bassboost` na música",
+        "cmd": {
+            "bassboost_off": "O filtro de `bassboost` foi desligado!"
+        }
+    },
+    "filter_8d": {
+        "command_name": "8d",
+        "command_description": "Mete um filtro de `8d` na música",
+        "cmd": {
+            "8d_off": "O filtro de `8d` foi desligado!"
+        }
+    },
+    "filter_reverb": {
+        "command_name": "reverb",
+        "command_description": "Mete um filtro de `slowed + reverb` na música",
+        "cmd": {
+            "reverb_off": "O filtro de `slowed + reverb` foi desligado!"
         }
     }
 }

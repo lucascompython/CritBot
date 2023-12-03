@@ -2,6 +2,8 @@
     "not_playing": "I'm not playing anything!",
     "not_connected": "I'm not connected to a voice channel!",
     "queue_empty": "The queue is empty!",
+    "not_in_voice": "You are not in a voice channel!",
+    "not_in_same_voice": "You are not in the same voice channel as me!",
     "play": {
         "command_name": "play",
         "command_description": "Play a song",
@@ -22,6 +24,7 @@
             "subs": "Subscribers"
         },
         "err": {
+            "no_tracks_found": "No tracks found for `{query}`!",
             "something_went_wrong": "Something went wrong while tying to get data from Spotify!"
         }
     },
@@ -92,10 +95,6 @@
         "command_name": "leave",
         "command_description": "Leave a voice channel"
     },
-    "filter": {
-        "command_name": "filter",
-        "command_description": "Set a filter effect to the current song"
-    },
     "seek": {
         "command_name": "seek",
         "command_description": "Seek to a specific time in the current song",
@@ -154,6 +153,49 @@
         "command_description": "Shuffle the queue",
         "cmd": {
             "output": "Shuffled the queue!"
+        }
+    },
+    "filter_nightcore": {
+        "command_name": "nightcore",
+        "command_description": "Set the nightcore effect to the current song",
+        "cmd": {
+            "nightcore_off": "Turned off `nightcore` effect!"
+        }
+    },
+    "filter_clear": {
+        "command_name": "clear_filters",
+        "command_description": "Clear all the filters from the current song"
+    },
+    "filter": {
+        "command_name": "filter_list",
+        "group_name": "filter",
+        "group_description": "Show the list of filters",
+        "command_description": "Show the list of filters",
+        "embed": {
+            "title": "|  Filters",
+            "filters": "Filters",
+            "description": "To apply a filter, use `filter <filter>`"
+        }
+    },
+    "filter_bass_boost": {
+        "command_name": "bassboost",
+        "command_description": "Set the bassboost effect to the current song",
+        "cmd": {
+            "bassboost_off": "`Bassboost` effect removed!"
+        }
+    },
+    "filter_8d": {
+        "command_name": "8d",
+        "command_description": "Set the 8D effect to the current song",
+        "cmd": {
+            "8d_off": "`8D` effect removed!"
+        }
+    },
+    "filter_reverb": {
+        "command_name": "reverb",
+        "command_description": "Set the slowed + reverb effect to the current song",
+        "cmd": {
+            "reverb_off": "`Slowed + Reverb` effect removed!"
         }
     }
 }
