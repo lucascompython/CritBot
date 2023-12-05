@@ -167,7 +167,7 @@
         "command_description": "Limpa todos os filtros"
     },
     "filter": {
-        "command_name": "lista_filtros",
+        "command_name": "filtros",
         "group_name": "filter",
         "group_description": "Show the list of filters",
         "command_description": "Mostra todos os filtros",

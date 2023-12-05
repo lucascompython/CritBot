@@ -12,3 +12,4 @@ application.yml
 auto_slots*
 bug_reports.json
 .pdm-python
+*cache

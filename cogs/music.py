@@ -10,6 +10,7 @@ import asyncio
 from bot import CritBot
 from Utils import GeniusLyrics, Paginator, SongNotFound
 from enum import Enum
+from typing import cast
 
 
 class Platform(Enum):
@@ -45,6 +46,19 @@ class Music(commands.Cog):
             f"({payload.node.players} players)",
         )
 
+    @staticmethod
+    async def send_reaction(ctx: commands.Context, msg: str) -> None:
+        """This function sends a reaction if the it is a prefix command, or a message if it is a slash command.
+
+        Args:
+            ctx (commands.Context): The context of the command.
+            msg (str): The message to send.
+        """
+        if ctx.message.content:
+            await ctx.message.add_reaction(msg)
+        else:
+            await ctx.send(msg)
+
     async def ensure_voice(self, ctx: commands.Context) -> bool:
         """This function always ensures that the bot is in a voice channel.
         If the bot is not in a voice channel, it will join the voice channel.
@@ -57,16 +71,16 @@ class Music(commands.Cog):
             bool: If the bot is in the same voice channel as the user.
         """
 
-        player: wavelink.Player = ctx.voice_client
-        if not ctx.author.voice or not ctx.author.voice.channel:
+        player = cast(wavelink.Player, ctx.voice_client)
+        if not ctx.author.voice or not ctx.author.voice.channel:  # type: ignore
             await ctx.send(self.t("not_in_voice"))
             return False
         if player is not None and player.connected:
-            if player.channel.id != ctx.author.voice.channel.id:
+            if player.channel.id != ctx.author.voice.channel.id:  # type: ignore
                 await ctx.send(self.t("not_in_same_voice"))
                 return False
         else:
-            await ctx.author.voice.channel.connect(self_deaf=True, cls=wavelink.Player)
+            await ctx.author.voice.channel.connect(self_deaf=True, cls=wavelink.Player)  # type: ignore
         return True
 
     @commands.hybrid_command(aliases=["p"])
@@ -78,10 +92,10 @@ class Music(commands.Cog):
 
         tracks: wavelink.Search = await wavelink.Playable.search(query)
 
-        player: wavelink.Player = ctx.voice_client
+        player = cast(wavelink.Player, ctx.voice_client)
 
         if not tracks:
-            await ctx.reply(self.t("cmd", "no_tracks_found", query=query))
+            await ctx.reply(self.t("err", "no_tracks_found", query=query))
             return
 
         if isinstance(tracks, wavelink.Playlist):
@@ -112,7 +126,7 @@ class Music(commands.Cog):
     async def filter(self, ctx: commands.Context) -> None:
         # list all filters
         if ctx.invoked_subcommand is None:
-            filter_cmd_list = [cmd.name for cmd in ctx.command.commands]
+            filter_cmd_list = [cmd.name for cmd in ctx.command.commands]  # type: ignore
             embed = discord.Embed(
                 title=self.t("embed", "title"),
                 description=self.t("embed", "description"),
@@ -129,7 +143,7 @@ class Music(commands.Cog):
 
     @filter.command(name="nightcore")
     async def nightcore(self, ctx: commands.Context) -> None:
-        player: wavelink.Player = ctx.voice_client
+        player = cast(wavelink.Player, ctx.voice_client)
         if not player:
             await ctx.send(self.t("not_in_voice"))
             return
@@ -152,12 +166,12 @@ class Music(commands.Cog):
 
         filters.timescale.set(pitch=1.2, speed=1.2, rate=1)
         await asyncio.gather(
-            player.set_filters(filters, seek=True), ctx.message.add_reaction("\u2705")
+            player.set_filters(filters, seek=True), self.send_reaction(ctx, "\u2705")
         )
 
     @filter.command(name="bass_boost")
     async def bass_boost(self, ctx: commands.Context) -> None:
-        player: wavelink.Player = ctx.voice_client
+        player = cast(wavelink.Player, ctx.voice_client)
         if not player:
             await ctx.send(self.t("not_in_voice"))
             return
@@ -178,12 +192,12 @@ class Music(commands.Cog):
         filters.equalizer.set(bands=[{"band": 0, "gain": 0.25}])
 
         await asyncio.gather(
-            player.set_filters(filters, seek=True), ctx.message.add_reaction("\u2705")
+            player.set_filters(filters, seek=True), self.send_reaction(ctx, "\u2705")
         )
 
     @filter.command(name="8d")
     async def eight_d(self, ctx: commands.Context) -> None:
-        player: wavelink.Player = ctx.voice_client
+        player = cast(wavelink.Player, ctx.voice_client)
         if not player:
             await ctx.send(self.t("not_in_voice"))
             return
@@ -210,14 +224,15 @@ class Music(commands.Cog):
         filters.tremolo.set(depth=0.3, frequency=14)
         filters.rotation.set(rotation_hz=0.125)
         filters.equalizer.set(bands=[{"band": 1, "gain": -0.2}])
+
         await asyncio.gather(
-            player.set_filters(filters, seek=True), ctx.message.add_reaction("\u2705")
+            player.set_filters(filters, seek=True), self.send_reaction(ctx, "\u2705")
         )
 
     # slowed + reverb
     @filter.command(name="reverb")
     async def reverb(self, ctx: commands.Context) -> None:
-        player: wavelink.Player = ctx.voice_client
+        player = cast(wavelink.Player, ctx.voice_client)
         if not player:
             await ctx.send(self.t("not_in_voice"))
             return
@@ -240,12 +255,12 @@ class Music(commands.Cog):
         filters.timescale.set(pitch=0.8, rate=0.9)
 
         await asyncio.gather(
-            player.set_filters(filters, seek=True), ctx.message.add_reaction("\u2705")
+            player.set_filters(filters, seek=True), self.send_reaction(ctx, "\u2705")
         )
 
     @filter.command(name="clear", aliases=["limpar"])
     async def clear(self, ctx: commands.Context) -> None:
-        player: wavelink.Player = ctx.voice_client
+        player = cast(wavelink.Player, ctx.voice_client)
         if not player:
             await ctx.send(self.t("not_in_voice"))
             return
@@ -256,12 +271,12 @@ class Music(commands.Cog):
         filters: wavelink.Filters = player.filters
         filters.reset()
         await asyncio.gather(
-            player.set_filters(filters, seek=True), ctx.message.add_reaction("\u2705")
+            player.set_filters(filters, seek=True), self.send_reaction(ctx, "\u2705")
         )
 
     @commands.hybrid_command(aliases=["pausa"])
     async def pause(self, ctx: commands.Context) -> None:
-        player: wavelink.Player = ctx.voice_client
+        player = cast(wavelink.Player, ctx.voice_client)
         if not player:
             await ctx.send(self.t("not_in_voice"))
             return
@@ -272,16 +287,16 @@ class Music(commands.Cog):
             await ctx.send(self.t("err", "already_paused"))
             return
 
-        await asyncio.gather(player.pause(True), ctx.message.add_reaction("⏸️"))
+        await asyncio.gather(player.pause(True), self.send_reaction(ctx, "⏸️"))
 
     @commands.hybrid_command(aliases=["continua"])
     async def resume(self, ctx: commands.Context) -> None:
-        player: wavelink.Player = ctx.voice_client
+        player = cast(wavelink.Player, ctx.voice_client)
         if not player:
             await ctx.send(self.t("not_in_voice"))
             return
         if player.paused:
-            await asyncio.gather(player.pause(False), ctx.message.add_reaction("⏭️"))
+            await asyncio.gather(player.pause(False), self.send_reaction(ctx, "⏭️"))
         else:
             await ctx.send(self.t("err", "not_paused"))
 
