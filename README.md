@@ -55,7 +55,7 @@ pdm run start --help
 
 ## Known "bugs"
 
-- URGENT - Probably on commands that take more time to execute, if another command is invoked while the other is executing the translations might get mixed up. Probably will need to inplement a sort of message queue linked to a guild's channel.  
+- URGENT - Probably on commands that take more time to execute, if another command is invoked while the other is executing the translations might get mixed up. 
 - The interaction name, description, choices, etc. are set per user locale while everything else is set per guild language.
 - The helper.py file is a mess and probably has some bugs.
 
