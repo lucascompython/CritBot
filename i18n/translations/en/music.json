@@ -197,5 +197,9 @@
         "cmd": {
             "reverb_off": "`Slowed + Reverb` effect removed!"
         }
+    },
+    "filter_show": {
+        "command_name": "show",
+        "command_description": "Show the available filters"
     }
 }

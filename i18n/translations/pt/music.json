@@ -197,5 +197,9 @@
         "cmd": {
             "reverb_off": "O filtro de `slowed + reverb` foi desligado!"
         }
+    },
+    "filter_show": {
+        "command_name": "mostrar",
+        "command_description": "Mostra os filtros disponiveis"
     }
 }

@@ -122,16 +122,17 @@ class Music(commands.Cog):
             filter_name = "slowed + reverb"
         return filter_name.replace("_", " ").title()
 
-    @commands.hybrid_group(aliases=["f", "filtro"])
-    async def filter(self, ctx: commands.Context) -> None:
+    async def filter_show_logic(self, ctx: commands.Context) -> None:
         # list all filters
         if ctx.invoked_subcommand is None:
-            filter_cmd_list = [cmd.name for cmd in ctx.command.commands]  # type: ignore
+            filter_cmd_list = [cmd.name for cmd in self.bot.get_command("filter").commands]  # type: ignore
             embed = discord.Embed(
-                title=self.t("embed", "title"),
-                description=self.t("embed", "description"),
+                title=self.t("embed", "title", mcommand_name="filter"),
+                description=self.t("embed", "description", mcommand_name="filter"),
             )
             for fil in filter_cmd_list:
+                if fil == "show":
+                    continue
                 embed.add_field(
                     name=self.nice_filter_name(fil),
                     value=fil
@@ -140,6 +141,15 @@ class Music(commands.Cog):
                     inline=False,
                 )
             await ctx.send(embed=embed)
+
+    @commands.hybrid_group(aliases=["f", "filtro"])
+    async def filter(self, ctx: commands.Context) -> None:
+        await self.filter_show_logic(ctx)
+
+    @filter.command(name="show", aliases=["mostrar"])
+    async def show(self, ctx: commands.Context) -> None:
+        self.bot.i18n.command_name = "filter"
+        await self.filter_show_logic(ctx)
 
     @filter.command(name="nightcore")
     async def nightcore(self, ctx: commands.Context) -> None:
