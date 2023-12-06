@@ -44,7 +44,7 @@ pdm run start --help
 
 ## Todo's (mostly by order)
 
-- [X] add internationalization with i18n
+- [X] add internationalization
 - [X] add i18n to app_commands and on commands descriptions
 - [X] add Music
 - [X] get a real database probably PostgreSql
