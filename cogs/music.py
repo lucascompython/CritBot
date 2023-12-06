@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, override
 
 import discord
 from discord import app_commands
@@ -45,6 +45,24 @@ class Music(commands.Cog):
             f"Wavelink node <{payload.node.identifier}> ready! "
             f"({payload.node.players} players)",
         )
+
+    @commands.Cog.listener()
+    async def on_wavelink_track_start(
+        self, payload: wavelink.TrackStartEventPayload
+    ) -> None:
+        self.log(20, f"Wavelink track <{payload.track.title}> started!")
+        self.log(20, f"Original {payload.original.title}")
+
+    @commands.Cog.listener()
+    async def on_wavelink_track_end(
+        self, payload: wavelink.TrackEndEventPayload
+    ) -> None:
+        player: wavelink.Player = payload.player
+        if player.queue:
+            await asyncio.gather(
+                player.play(await player.queue.get_wait()),
+                player.ctx.send(f"A tocar agora: {payload.track.title}"),
+            )
 
     @staticmethod
     async def send_reaction(ctx: commands.Context, msg: str) -> None:
@@ -93,6 +111,7 @@ class Music(commands.Cog):
         tracks: wavelink.Search = await wavelink.Playable.search(query)
 
         player = cast(wavelink.Player, ctx.voice_client)
+        player.ctx = ctx
 
         if not tracks:
             await ctx.reply(self.t("err", "no_tracks_found", query=query))
@@ -115,6 +134,46 @@ class Music(commands.Cog):
 
         if not player.playing:
             await player.play(await player.queue.get_wait(), volume=30)
+
+    @commands.hybrid_command(aliases=["s"])
+    async def skip(self, ctx: commands.Context) -> None:
+        player = cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            await ctx.send(self.t("not_in_voice"))
+            return
+        if not player.playing:
+            await ctx.send(self.t("not_playing"))
+            return
+
+        await asyncio.gather(
+            player.skip(force=True), self.send_reaction(ctx, "\u23ED\ufe0f")
+        )
+
+    @commands.hybrid_command(aliases=["p", "pausa"])
+    async def pause(self, ctx: commands.Context) -> None:
+        player = cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            await ctx.send(self.t("not_in_voice"))
+            return
+        if not player.playing:
+            await ctx.send(self.t("not_playing"))
+            return
+        if player.paused:
+            await ctx.send(self.t("err", "already_paused"))
+            return
+
+        await asyncio.gather(player.pause(True), self.send_reaction(ctx, "⏸️"))
+
+    @commands.hybrid_command(aliases=["r", "continua"])
+    async def resume(self, ctx: commands.Context) -> None:
+        player = cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            await ctx.send(self.t("not_in_voice"))
+            return
+        if player.paused:
+            await asyncio.gather(player.pause(False), self.send_reaction(ctx, "⏭️"))
+        else:
+            await ctx.send(self.t("err", "not_paused"))
 
     @staticmethod
     def nice_filter_name(filter_name: str) -> str:
