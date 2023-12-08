@@ -201,5 +201,12 @@
     "filter_show": {
         "command_name": "mostrar",
         "command_description": "Mostra os filtros disponiveis"
+    },
+    "tts": {
+        "command_name": "tts",
+        "command_description": "Toca um texto em voz alta",
+        "err": {
+            "no_text": "Não há texto para ler!"
+        }
     }
 }

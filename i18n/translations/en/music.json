@@ -201,5 +201,12 @@
     "filter_show": {
         "command_name": "show",
         "command_description": "Show the available filters"
+    },
+    "tts": {
+        "command_name": "tts",
+        "command_description": "Play a text-to-speech message",
+        "err": {
+            "no_text": "You didn't specify any text to say!"
+        }
     }
 }

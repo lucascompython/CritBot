@@ -5,6 +5,7 @@ from discord import app_commands
 import wavelink
 from discord.ext import commands
 import asyncio
+import urllib.parse
 
 # import the bot class from bot.py
 from bot import CritBot
@@ -149,7 +150,7 @@ class Music(commands.Cog):
             player.skip(force=True), self.send_reaction(ctx, "\u23ED\ufe0f")
         )
 
-    @commands.hybrid_command(aliases=["p", "pausa"])
+    @commands.hybrid_command(aliases=["pausa"])
     async def pause(self, ctx: commands.Context) -> None:
         player = cast(wavelink.Player, ctx.voice_client)
         if not player:
@@ -343,31 +344,40 @@ class Music(commands.Cog):
             player.set_filters(filters, seek=True), self.send_reaction(ctx, "\u2705")
         )
 
-    @commands.hybrid_command(aliases=["pausa"])
-    async def pause(self, ctx: commands.Context) -> None:
-        player = cast(wavelink.Player, ctx.voice_client)
-        if not player:
-            await ctx.send(self.t("not_in_voice"))
+    @commands.hybrid_command(aliases=["t"])
+    async def tts(self, ctx: commands.Context, *, text: str = None) -> None:
+        if not text:
+            await ctx.send(self.t("err", "no_text"))
             return
+        # URI encode the text
+        text = urllib.parse.quote(text)
+        if not await self.ensure_voice(ctx):
+            return
+
+        player = cast(wavelink.Player, ctx.voice_client)
+        tracks: wavelink.Search = await wavelink.Playable.search(
+            "ftts://" + text
+        )  # flower tts
+        track = tracks[0]
+
         if not player.playing:
-            await ctx.send(self.t("not_playing"))
-            return
-        if player.paused:
-            await ctx.send(self.t("err", "already_paused"))
-            return
-
-        await asyncio.gather(player.pause(True), self.send_reaction(ctx, "⏸️"))
-
-    @commands.hybrid_command(aliases=["continua"])
-    async def resume(self, ctx: commands.Context) -> None:
-        player = cast(wavelink.Player, ctx.voice_client)
-        if not player:
-            await ctx.send(self.t("not_in_voice"))
-            return
-        if player.paused:
-            await asyncio.gather(player.pause(False), self.send_reaction(ctx, "⏭️"))
+            await asyncio.gather(
+                player.play(track, volume=100),
+                self.send_reaction(ctx, "\u2705"),
+            )
         else:
-            await ctx.send(self.t("err", "not_paused"))
+            await asyncio.gather(
+                player.queue.put_wait(track),
+                ctx.send(
+                    self.t(
+                        "cmd",
+                        "queued",
+                        track=track.title,
+                        author=track.author,
+                        mcommand_name="play",
+                    )
+                ),
+            )
 
     async def cog_load(self) -> None:
         print("Loaded {name} cog!".format(name=self.__class__.__name__))

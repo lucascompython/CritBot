@@ -12,11 +12,11 @@ plugins:
       # - "ytsearch:%QUERY%" # Will be used if track has no ISRC or no track could be found for the ISRC
       #  you can add multiple other fallback sources here
     sources:
-      spotify: false # Enable Spotify source
+      spotify: true # Enable Spotify source
       applemusic: false # Enable Apple Music source
       deezer: false # Enable Deezer source
       yandexmusic: false # Enable Yandex Music source
-      flowerytts: false # Enable Flowery TTS source
+      flowerytts: true # Enable Flowery TTS source
       youtube: false # Enable YouTube search source (https://github.com/topi314/LavaSearch)
     spotify:
       clientId: "your client id"
@@ -41,7 +41,7 @@ plugins:
     yandexmusic:
       accessToken: "your access token" # the token used for accessing the yandex music api. See https://github.com/TopiSenpai/LavaSrc#yandex-music
     flowerytts:
-      voice: "default voice" # (case-sensitive) get default voice from here https://api.flowery.pw/v1/tts/voices
+      voice: "Carolina" # (case-sensitive) get default voice from here https://api.flowery.pw/v1/tts/voices
       translate: false # whether to translate the text to the native language of voice
       silence: 0 # the silence parameter is in milliseconds. Range is 0 to 10000. The default is 0.
       speed: 1.0 # the speed parameter is a float between 0.5 and 10. The default is 1.0. (0.5 is half speed, 2.0 is double speed, etc.)
