@@ -163,7 +163,7 @@
         }
     },
     "filter_clear": {
-        "command_name": "clear_filters",
+        "command_name": "clear",
         "command_description": "Clear all the filters from the current song"
     },
     "filter": {
