@@ -351,12 +351,14 @@ class Music(commands.Cog):
             return
         # URI encode the text
         text = urllib.parse.quote(text)
+        lang = self.bot.i18n.get_lang(ctx.guild.id)
+        voice = "Carolina" if lang == "pt" else "Olivia"
         if not await self.ensure_voice(ctx):
             return
 
         player = cast(wavelink.Player, ctx.voice_client)
         tracks: wavelink.Search = await wavelink.Playable.search(
-            "ftts://" + text
+            "ftts://" + text + "?voice=" + voice
         )  # flower tts
         track = tracks[0]
 
