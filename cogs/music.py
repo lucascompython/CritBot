@@ -132,6 +132,23 @@ class Music(commands.Cog):
                 self.t("cmd", "queued_playlist", playlist=tracks.name, length=added)
             )
         else:
+            node = wavelink.Pool.get_node()
+
+            resp = await node.send(
+                "PUT",
+                path=f"v4/sessions/{node.session_id}/players/{ctx.guild.id}/sponsorblock/categories",
+                data=[
+                    "sponsor",
+                    "selfpromo",
+                    # "interaction",
+                    "intro",
+                    "outro",
+                    # "preview",
+                    "music_offtopic",
+                    # "filler",
+                ],
+            )
+            print(resp)
             await asyncio.gather(
                 player.queue.put_wait(tracks[0]),
                 ctx.send(
@@ -400,7 +417,7 @@ class Music(commands.Cog):
             return
 
         time = secs * 1000
-        position = self.parse_duration(round(player.position))
+        position = self.parse_duration(round(player.position / 1000))
         time_to_seek = self.parse_duration(secs)
 
         await asyncio.gather(
