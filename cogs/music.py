@@ -5,6 +5,7 @@ from discord import app_commands
 import wavelink
 from discord.ext import commands
 import asyncio
+import datetime
 import urllib.parse
 
 # import the bot class from bot.py
@@ -77,6 +78,13 @@ class Music(commands.Cog):
             await ctx.message.add_reaction(msg)
         else:
             await ctx.send(msg)
+
+    @staticmethod
+    def parse_duration(duration: float | int) -> str:
+        value = str(datetime.timedelta(seconds=duration))
+        if value.startswith("0:"):
+            value = value[2:]
+        return value
 
     async def ensure_voice(self, ctx: commands.Context) -> bool:
         """This function always ensures that the bot is in a voice channel.
@@ -380,6 +388,25 @@ class Music(commands.Cog):
                     )
                 ),
             )
+
+    @commands.hybrid_command()
+    async def seek(self, ctx: commands.Context, secs: int) -> None:
+        player = cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            await ctx.send(self.t("not_in_voice"))
+            return
+        if not player.playing:
+            await ctx.send(self.t("not_playing"))
+            return
+
+        time = secs * 1000
+        position = self.parse_duration(round(player.position))
+        time_to_seek = self.parse_duration(secs)
+
+        await asyncio.gather(
+            player.seek(time),
+            ctx.send(self.t("cmd", "output", position=position, time=time_to_seek)),
+        )
 
     async def cog_load(self) -> None:
         print("Loaded {name} cog!".format(name=self.__class__.__name__))
