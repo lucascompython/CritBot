@@ -2,7 +2,6 @@
     "change_prefix": {
         "command_name": "prefix",
         "command_description": "Change the prefix of the bot.",
-
         "cmd": {
             "output": "Prefix changed to **{prefix}**"
         },
@@ -10,11 +9,9 @@
             "same_prefix": "The prefix is already **{prefix}**"
         }
     },
-
     "change_language": {
         "command_name": "language",
         "command_description": "Change the language of the bot.",
-
         "cmd": {
             "output": "Language changed to **{lang}**!"
         },
@@ -22,6 +19,31 @@
             "same_language": "**{lang}** is already the defined language.",
             "invalid_language": "Sorry I don't support **{lang}** yet :frowning2:.\nThe supported languages are: **{langs}**."
         }
+    },
+    "sponsorblock": {
+        "group_name": "sponsorblock",
+        "group_description": "Skip the sponsor of the current video",
+        "command_name": "sponsorblock",
+        "command_description": "Skip the sponsor of the current video",
+        "embed": {
+            "title": "|  Sponsorblock Categories",
+            "description": "Currently skipping:",
+            "footer": "\u2705 - Skipping | \u274C - Not Skipping"
+        }
+    },
+    "sponsorblock_show": {
+        "command_name": "show",
+        "command_description": "Show the categories to skip"
+    },
+    "sponsorblock_enable": {
+        "command_name": "enable",
+        "command_description": "Enable a category to skip",
+        "cmd": {
+            "output": "Enabled **{category}**"
+        },
+        "err": {
+            "already_enabled": "**{category}** is already enabled",
+            "invalid_category": "**{category}** is not a valid category\nUse `sponsorblock show` to see the categories"
+        }
     }
-
 }

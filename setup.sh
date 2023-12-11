@@ -10,9 +10,7 @@ echo "Installing config files..."
 cp ./config/appsettings.example.yaml ./config/appsettings.yaml
 cp ./config/application.example.yml ./config/application.yml
 mkdir logs
-echo "{}" > prefixes.json
-echo "{}" > ./i18n/langs.json
-echo "{}" > ./logs/bug_reports.json
+echo "{}" > ./logs/bug_reports.json # TODO: Make this in the database
 echo "Done!"
 echo "Don't forget to edit the config files! (config/appsettings.yaml, config/application.yml)"
 echo "And don't forget to install PostgreSQL if you don't already have it!"

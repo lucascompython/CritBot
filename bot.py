@@ -4,13 +4,13 @@ import logging
 import logging.handlers
 import time
 from collections import deque
+from typing import Optional
 
 import aiofiles
 import aiofiles.os
 import asyncpg
 import asyncpraw
 import discord
-import orjson
 import wavelink
 from aiofiles import open as async_open
 from aiohttp import ClientSession
@@ -25,7 +25,7 @@ class CritBot(commands.Bot):
         self,
         *args,
         i18n: I18n,
-        prefixes: dict[str, str],
+        prefixes: dict[int, str],
         web_client: ClientSession,
         initial_extensions: list[str],
         db_pool: asyncpg.Pool,
@@ -71,6 +71,8 @@ class CritBot(commands.Bot):
         self.default_language = default_language
         self.i18n = i18n
 
+        self.wavelink_node: wavelink.Node = None
+
         if self.dev:
             self.last_cmds = deque(maxlen=10)  # cache the 10 last commands
 
@@ -106,27 +108,13 @@ class CritBot(commands.Bot):
         self.help_command = CritHelpCommand(i18n=self.i18n, slash=False)
 
         # Initiate the lavalink client
-
-        nodes = [
-            wavelink.Node(
-                uri=self.lavalink["ip"] + ":" + self.lavalink["port"],
-                password=self.lavalink["password"],
-            )
-        ]
+        self.node = wavelink.Node(
+            uri=self.lavalink["ip"] + ":" + self.lavalink["port"],
+            password=self.lavalink["password"],
+        )
+        nodes = [self.node]
 
         await wavelink.Pool.connect(nodes=nodes, client=self, cache_capacity=100)
-
-        # node: wavelink.Node = wavelink.Node(
-        #     uri=self.lavalink["ip"] + ":" + self.lavalink["port"],
-        #     password=self.lavalink["password"],
-        # )
-        # spotify_client = spotify.SpotifyClient(
-        #     client_id=self.spotify_cred["client_id"],
-        #     client_secret=self.spotify_cred["client_secret"],
-        # )
-        # await wavelink.NodePool.connect(
-        #     client=self, nodes=[node], spotify=spotify_client
-        # )
 
         self.logger.log(20, "Loading the cogs.")
         # load all cogs in ./cogs
@@ -177,31 +165,55 @@ class CritBot(commands.Bot):
         else:
             raise ValueError("Invalid mode")
 
-    async def update_prefixes(self, guild_id: int, new_prefix: str) -> None:
-        """Updates the prefixes.json file with the new prefix"""
+    async def update_prefixes(
+        self, guild_id: int, new_prefix: str, ctx: Optional[commands.Context] = None
+    ) -> None:
+        """This function updates the prefixes in the database and in the prefixes dict
+
+        Args:
+            guild_id (int): The guild id
+            new_prefix (str): The new prefix
+            ctx (Optional[commands.Context], optional): If provided the function will send the output message to the context's channel. Defaults to None.
+        """
         try:
-            if self.prefixes[str(guild_id)] == new_prefix:
-                raise ValueError("The new prefix is the same as the old one")
+            if self.prefixes[guild_id] == new_prefix:
+                if ctx:
+                    await ctx.send(
+                        self.i18n.t("err", "same_prefix", prefix=new_prefix, ctx=ctx)
+                    )
+                    return
         except KeyError:
-            # if the guild is not in the prefixes.json file yet probably because it's a new guild from a new server
+            # if the guild is not in the database yet probably because it's a new guild from a new server
             pass
 
-        self.prefixes[str(guild_id)] = new_prefix
-        async with async_open("./prefixes.json", mode="wb") as f:
-            # write json async
-            await f.write(orjson.dumps(self.prefixes, option=orjson.OPT_INDENT_2))
+        self.prefixes[guild_id] = new_prefix
 
-    async def delete_prefix(self, guild_id: int) -> None:
-        """Deletes the prefix for the guild"""
-        self.prefixes.pop(str(guild_id))
-        async with async_open("./prefixes.json", "wb") as f:
-            await f.write(orjson.dumps(self.prefixes, option=orjson.OPT_INDENT_2))
+        # update in the database
+        async with self.db_pool.acquire() as conn:
+            if ctx:
+                await asyncio.gather(
+                    conn.execute(
+                        "INSERT INTO guilds (id, prefix) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET prefix = excluded.prefix;",
+                        guild_id,
+                        new_prefix,
+                    ),
+                    ctx.send(self.i18n.t("cmd", "output", prefix=new_prefix, ctx=ctx)),
+                )
+            else:
+                await conn.execute(
+                    "INSERT INTO guilds (id, prefix) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET prefix = excluded.prefix;",
+                    guild_id,
+                    new_prefix,
+                )
 
     async def reload_prefixes(self) -> None:
-        """Reloads from the prefixes.json file
+        """Reloads from the database
         Only use case when the developer changes manually the prefixes"""
-        async with async_open("./prefixes.json", "r") as f:
-            self.prefixes = orjson.loads(await f.read())
+
+        async with self.db_pool.acquire() as conn:
+            self.prefixes = await conn.fetch(
+                "SELECT id, prefix FROM guilds WHERE prefix IS NOT NULL;"
+            )
 
     async def set_guild_and_cog_and_command(self, ctx) -> bool:
         """Sets the guild id and the cog name to i18n"""
@@ -218,6 +230,7 @@ class CritBot(commands.Bot):
 
     @tasks.loop(minutes=5.0)
     async def batch_update_commands(self) -> None:
+        # TODO: add the guild specific commands to the database
         """Updates the number of time a command has been used to the database"""
         if any(value for value in self.used_commands.values()):
             async with self.db_pool.acquire() as conn:

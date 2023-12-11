@@ -2,8 +2,6 @@
     "change_prefix": {
         "command_name": "prefixo",
         "command_description": "Muda o prefixo do bot",
-
-
         "cmd": {
             "output": "Prefixo mudado para **{prefix}**"
         },
@@ -14,13 +12,38 @@
     "change_language": {
         "command_name": "idioma",
         "command_description": "Muda o idioma do bot",
-
         "cmd": {
             "output": "Língua mudada para **{lang}**!"
         },
         "err": {
             "same_language": "**{lang}** já é a língua atual!",
             "invalid_language": "Desculpa ainda não suporto **{lang}** :frowning2:.\nAs línguas suportadas são: **{langs}**."
+        }
+    },
+    "sponsorblock": {
+        "command_name": "sponsorblock",
+        "command_description": "Passar o patrocinio",
+        "group_name": "sponsorblock",
+        "group_description": "Passar o patrocinio",
+        "embed": {
+            "title": "|  Categorias SponsorBlock",
+            "description": "Atualmente a ignorar:",
+            "footer": "\u2705 - Ativo | \u274C - Desativo"
+        }
+    },
+    "sponsorblock_show": {
+        "command_name": "mostar",
+        "command_description": "Mostrar as categorias do sponsorblock"
+    },
+    "sponsorblock_enable": {
+        "command_name": "ativar",
+        "command_description": "Ativar uma categoria do sponsorblock",
+        "cmd": {
+            "output": "Categoria **{category}** ativada!"
+        },
+        "err": {
+            "already_enabled": "Categoria **{category}** já está ativada!",
+            "invalid_category": "Categoria **{category}** não existe!\nUse `sponsorblock mostrar` para ver as categorias."
         }
     }
 }

@@ -48,8 +48,8 @@ pdm run start --help
 - [X] add i18n to app_commands and on commands descriptions
 - [X] add Music
 - [X] get a real database probably PostgreSql
-- [ ] update to wavelink 2.0
-- [ ] follow ruff's and mypy's suggestions
+- [ ] update to wavelink 3.0
+- [ ] update help menu on specific command
 - [ ] add support for other languages with Google Translate
 - [ ] add Docker support
 

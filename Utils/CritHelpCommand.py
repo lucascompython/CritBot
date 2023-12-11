@@ -31,6 +31,7 @@ class CritHelpCommand(commands.DefaultHelpCommand):
     async def send_command_help(
         self, command: commands.Command[Any, ..., Any], /
     ) -> Optional[list[str]]:
+        # TODO: add translations
         self.add_command_formatting(command)
         self.paginator.close_page()
         if self.slash:
@@ -38,6 +39,7 @@ class CritHelpCommand(commands.DefaultHelpCommand):
         await self.send_pages()
 
     async def send_bot_help(self, mapping) -> Optional[discord.Embed]:
+        # FIXME: translations are not working correctly
         channel = (
             self.get_destination()
         )  # this method is inherited from `HelpCommand`, and gets the channel in context

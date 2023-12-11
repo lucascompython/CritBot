@@ -65,6 +65,11 @@ class Music(commands.Cog):
                 player.play(await player.queue.get_wait()),
                 player.ctx.send(f"A tocar agora: {payload.track.title}"),
             )
+    
+    @commands.Cog.listener()
+    async def on_wavelink_extra_event(self, payload: wavelink.ExtraEventPayload) -> None:
+        print(f"DATA: {payload.data}\nNODE: {payload.node}\nPLAYER: {payload.player}")
+        
 
     @staticmethod
     async def send_reaction(ctx: commands.Context, msg: str) -> None:
@@ -97,7 +102,22 @@ class Music(commands.Cog):
         Returns:
             bool: If the bot is in the same voice channel as the user.
         """
+        node = wavelink.Pool.get_node()
 
+        await node.send(
+            "PUT",
+            path=f"v4/sessions/{node.session_id}/players/{ctx.guild.id}/sponsorblock/categories",
+            data=[
+                "sponsor",
+                "selfpromo",
+                # "interaction",
+                "intro",
+                "outro",
+                # "preview",
+                "music_offtopic",
+                # "filler",
+            ],
+        )
         player = cast(wavelink.Player, ctx.voice_client)
         if not ctx.author.voice or not ctx.author.voice.channel:  # type: ignore
             await ctx.send(self.t("not_in_voice"))
@@ -109,6 +129,11 @@ class Music(commands.Cog):
         else:
             await ctx.author.voice.channel.connect(self_deaf=True, cls=wavelink.Player)  # type: ignore
         return True
+
+    @staticmethod
+    def make_progress_bar(progress: int, total: int, length: int = 10) -> str:
+        num_hash = int((progress / total) * length)
+        return "⎯" * num_hash + ":radio_button:" + "⎯" * (length - num_hash - 1)
 
     @commands.hybrid_command(aliases=["p"])
     async def play(self, ctx: commands.Context, *, query: str) -> None:
@@ -132,23 +157,7 @@ class Music(commands.Cog):
                 self.t("cmd", "queued_playlist", playlist=tracks.name, length=added)
             )
         else:
-            node = wavelink.Pool.get_node()
 
-            resp = await node.send(
-                "PUT",
-                path=f"v4/sessions/{node.session_id}/players/{ctx.guild.id}/sponsorblock/categories",
-                data=[
-                    "sponsor",
-                    "selfpromo",
-                    # "interaction",
-                    "intro",
-                    "outro",
-                    # "preview",
-                    "music_offtopic",
-                    # "filler",
-                ],
-            )
-            print(resp)
             await asyncio.gather(
                 player.queue.put_wait(tracks[0]),
                 ctx.send(
@@ -227,7 +236,7 @@ class Music(commands.Cog):
                 )
             await ctx.send(embed=embed)
 
-    @commands.hybrid_group(aliases=["f", "filtro"])
+    @commands.hybrid_group(aliases=["f", "filtro", "filtros", "filters"])
     async def filter(self, ctx: commands.Context) -> None:
         await self.filter_show_logic(ctx)
 
@@ -424,6 +433,84 @@ class Music(commands.Cog):
             player.seek(time),
             ctx.send(self.t("cmd", "output", position=position, time=time_to_seek)),
         )
+
+    @commands.hybrid_command(
+        aliases=["np", "nowplaying", "tocando", "current", "currentsong", "a_tocar"]
+    )
+    async def now_playing(self, ctx: commands.Context) -> None:
+        player = cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            await ctx.send(self.t("not_in_voice"))
+            return
+        if not player.playing:
+            await ctx.send(self.t("not_playing"))
+            return
+
+        track = player.current
+        position = round(player.position / 1000)
+        parsed_position = self.parse_duration(position)
+        total = track.length
+        parsed_length = self.parse_duration(total)
+        progress_bar = self.make_progress_bar(position, total)
+
+        embed = discord.Embed()
+        embed.set_author(icon_url=ctx.author.avatar.url, name=self.t("embed", "title"))
+        embed.add_field(
+            name=self.t("embed", "currently_playing"),
+            value=f"[{track.title}]({track.uri}) - *({parsed_length})*",
+            inline=False,
+        )
+
+        embed.add_field(
+            name=self.t("embed", "by"),
+            value=f"[{track.author}]({track.artist.url})",
+            inline=False,
+        )
+        embed.add_field(
+            name="Likes",
+            value=f"<:likeemoji:1074046790237700097> {"LIKES"}",
+        )
+        embed.add_field(
+            name="Dislikes",
+            value=f"<:dislikeemoji:1074052963649200198> {"DISLIKES"}",
+        )
+        embed.add_field(
+            name=self.t("embed", "views"),
+            value=f"<:views:1074047661759528990> {"VIEWS"}",
+        )
+        embed.add_field(
+            name=self.t("embed", "subs"), value=f':envelope: {"SUBS"}'
+        )
+        embed.add_field(
+            name=self.t("embed", "uploaded"),
+            value=f":calendar_spiral: {"UPLOAD DATE"}",
+            inline=False,
+        )
+        embed.add_field(
+            name=self.t("embed", "requested_by"),
+            value=f"{"REQUESTED"} {self.t('embed', 'ago', time=69)}",
+            inline=False,
+        )
+        embed.add_field(
+            name=self.t("embed", "progress"),
+            value=f"{':arrow_forward:' if not player.paused else ':pause_button:'} {self.parse_duration(round(player.position))} - {progress_bar} - {self.parse_duration(track.length)}",
+            inline=False,
+        )
+        volume_emoji = ":sound:" if player.volume <= 50 else ":loud_sound:"
+        if player.volume == 0:
+            volume_emoji = ":mute:"
+        embed.add_field(name="Volume", value=f"{volume_emoji} {player.volume}%")
+        # embed.add_field(
+        #     name=self.t("embed", "next"),
+        #     value=f":track_next: `{player.queue[0].info['title']} - {self.parse_duration(player.queue[0].duration)}`"
+        #     if player.queue
+        #     else self.t("embed", "no_next"),
+        # )
+        embed.timestamp = datetime.datetime.now()
+
+        embed.set_thumbnail(url=track.artwork)
+        await ctx.send(embed=embed)
+    
 
     async def cog_load(self) -> None:
         print("Loaded {name} cog!".format(name=self.__class__.__name__))

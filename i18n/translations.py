@@ -2,9 +2,12 @@ import os
 from typing import Optional
 
 import orjson
+import asyncio
 from aiofiles import open as async_open
 from discord import Locale
+from discord.ext.commands import Context
 from lru import LRU
+import asyncpg
 
 
 class I18n:
@@ -13,8 +16,8 @@ class I18n:
     """
 
     __slots__ = (
+        "langs",
         "testing_guild_id",
-        "path_to_langs",
         "path_to_translations",
         "langs",
         "translations",
@@ -26,8 +29,13 @@ class I18n:
         "isdev",
     )
 
-    def __init__(self, default_lang: str, isdev: bool, testing_guild_id: int) -> None:
-        self.path_to_langs = "./i18n/langs.json"
+    def __init__(
+        self,
+        default_lang: str,
+        isdev: bool,
+        testing_guild_id: int,
+        langs: dict[int, str],
+    ) -> None:
         self.path_to_translations = "./i18n/translations/"
         self.translations = {}
 
@@ -44,9 +52,7 @@ class I18n:
         # self.translations = LRU(14)
         self.translations = {}
 
-        # load the file that contains the guilds and their languages
-        with open(self.path_to_langs, "r") as f:
-            self.langs = orjson.loads(f.read())
+        self.langs = langs  # guild_id: lang
 
         # load all translations
         for dir_name in [dir for dir in os.listdir(self.path_to_translations)]:
@@ -175,7 +181,7 @@ class I18n:
         return self.translations[lang + "." + cog]
 
     def get_lang(self, guild_id: int) -> str:
-        return self.langs[str(guild_id)]
+        return self.langs[guild_id]
 
     def get_app_commands_translation(
         self, thing: str, cog: str, lang: str, mode: str
@@ -200,24 +206,48 @@ class I18n:
 
         return None
 
-    async def update_langs(self, guild_id: int, lang: str) -> None:
+    async def update_langs(
+        self,
+        guild_id: int,
+        lang: str,
+        conn: asyncpg.Connection,
+        ctx: Optional[Context] = None,
+    ) -> None:
+        """This function updates the language of a given guild in the database and in the bot's memory
+
+        Args:
+            guild_id (int): The guild id
+            lang (str): The language to update to
+            conn (asyncpg.Connection): The database connection
+            ctx (Optional[Context], optional): If provided the function will send the output message to the channel. Defaults to None.
+        """
         try:
-            if self.langs[str(guild_id)] == lang:
-                raise ValueError("The language is the same as the current one")
+            if self.langs[guild_id] == lang:
+                if ctx:
+                    await ctx.reply(self.t("err", "same_language", lang=lang, ctx=ctx))
+                    return
         except KeyError:
             pass
 
         if lang in self.accepted_langs:
-            self.langs[str(guild_id)] = lang
+            self.langs[guild_id] = lang
         elif any(lang in sublist for sublist in self.accepted_langs.values()):
-            self.langs[str(guild_id)] = [
+            self.langs[guild_id] = [
                 key for key, value in self.accepted_langs.items() if lang in value
             ][0]
 
-        async with async_open("./i18n/langs.json", "wb") as f:
-            await f.write(orjson.dumps(self.langs, option=orjson.OPT_INDENT_2))
-
-    async def delete_lang(self, guild_id: int) -> None:
-        self.langs.pop(str(guild_id))
-        async with async_open("./i18n/langs.json", "wb") as f:
-            await f.write(orjson.dumps(self.langs, option=orjson.OPT_INDENT_2))
+        if not ctx:
+            await conn.execute(
+                "UPDATE guilds SET lang = $1 WHERE id = $2",
+                self.langs[guild_id],
+                guild_id,
+            )
+        else:
+            await asyncio.gather(
+                conn.execute(
+                    "UPDATE guilds SET lang = $1 WHERE id = $2",
+                    self.langs[guild_id],
+                    guild_id,
+                ),
+                ctx.send(self.t("cmd", "output", lang=lang, ctx=ctx)),
+            )

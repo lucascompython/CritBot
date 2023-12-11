@@ -19,7 +19,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from bot import CritBot
-from config import data, prefixes
+from config import data
 from i18n import I18n
 
 lavalink_proc: subprocess.Popen[bytes] = None
@@ -45,9 +45,6 @@ async def start_bot(dev: bool) -> None:
     else:
         print("Running in production mode...")
         data["dev"] = False
-
-    async def get_prefix(bot, message):
-        return commands.when_mentioned_or(prefixes[str(message.guild.id)])(bot, message)
 
     logger = logging.getLogger("discord")
     logger.setLevel(logging.INFO)
@@ -79,26 +76,46 @@ async def start_bot(dev: bool) -> None:
     console.setFormatter(formatter)
     logger.addHandler(console)
 
-    i18n = I18n(data["default_language"], data["dev"], data["testing_guild_id"])
-
-    class CritTree(app_commands.CommandTree):
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-
-        async def interaction_check(self, interaction, /) -> bool:
-            if "hybrid" not in str(interaction.command):
-                i18n.guild_id = interaction.guild_id
-                i18n.cog_name = interaction.command.extras["cog_name"]
-                i18n.command_name = interaction.command.qualified_name.replace(" ", "_")
-            return True
-
     async with ClientSession() as our_client, asyncpg.create_pool(
         **data["postgres"]
     ) as pool:
-        exts = []
-        for filename in os.listdir("./cogs"):
-            if filename.endswith(".py"):
-                exts.append(f"cogs.{filename[:-3]}")
+        exts = [
+            f"cogs.{file[:-3]}" for file in os.listdir("./cogs") if file.endswith(".py")
+        ]
+
+        async with pool.acquire() as conn:
+            prefixes_and_langs: list[asyncpg.Record] = await conn.fetch(
+                "SELECT id, prefix, lang FROM guilds"
+            )
+
+        prefixes: dict[int, str] = {}
+        langs: dict[int, str] = {}
+        for record in prefixes_and_langs:
+            prefixes[record["id"]] = record["prefix"]
+            langs[record["id"]] = record["lang"]
+
+        async def get_prefix(bot, message):
+            return commands.when_mentioned_or(prefixes[message.guild.id])(bot, message)
+
+        i18n = I18n(
+            data["default_language"],
+            data["dev"],
+            data["testing_guild_id"],
+            langs,
+        )
+
+        class CritTree(app_commands.CommandTree):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+
+            async def interaction_check(self, interaction, /) -> bool:
+                if "hybrid" not in str(interaction.command):
+                    i18n.guild_id = interaction.guild_id
+                    i18n.cog_name = interaction.command.extras["cog_name"]
+                    i18n.command_name = interaction.command.qualified_name.replace(
+                        " ", "_"
+                    )
+                return True
 
         async with CritBot(
             i18n=i18n,
