@@ -6,17 +6,14 @@ import time
 from collections import deque
 from typing import Optional
 
-import aiofiles
-import aiofiles.os
 import asyncpg
 import asyncpraw
 import discord
 import wavelink
-from aiofiles import open as async_open
 from aiohttp import ClientSession
 from discord.ext import commands, tasks
 
-from i18n import Translator, I18n
+from i18n import I18n, Translator
 from Utils import CritHelpCommand
 
 
@@ -78,14 +75,6 @@ class CritBot(commands.Bot):
 
     # TODO if all the commands can be hybrid command check the new (2.1 feature) interaction.translate to translate per user locale instead of per guild locale
 
-    async def apply_migrations(self) -> None:
-        files = await aiofiles.os.listdir("./migrations")
-        for file in files:
-            async with async_open(f"./migrations/{file}", "r") as f:
-                migration = await f.read()
-                await self.db_pool.execute(migration)
-                self.logger.log(20, f"Applied migration {file}")
-
     async def get_reddit_submissions(self) -> asyncpraw.Reddit:
         async with asyncpraw.Reddit(**self.reddit_cred) as reddit:
             reddit.read_only = True
@@ -100,7 +89,6 @@ class CritBot(commands.Bot):
     async def setup_hook(self) -> None:
         translator = Translator(i18n=self.i18n)
         await asyncio.gather(
-            self.apply_migrations(),
             self.get_reddit_submissions(),
             self.tree.set_translator(translator),
         )

@@ -11,6 +11,7 @@ from argparse import ArgumentParser
 from time import sleep
 
 import asyncpg
+import aiofiles
 import discord
 import uvloop
 from aiohttp import ClientSession
@@ -82,6 +83,14 @@ async def start_bot(dev: bool) -> None:
         exts = [
             f"cogs.{file[:-3]}" for file in os.listdir("./cogs") if file.endswith(".py")
         ]
+
+        # Apply migrations
+        files = await aiofiles.os.listdir("./migrations")
+        for file in files:
+            async with aiofiles.open(f"./migrations/{file}", "r") as f:
+                migration = await f.read()
+                await pool.execute(migration)
+                logger.log(20, f"Applied migration {file}")
 
         async with pool.acquire() as conn:
             prefixes_and_langs: list[asyncpg.Record] = await conn.fetch(
