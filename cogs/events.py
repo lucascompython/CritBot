@@ -5,6 +5,8 @@ from discord.ext import commands
 import asyncio
 import discord
 
+from Utils import SponsorBlockCache
+
 
 class Events(commands.Cog):
     def __init__(self, bot: CritBot) -> None:
@@ -14,6 +16,10 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
+        self.bot.sponsorblock_cache[guild.id] = SponsorBlockCache(
+            active_categories=self.bot.sponsorblock_default_categories,
+            print_segment_skipped=True,
+        )
         async with self.bot.db_pool.acquire() as conn:
             await asyncio.gather(
                 self.bot.update_prefixes(guild.id, self.bot.default_prefix),

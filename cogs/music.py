@@ -124,14 +124,13 @@ class Music(commands.Cog):
                 await ctx.send(self.t("not_in_same_voice"))
                 return False
         else:
-            if player is None:
-                await self.bot.wavelink_node.send(
-                    "PUT",
-                    path=f"v4/sessions/{self.bot.wavelink_node.session_id}/players/{ctx.guild.id}/sponsorblock/categories",
-                    data=self.bot.sponsorblock_cache[ctx.guild.id].active_categories,
-                )
 
             await ctx.author.voice.channel.connect(self_deaf=True, cls=wavelink.Player)  # type: ignore
+            await self.bot.wavelink_node.send(
+                "PUT",
+                path=f"v4/sessions/{self.bot.wavelink_node.session_id}/players/{ctx.guild.id}/sponsorblock/categories",
+                data=self.bot.sponsorblock_cache[ctx.guild.id].active_categories,
+            )
         return True
 
     @staticmethod

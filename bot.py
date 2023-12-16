@@ -78,6 +78,13 @@ class CritBot(commands.Bot):
         self.sponsorblock: SponsorBlock
         self.sponsorblock_cache: dict[int, SponsorBlockCache]
         self.sponsorblock_categories: set[str]
+        self.sponsorblock_default_categories = [
+            "sponsor",
+            "selfpromo",
+            "intro",
+            "outro",
+            "music_offtopic",
+        ]  # has to be a list because sets are not json serializable
 
         if self.dev:
             self.last_cmds = deque(maxlen=10)  # cache the 10 last commands
