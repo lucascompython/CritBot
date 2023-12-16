@@ -208,5 +208,12 @@
         "err": {
             "no_text": "Não há texto para ler!"
         }
+    },
+    "sponsorblock_segment_skipped": {
+        "command_name": "sponsorblock",
+        "command_description": "Pula o segmento patrocinado",
+        "cmd": {
+            "output": "Segmento ignorado: **{category}** - `{start}` -> `{end}`"
+        }
     }
 }

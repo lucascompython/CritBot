@@ -14,7 +14,12 @@ from aiohttp import ClientSession
 from discord.ext import commands, tasks
 
 from i18n import I18n, Translator
-from Utils import CritHelpCommand
+from Utils import (
+    CritHelpCommand,
+    SponsorBlock,
+    SponsorBlockCache,
+    SponsorBlockCategories,
+)
 
 
 class CritBot(commands.Bot):
@@ -70,6 +75,10 @@ class CritBot(commands.Bot):
 
         self.wavelink_node: wavelink.Node = None
 
+        self.sponsorblock: SponsorBlock
+        self.sponsorblock_cache: dict[int, SponsorBlockCache]
+        self.sponsorblock_categories: set[str]
+
         if self.dev:
             self.last_cmds = deque(maxlen=10)  # cache the 10 last commands
 
@@ -96,13 +105,19 @@ class CritBot(commands.Bot):
         self.help_command = CritHelpCommand(i18n=self.i18n, slash=False)
 
         # Initiate the lavalink client
-        self.node = wavelink.Node(
+        self.wavelink_node = wavelink.Node(
             uri=self.lavalink["ip"] + ":" + self.lavalink["port"],
             password=self.lavalink["password"],
         )
-        nodes = [self.node]
+        nodes = [self.wavelink_node]
 
         await wavelink.Pool.connect(nodes=nodes, client=self, cache_capacity=100)
+
+        self.sponsorblock = SponsorBlock(self)
+        self.sponsorblock_cache = await self.sponsorblock.get_cache()
+        self.sponsorblock_categories = {
+            category.value for category in SponsorBlockCategories
+        }
 
         self.logger.log(20, "Loading the cogs.")
         # load all cogs in ./cogs

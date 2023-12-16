@@ -68,7 +68,19 @@ class Music(commands.Cog):
     
     @commands.Cog.listener()
     async def on_wavelink_extra_event(self, payload: wavelink.ExtraEventPayload) -> None:
-        print(f"DATA: {payload.data}\nNODE: {payload.node}\nPLAYER: {payload.player}")
+        if payload.data.get("type", "") == "SegmentSkipped":
+            if self.bot.sponsorblock_cache[int(payload.data["guildId"])].print_segment_skipped:
+                await payload.player.ctx.send(
+                    self.t(
+                        "cmd",
+                        "output",
+                        category=payload.data["segment"]["category"].replace("_", " ").title(),
+                        start=self.parse_duration(round(payload.data["segment"]["start"] / 1000)),
+                        end=self.parse_duration(round(payload.data["segment"]["end"] / 1000)),
+                        mcommand_name="sponsorblock_segment_skipped",
+                    )
+                )
+            
         
 
     @staticmethod
@@ -102,22 +114,7 @@ class Music(commands.Cog):
         Returns:
             bool: If the bot is in the same voice channel as the user.
         """
-        node = wavelink.Pool.get_node()
 
-        await node.send(
-            "PUT",
-            path=f"v4/sessions/{node.session_id}/players/{ctx.guild.id}/sponsorblock/categories",
-            data=[
-                "sponsor",
-                "selfpromo",
-                # "interaction",
-                "intro",
-                "outro",
-                # "preview",
-                "music_offtopic",
-                # "filler",
-            ],
-        )
         player = cast(wavelink.Player, ctx.voice_client)
         if not ctx.author.voice or not ctx.author.voice.channel:  # type: ignore
             await ctx.send(self.t("not_in_voice"))
@@ -127,6 +124,13 @@ class Music(commands.Cog):
                 await ctx.send(self.t("not_in_same_voice"))
                 return False
         else:
+            if player is None:
+                await self.bot.wavelink_node.send(
+                    "PUT",
+                    path=f"v4/sessions/{self.bot.wavelink_node.session_id}/players/{ctx.guild.id}/sponsorblock/categories",
+                    data=self.bot.sponsorblock_cache[ctx.guild.id].active_categories,
+                )
+
             await ctx.author.voice.channel.connect(self_deaf=True, cls=wavelink.Player)  # type: ignore
         return True
 

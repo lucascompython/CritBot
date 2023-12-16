@@ -45,5 +45,28 @@
             "already_enabled": "**{category}** is already enabled",
             "invalid_category": "**{category}** is not a valid category\nUse `sponsorblock show` to see the categories"
         }
+    },
+    "sponsorblock_disable": {
+        "command_name": "disable",
+        "command_description": "Disable a category to skip",
+        "cmd": {
+            "output": "Disabled **{category}**"
+        },
+        "err": {
+            "already_disabled": "**{category}** is already disabled",
+            "invalid_category": "**{category}** is not a valid category\nUse `sponsorblock show` to see the categories"
+        }
+    },
+    "sponsorblock_toggle": {
+        "command_name": "toggle",
+        "command_description": "Toggle a category to skip"
+    },
+    "sponsorblock_print": {
+        "command_name": "print",
+        "command_description": "Send a message when a segment is skipped",
+        "cmd": {
+            "printing": "Now printing skipped segments!",
+            "not_printing": "Stopped printing skipped segments!"
+        }
     }
 }

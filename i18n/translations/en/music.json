@@ -208,5 +208,12 @@
         "err": {
             "no_text": "You didn't specify any text to say!"
         }
+    },
+    "sponsorblock_segment_skipped": {
+        "command_name": "sponsoblock_segment_skipped",
+        "command_description": "Skip the current sponsoblock segment",
+        "cmd": {
+            "output": "Skipped segment: **{category}** - `{start}` -> `{end}`"
+        }
     }
 }

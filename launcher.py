@@ -12,6 +12,7 @@ from time import sleep
 
 import asyncpg
 import aiofiles
+import aiofiles.os
 import discord
 import uvloop
 from aiohttp import ClientSession

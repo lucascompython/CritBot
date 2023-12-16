@@ -45,5 +45,28 @@
             "already_enabled": "Categoria **{category}** já está ativada!",
             "invalid_category": "Categoria **{category}** não existe!\nUse `sponsorblock mostrar` para ver as categorias."
         }
+    },
+    "sponsorblock_disable": {
+        "command_name": "desativar",
+        "command_description": "Desativar uma categoria do sponsorblock",
+        "cmd": {
+            "output": "Categoria **{category}** desativada!"
+        },
+        "err": {
+            "already_disabled": "Categoria **{category}** já está desativada!",
+            "invalid_category": "Categoria **{category}** não existe!\nUse `sponsorblock mostrar` para ver as categorias."
+        }
+    },
+    "sponsorblock_toggle": {
+        "command_name": "alternar",
+        "command_description": "Alternar uma categoria do sponsorblock"
+    },
+    "sponsorblock_print": {
+        "command_name": "enviar",
+        "command_description": "Enviar mensagem quando um segmento é ignorado",
+        "cmd": {
+            "printing": "A enviar mensagem quando um segmento é ignorado!",
+            "not_printing": "Não vou enviar mensagem quando um segmento é ignorado!"
+        }
     }
 }
