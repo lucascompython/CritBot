@@ -1,7 +1,7 @@
-from discord.ext.commands import Converter
+from discord.ext import commands
 
 
-class BoolConverter(Converter):
+class BoolConverter(commands.Converter):
     @classmethod
     async def convert(cls, ctx, argument: str):
         if argument.lower() in (
@@ -40,4 +40,4 @@ class BoolConverter(Converter):
         ):
             return False
         else:
-            raise ValueError("Invalid boolean argument")
+            raise commands.BadArgument("Invalid boolean value.")

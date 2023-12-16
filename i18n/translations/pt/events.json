@@ -2,7 +2,9 @@
     "on_command_error": {
         "err": {
             "not_owner": "Não és um desenvolvedor do bot.",
-            "unknown": "Um erro desconhecido ocorreu."
+            "unknown": "Um erro desconhecido ocorreu.",
+            "missing_argument": "Argumento em falta: `{param}`",
+            "bad_argument": "Argumento inválido..."
         }
     }
 }

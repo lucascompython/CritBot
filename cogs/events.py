@@ -38,7 +38,7 @@ class Events(commands.Cog):
         self.log(20, f"Left {guild.name} ({guild.id})")
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
+    async def on_command_error(self, ctx: commands.Context, error):
         self.bot.i18n.command_name = "on_command_error"
         self.bot.i18n.cog_name = "events"
         self.bot.i18n.guild_id = ctx.guild.id
@@ -47,8 +47,15 @@ class Events(commands.Cog):
         if isinstance(error, commands.NotOwner):
             await ctx.reply(self.t("err", "not_owner"))
 
-        if isinstance(error, commands.CommandNotFound):
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await ctx.reply(self.t("err", "missing_argument", param=error.param.name))
+
+        elif isinstance(error, commands.BadArgument):
+            await ctx.reply(self.t("err", "bad_argument"))
+
+        elif isinstance(error, commands.CommandNotFound):
             pass
+
         else:
             await ctx.reply(self.t("err", "unknown"))
             self.log(40, error)
