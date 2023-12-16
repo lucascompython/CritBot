@@ -28,7 +28,8 @@
         "embed": {
             "title": "|  Categorias SponsorBlock",
             "description": "Atualmente a ignorar:",
-            "footer": "\u2705 - Ativo | \u274C - Desativo"
+            "footer": "\u2705 - Ativo | \u274C - Desativo",
+            "print": "Enviar mensagem quando um segmento é ignorado"
         }
     },
     "sponsorblock_show": {

@@ -28,7 +28,8 @@
         "embed": {
             "title": "|  Sponsorblock Categories",
             "description": "Currently skipping:",
-            "footer": "\u2705 - Skipping | \u274C - Not Skipping"
+            "footer": "\u2705 - Skipping | \u274C - Not Skipping",
+            "print": "Send a message when a segment is skipped"
         }
     },
     "sponsorblock_show": {

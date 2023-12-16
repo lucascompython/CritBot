@@ -72,6 +72,16 @@ class Config(commands.Cog):
             name=self.t("embed", "title"),
             url="https://wiki.sponsor.ajay.app/w/Guidelines",
         )
+
+        embed.add_field(
+            name=self.t(
+                "embed",
+                "print",
+            ),
+            value=":white_check_mark:  "
+            if self.bot.sponsorblock_cache[ctx.guild.id].print_segment_skipped
+            else ":x:  ",
+        )
         embed.set_footer(text=self.t("embed", "footer"))
         await ctx.send(embed=embed)
 
