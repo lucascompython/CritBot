@@ -217,7 +217,6 @@ class Config(commands.Cog):
     async def sponsorblock_print(
         self, ctx: commands.Context, value: BoolConverter
     ) -> None:
-        print(f"VALOR: {value}")
         self.bot.sponsorblock_cache[ctx.guild.id].print_segment_skipped = value
         await asyncio.gather(
             ctx.send(self.t("cmd", "printing" if value else "not_printing")),
