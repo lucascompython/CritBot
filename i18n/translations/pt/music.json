@@ -58,14 +58,11 @@
         "command_name": "volume",
         "command_description": "Muda o volume",
         "cmd": {
-            "output": "Volume alterado para {volume}%!",
-            "volume": "O volume atual é {volume}%!"
+            "output": "Volume alterado para **{volume}%!**",
+            "volume": "O volume atual é **{volume}%!**"
         },
         "err": {
-            "too_high": "O volume não pode ser maior que 100!",
-            "too_low": "O volume não pode ser menor que 0!",
-            "not_int": "O volume tem de ser um número inteiro!",
-            "same_volume": "O volume já é {volume}%!"
+            "out_of_range": "O volume tem de estar entre `0%` e `1000%`"
         }
     },
     "history": {
@@ -214,6 +211,18 @@
         "command_description": "Pula o segmento patrocinado",
         "cmd": {
             "output": "Segmento ignorado: **{category}** - `{start}` -> `{end}`"
+        }
+    },
+    "download": {
+        "command_name": "transferir",
+        "command_description": "Transfere uma música",
+        "cmd": {
+            "downloading": "A transferir...",
+            "sending": "A enviar...",
+            "finished": "Transferido **{title}** por **{author}**"
+        },
+        "err": {
+            "file_too_big": "O ficheiro é muito grande!"
         }
     }
 }

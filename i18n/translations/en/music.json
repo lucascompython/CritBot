@@ -58,14 +58,11 @@
         "command_name": "volume",
         "command_description": "Change the volume",
         "cmd": {
-            "output": "Changed the volume to {volume}%!",
-            "volume": "The volume is {volume}%!"
+            "output": "Changed the volume to **{volume}%!**",
+            "volume": "The volume is **{volume}%!**"
         },
         "err": {
-            "too_high": "The volume can't be higher than 100%!",
-            "too_low": "The volume can't be lower than 0%!",
-            "not_int": "The volume must be an integer!",
-            "same_volume": "The volume is already {volume}%!"
+            "out_of_range": "The volume must be between `0%` and `1000%`"
         }
     },
     "history": {
@@ -214,6 +211,18 @@
         "command_description": "Skip the current sponsoblock segment",
         "cmd": {
             "output": "Skipped segment: **{category}** - `{start}` -> `{end}`"
+        }
+    },
+    "download": {
+        "command_name": "download",
+        "command_description": "Download the current song",
+        "cmd": {
+            "downloading": "Downloading...",
+            "sending": "Sending...",
+            "finished": "Finished downloading **{title}** by **{author}**!"
+        },
+        "err": {
+            "file_too_big": "The file is too big to download!"
         }
     }
 }

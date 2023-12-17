@@ -1,18 +1,19 @@
-from typing import Optional, override
-
-import discord
-from discord import app_commands
-import wavelink
-from discord.ext import commands
 import asyncio
 import datetime
 import urllib.parse
+from enum import Enum
+from typing import Optional, cast, override
+
+import discord
+import wavelink
+import yt_dlp
+from discord import app_commands
+from discord.ext import commands
+import aiofiles.os
 
 # import the bot class from bot.py
 from bot import CritBot
 from Utils import GeniusLyrics, Paginator, SongNotFound
-from enum import Enum
-from typing import cast
 
 
 class Platform(Enum):
@@ -436,6 +437,86 @@ class Music(commands.Cog):
             player.seek(time),
             ctx.send(self.t("cmd", "output", position=position, time=time_to_seek)),
         )
+    
+    @commands.hybrid_command(aliases=["vol", "v"])
+    async def volume(self, ctx: commands.Context, volume: Optional[int] = None) -> None:
+        
+        player = cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            await ctx.send(self.t("not_in_voice"))
+            return
+        if volume:
+            if volume < 0 or volume > 1000:
+                await ctx.send(self.t("err", "volume_out_of_range"))
+                return
+        
+            await asyncio.gather(
+                player.set_volume(volume),
+                ctx.send(self.t("cmd", "output", volume=volume))
+            )
+        else:
+            await ctx.send(self.t("cmd", "volume", volume=player.volume))
+
+
+    @staticmethod
+    def get_expected_file_size(duration: int) -> int:
+        return duration * ((320 * 1000) // 8)
+
+
+    @commands.hybrid_command(aliases=["transferir"])
+    async def download(self, ctx: commands.Context, *, query: str) -> None:
+        query = query.strip("<>")
+
+        ydl_opts = {
+            "format": "bestaudio/best",
+            "outtmpl": "/tmp/%(title)s.%(ext)s",
+            "noplaylist": True,
+            "nocheckcertificate": True,
+            "ignoreerrors": True,
+            "logtostderr": False,
+            "quiet": True,
+            "no_warnings": True,
+            "default_search": "auto",
+            "postprocessors": [{
+                "key": "FFmpegExtractAudio",
+                "preferredcodec": "mp3",
+                "preferredquality": "320",
+            }]
+        }
+
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            # download with info
+            msg: discord.Message
+            async with ctx.typing():
+                info, msg = await asyncio.gather(
+                    asyncio.to_thread(ydl.extract_info, query, download=False),
+                    ctx.send(self.t("cmd", "downloading")),
+                )
+                # check the file size
+                if self.get_expected_file_size(info["duration"]) > 25 * 1024 * 1024:
+                    await msg.edit(content=self.t("err", "file_too_big"))
+                    return
+                
+                # download the file
+                await asyncio.to_thread(ydl.download, [query])
+
+                await msg.edit(content=self.t("cmd", "sending"))
+
+                # get the file name
+                file_name = ydl.prepare_filename(info)
+                file_name = file_name.replace("webm", "mp3")
+
+                # send the file
+                await asyncio.gather(
+                    ctx.send(file=discord.File(file_name)),
+                    msg.edit(content=self.t("cmd", "finished", title=info["title"], author=info["uploader"])),
+                )
+            await aiofiles.os.remove(file_name)
+            
+            
+        
+
+            
 
     @commands.hybrid_command(
         aliases=["np", "nowplaying", "tocando", "current", "currentsong", "a_tocar"]
