@@ -217,12 +217,15 @@
         "command_name": "download",
         "command_description": "Download the current song",
         "cmd": {
+            "checking": "Checking...",
             "downloading": "Downloading...",
             "sending": "Sending...",
+            "too_many_downloads": "Too many downloads, trying again ({time}s/60s)",
             "finished": "Finished downloading **{title}** by **{author}**!"
         },
         "err": {
-            "file_too_big": "The file is too big to download!"
+            "file_too_big": "The file is too big to download!",
+            "too_many_downloads": "Too many downloads, try again later!"
         }
     }
 }

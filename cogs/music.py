@@ -3,6 +3,7 @@ import datetime
 import urllib.parse
 from enum import Enum
 from typing import Optional, cast, override
+import os
 
 import discord
 import wavelink
@@ -66,23 +67,31 @@ class Music(commands.Cog):
                 player.play(await player.queue.get_wait()),
                 player.ctx.send(f"A tocar agora: {payload.track.title}"),
             )
-    
+
     @commands.Cog.listener()
-    async def on_wavelink_extra_event(self, payload: wavelink.ExtraEventPayload) -> None:
+    async def on_wavelink_extra_event(
+        self, payload: wavelink.ExtraEventPayload
+    ) -> None:
         if payload.data.get("type", "") == "SegmentSkipped":
-            if self.bot.sponsorblock_cache[int(payload.data["guildId"])].print_segment_skipped:
+            if self.bot.sponsorblock_cache[
+                int(payload.data["guildId"])
+            ].print_segment_skipped:
                 await payload.player.ctx.send(
                     self.t(
                         "cmd",
                         "output",
-                        category=payload.data["segment"]["category"].replace("_", " ").title(),
-                        start=self.parse_duration(round(payload.data["segment"]["start"] / 1000)),
-                        end=self.parse_duration(round(payload.data["segment"]["end"] / 1000)),
+                        category=payload.data["segment"]["category"]
+                        .replace("_", " ")
+                        .title(),
+                        start=self.parse_duration(
+                            round(payload.data["segment"]["start"] / 1000)
+                        ),
+                        end=self.parse_duration(
+                            round(payload.data["segment"]["end"] / 1000)
+                        ),
                         mcommand_name="sponsorblock_segment_skipped",
                     )
                 )
-            
-        
 
     @staticmethod
     async def send_reaction(ctx: commands.Context, msg: str) -> None:
@@ -125,7 +134,6 @@ class Music(commands.Cog):
                 await ctx.send(self.t("not_in_same_voice"))
                 return False
         else:
-
             await ctx.author.voice.channel.connect(self_deaf=True, cls=wavelink.Player)  # type: ignore
             await self.bot.wavelink_node.send(
                 "PUT",
@@ -161,7 +169,6 @@ class Music(commands.Cog):
                 self.t("cmd", "queued_playlist", playlist=tracks.name, length=added)
             )
         else:
-
             await asyncio.gather(
                 player.queue.put_wait(tracks[0]),
                 ctx.send(
@@ -223,7 +230,9 @@ class Music(commands.Cog):
     async def filter_show_logic(self, ctx: commands.Context) -> None:
         # list all filters
         if ctx.invoked_subcommand is None:
-            filter_cmd_list = [cmd.name for cmd in self.bot.get_command("filter").commands]  # type: ignore
+            filter_cmd_list = [
+                cmd.name for cmd in self.bot.get_command("filter").commands
+            ]  # type: ignore
             embed = discord.Embed(
                 title=self.t("embed", "title", mcommand_name="filter"),
                 description=self.t("embed", "description", mcommand_name="filter"),
@@ -437,10 +446,9 @@ class Music(commands.Cog):
             player.seek(time),
             ctx.send(self.t("cmd", "output", position=position, time=time_to_seek)),
         )
-    
+
     @commands.hybrid_command(aliases=["vol", "v"])
     async def volume(self, ctx: commands.Context, volume: Optional[int] = None) -> None:
-        
         player = cast(wavelink.Player, ctx.voice_client)
         if not player:
             await ctx.send(self.t("not_in_voice"))
@@ -449,19 +457,29 @@ class Music(commands.Cog):
             if volume < 0 or volume > 1000:
                 await ctx.send(self.t("err", "volume_out_of_range"))
                 return
-        
+
             await asyncio.gather(
                 player.set_volume(volume),
-                ctx.send(self.t("cmd", "output", volume=volume))
+                ctx.send(self.t("cmd", "output", volume=volume)),
             )
         else:
             await ctx.send(self.t("cmd", "volume", volume=player.volume))
-
 
     @staticmethod
     def get_expected_file_size(duration: int) -> int:
         return duration * ((320 * 1000) // 8)
 
+    @staticmethod
+    def get_tmp_size() -> int:
+        total_size = 0
+        for dirpath, dirnames, filenames in os.walk("/tmp"):
+            for f in filenames:
+                fp = os.path.join(dirpath, f)
+                # skip if it is symbolic link
+                if not os.path.islink(fp):
+                    total_size += os.path.getsize(fp)
+
+        return total_size
 
     @commands.hybrid_command(aliases=["transferir"])
     async def download(self, ctx: commands.Context, *, query: str) -> None:
@@ -477,11 +495,13 @@ class Music(commands.Cog):
             "quiet": True,
             "no_warnings": True,
             "default_search": "auto",
-            "postprocessors": [{
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "mp3",
-                "preferredquality": "320",
-            }]
+            "postprocessors": [
+                {
+                    "key": "FFmpegExtractAudio",
+                    "preferredcodec": "mp3",
+                    "preferredquality": "320",
+                }
+            ],
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -490,15 +510,39 @@ class Music(commands.Cog):
             async with ctx.typing():
                 info, msg = await asyncio.gather(
                     asyncio.to_thread(ydl.extract_info, query, download=False),
-                    ctx.send(self.t("cmd", "downloading")),
+                    ctx.send(self.t("cmd", "checking")),
                 )
-                # check the file size
+
+                # check for query
+                if "entries" in info:
+                    info = info["entries"][0]
+
+                # check if the file is bigger than 25MB
                 if self.get_expected_file_size(info["duration"]) > 25 * 1024 * 1024:
                     await msg.edit(content=self.t("err", "file_too_big"))
                     return
-                
+
+                # check if the /tmp folder is bigger than 1GB, if it is, wait 5 seconds and try again
+                if self.get_tmp_size() > 1024 * 1024 * 1024:
+                    total_time = 0
+                    await msg.edit(
+                        content=self.t("cmd", "too_many_downloads", time=total_time)
+                    )
+                    while self.get_tmp_size() > 1024 * 1024 * 1024:
+                        await asyncio.sleep(5)
+                        await msg.edit(
+                            content=self.t("cmd", "too_many_downloads", time=total_time)
+                        )
+                        total_time += 5
+                        if total_time > 60:
+                            await msg.edit(content=self.t("err", "too_many_downloads"))
+                            return
+
                 # download the file
-                await asyncio.to_thread(ydl.download, [query])
+                await asyncio.gather(
+                    asyncio.to_thread(ydl.download, [query]),
+                    msg.edit(content=self.t("cmd", "downloading")),
+                )
 
                 await msg.edit(content=self.t("cmd", "sending"))
 
@@ -509,14 +553,15 @@ class Music(commands.Cog):
                 # send the file
                 await asyncio.gather(
                     ctx.send(file=discord.File(file_name)),
-                    msg.edit(content=self.t("cmd", "finished", title=info["title"], author=info["uploader"])),
                 )
-            await aiofiles.os.remove(file_name)
-            
-            
-        
-
-            
+            await asyncio.gather(
+                msg.edit(
+                    content=self.t(
+                        "cmd", "finished", title=info["title"], author=info["uploader"]
+                    )
+                ),
+                aiofiles.os.remove(file_name),
+            )
 
     @commands.hybrid_command(
         aliases=["np", "nowplaying", "tocando", "current", "currentsong", "a_tocar"]
@@ -562,9 +607,7 @@ class Music(commands.Cog):
             name=self.t("embed", "views"),
             value=f"<:views:1074047661759528990> {"VIEWS"}",
         )
-        embed.add_field(
-            name=self.t("embed", "subs"), value=f':envelope: {"SUBS"}'
-        )
+        embed.add_field(name=self.t("embed", "subs"), value=f':envelope: {"SUBS"}')
         embed.add_field(
             name=self.t("embed", "uploaded"),
             value=f":calendar_spiral: {"UPLOAD DATE"}",
@@ -594,7 +637,6 @@ class Music(commands.Cog):
 
         embed.set_thumbnail(url=track.artwork)
         await ctx.send(embed=embed)
-    
 
     async def cog_load(self) -> None:
         print("Loaded {name} cog!".format(name=self.__class__.__name__))

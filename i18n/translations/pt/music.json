@@ -217,12 +217,15 @@
         "command_name": "transferir",
         "command_description": "Transfere uma música",
         "cmd": {
+            "checking": "A verificar...",
             "downloading": "A transferir...",
             "sending": "A enviar...",
+            "too_many_downloads": "Demasiados downloads, tentando novamente ({time}s/60s)",
             "finished": "Transferido **{title}** por **{author}**"
         },
         "err": {
-            "file_too_big": "O ficheiro é muito grande!"
+            "file_too_big": "O ficheiro é muito grande!",
+            "too_many_downloads": "Demasiados downloads, tente novamente mais tarde..."
         }
     }
 }
