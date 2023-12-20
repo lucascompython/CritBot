@@ -551,9 +551,8 @@ class Music(commands.Cog):
                 file_name = file_name.replace("webm", "mp3")
 
                 # send the file
-                await asyncio.gather(
-                    ctx.send(file=discord.File(file_name)),
-                )
+                await ctx.send(file=discord.File(file_name))
+
             await asyncio.gather(
                 msg.edit(
                     content=self.t(
@@ -563,6 +562,7 @@ class Music(commands.Cog):
                 aiofiles.os.remove(file_name),
             )
 
+    # TODO: actually implement this
     @commands.hybrid_command(
         aliases=["np", "nowplaying", "tocando", "current", "currentsong", "a_tocar"]
     )
