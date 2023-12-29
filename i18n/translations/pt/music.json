@@ -150,6 +150,9 @@
         "command_description": "Embaralha a fila",
         "cmd": {
             "output": "A fila foi embaralhada!"
+        },
+        "err": {
+            "queue_empty": "A fila está vazia!"
         }
     },
     "filter_nightcore": {

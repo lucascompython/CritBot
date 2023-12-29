@@ -150,6 +150,9 @@
         "command_description": "Shuffle the queue",
         "cmd": {
             "output": "Shuffled the queue!"
+        },
+        "err": {
+            "queue_empty": "The queue is empty!"
         }
     },
     "filter_nightcore": {

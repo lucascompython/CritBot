@@ -140,7 +140,18 @@ class Music(commands.Cog):
                 await ctx.send(self.t("not_in_same_voice"))
                 return False
         else:
-            await ctx.author.voice.channel.connect(self_deaf=True, cls=wavelink.Player)  # type: ignore
+            await asyncio.gather(
+                ctx.author.voice.channel.connect(self_deaf=True, cls=wavelink.Player),  # type: ignore
+                ctx.send(
+                    self.t(
+                        "cmd",
+                        "connect",
+                        channel=ctx.author.voice.channel,
+                        mcommand_name="join",
+                    )
+                ),  # type: ignore
+            )
+
             await self.bot.wavelink_node.send(
                 "PUT",
                 path=f"v4/sessions/{self.bot.wavelink_node.session_id}/players/{ctx.guild.id}/sponsorblock/categories",
@@ -305,6 +316,59 @@ class Music(commands.Cog):
             await asyncio.gather(player.pause(False), self.send_reaction(ctx, "⏭️"))
         else:
             await ctx.send(self.t("err", "not_paused"))
+
+    @staticmethod
+    async def stop_logic(player: wavelink.Player) -> None:
+        player.queue.clear()
+        player.autoplay = wavelink.AutoPlayMode.disabled
+        player.auto_queue.clear()
+        await player.stop()
+
+    @commands.hybrid_command(aliases=["para"])
+    async def stop(self, ctx: commands.Context) -> None:
+        player = cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            await ctx.send(self.t("not_in_voice"))
+            return
+
+        await asyncio.gather(
+            self.stop_logic(player), self.send_reaction(ctx, "\u23F9\ufe0f")
+        )
+
+    @commands.hybrid_command(aliases=["sai", "sair"])
+    async def leave(self, ctx: commands.Context) -> None:
+        player = cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            await ctx.send(self.t("not_in_voice"))
+            return
+
+        await asyncio.gather(
+            self.send_reaction(ctx, "\u23F9\ufe0f"), ctx.voice_client.disconnect()
+        )
+
+    @commands.hybrid_command(aliases=["entra"])
+    async def join(self, ctx: commands.Context) -> None:
+        if not await self.ensure_voice(ctx):
+            return
+        if ctx.author.voice.channel == ctx.voice_client.channel:
+            await ctx.send(self.t("err", "already_connected"))
+            return
+
+    @commands.hybrid_command(aliases=["embaralhar", "misturar"])
+    async def shuffle(self, ctx: commands.Context) -> None:
+        player = cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            await ctx.reply(self.t("not_in_voice"))
+            return
+        if not player.playing:
+            await ctx.reply(self.t("not_playing"))
+            return
+        if not player.queue:
+            await ctx.reply(self.t("cmd", "queue_empty"))
+            return
+
+        player.queue.shuffle()
+        await ctx.send(self.t("cmd", "output"))
 
     @staticmethod
     def nice_filter_name(filter_name: str) -> str:
