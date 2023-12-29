@@ -33,7 +33,7 @@
         "command_description": "Mostra a fila",
         "embed": {
             "title": "|  Fila",
-            "description": "Tocando agora: `{track}` adicionado por `{user}` `[{current_time}/{total_time}]`"
+            "description": "A tocar agora: `{track}` adicionado por `{user}` `[{current_time}/{total_time}]`"
         }
     },
     "skip": {
@@ -81,7 +81,7 @@
         "command_name": "entra",
         "command_description": "Entra num canal de voz",
         "cmd": {
-            "connect": "Entrando em {channel}!"
+            "connect": "A entrar em {channel}!"
         },
         "err": {
             "not_in_voice": "Não estás num canal de voz!",
@@ -112,14 +112,14 @@
         "command_description": "Mostra informações sobre a música que está a tocar",
         "embed": {
             "title": "|  A tocar",
-            "currently_playing": "Tocando Atualmente:",
+            "currently_playing": "A Tocar Atualmente:",
             "by": "Por",
             "views": "Visualizações",
             "subs": "Inscritos",
             "requested_by": "Requisitado por",
             "progress": "Progresso",
             "uploaded": "Data de Upload",
-            "next": "Tocando a seguir",
+            "next": "A tocar a seguir",
             "no_next": ":no_entry_sign: `Não há nada a seguir`",
             "ago": "*({time}s atrás)*"
         }
@@ -220,12 +220,23 @@
             "checking": "A verificar...",
             "downloading": "A transferir...",
             "sending": "A enviar...",
-            "too_many_downloads": "Demasiados downloads, tentando novamente ({time}s/60s)",
+            "too_many_downloads": "Demasiados downloads, a tentar novamente ({time}s/60s)",
             "finished": "Transferido **{title}** por **{author}**"
         },
         "err": {
             "file_too_big": "O ficheiro é muito grande!",
             "too_many_downloads": "Demasiados downloads, tente novamente mais tarde..."
+        }
+    },
+    "auto_play": {
+        "command_name": "autoplay",
+        "command_description": "Muda o modo de autoplay",
+        "cmd": {
+            "auto_play": "O AutoPlay está **{status}**!",
+            "status_enabled": "ativado",
+            "status_disabled": "desativado",
+            "enabled": "O autoplay foi ativado!",
+            "disabled": "O autoplay foi desativado!"
         }
     }
 }

@@ -3,7 +3,7 @@
         "command_name": "spam",
         "command_description": "Spama um usuário",
         "cmd": {
-            "spamming": "Spamando {user}!",
+            "spamming": "A spamar {user}!",
             "output": "{user} foi spamado com sucesso!"
         },
         "err": {
@@ -15,7 +15,7 @@
         "command_name": "acorda",
         "command_description": "Acorda um usuário (move entre canais)",
         "cmd": {
-            "waking": "Acordando {user}!",
+            "waking": "A acordar {user}!",
             "output": "{user} foi acordado com sucesso!"
         },
         "err": {

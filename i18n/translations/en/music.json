@@ -227,5 +227,16 @@
             "file_too_big": "The file is too big to download!",
             "too_many_downloads": "Too many downloads, try again later!"
         }
+    },
+    "auto_play": {
+        "command_name": "autoplay",
+        "command_description": "Toggle autoplay",
+        "cmd": {
+            "auto_play": "AutoPlay is **{status}**!",
+            "status_enabled": "enabled",
+            "status_disabled": "disabled",
+            "enabled": "Enabled autoplay!",
+            "disabled": "Disabled autoplay!"
+        }
     }
 }

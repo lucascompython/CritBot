@@ -14,7 +14,7 @@ import aiofiles.os
 
 # import the bot class from bot.py
 from bot import CritBot
-from Utils import GeniusLyrics, Paginator, SongNotFound
+from Utils import GeniusLyrics, Paginator, SongNotFound, BoolConverter
 
 
 class Platform(Enum):
@@ -57,16 +57,22 @@ class Music(commands.Cog):
         self.log(20, f"Wavelink track <{payload.track.title}> started!")
         self.log(20, f"Original {payload.original.title}")
 
+        player: wavelink.Player = payload.player
+
+        await player.ctx.send(
+            f"A tocar agora: **{payload.track.title}** - {payload.track.author}"
+        )
+
     @commands.Cog.listener()
     async def on_wavelink_track_end(
         self, payload: wavelink.TrackEndEventPayload
     ) -> None:
         player: wavelink.Player = payload.player
-        if player.queue:
-            await asyncio.gather(
-                player.play(await player.queue.get_wait()),
-                player.ctx.send(f"A tocar agora: {payload.track.title}"),
-            )
+        if player is None:
+            return
+
+        if player.queue and player.autoplay == wavelink.AutoPlayMode.disabled:
+            await player.play(player.queue.get())
 
     @commands.Cog.listener()
     async def on_wavelink_extra_event(
@@ -164,22 +170,101 @@ class Music(commands.Cog):
             return
 
         if isinstance(tracks, wavelink.Playlist):
-            added: int = await player.queue.put_wait(tracks)
-            await ctx.send(
-                self.t("cmd", "queued_playlist", playlist=tracks.name, length=added)
-            )
-        else:
-            await asyncio.gather(
-                player.queue.put_wait(tracks[0]),
-                ctx.send(
-                    self.t(
-                        "cmd", "queued", track=tracks[0].title, author=tracks[0].author
-                    )
-                ),
-            )
+            if not player.playing:
+                await asyncio.gather(
+                    ctx.send(
+                        self.t(
+                            "cmd",
+                            "queued_playlist",
+                            playlist=tracks.name,
+                            length=len(tracks),
+                        )
+                    ),
+                    player.play(tracks[0], volume=30),
+                    player.queue.put_wait(tracks[1:]),
+                )
+            else:
+                await asyncio.gather(
+                    player.queue.put_wait(tracks),
+                    ctx.send(
+                        self.t(
+                            "cmd",
+                            "queued_playlist",
+                            playlist=tracks.name,
+                            length=len(tracks),
+                        ),
+                    ),
+                )
 
+        else:
+            if not player.playing:
+                await player.play(tracks[0], volume=30)
+            else:
+                await asyncio.gather(
+                    player.queue.put_wait(tracks[0]),
+                    ctx.send(
+                        self.t(
+                            "cmd",
+                            "queued",
+                            track=tracks[0].title,
+                            author=tracks[0].author,
+                        )
+                    ),
+                )
+
+    @commands.hybrid_command(aliases=["autoplay", "ap"])
+    async def auto_play(
+        self, ctx: commands.Context, value: Optional[BoolConverter] = None
+    ) -> None:
+        if not await self.ensure_voice(ctx):
+            return
+
+        player = cast(wavelink.Player, ctx.voice_client)
+
+        if value is None:
+            status = ""
+            if player.autoplay == wavelink.AutoPlayMode.disabled:
+                status = self.t("cmd", "status_disabled")
+            elif player.autoplay == wavelink.AutoPlayMode.enabled:
+                status = self.t("cmd", "status_enabled")
+
+            await ctx.send(self.t("cmd", "auto_play", status=status))
+
+        elif value:
+            player.autoplay = wavelink.AutoPlayMode.enabled
+            await ctx.send(self.t("cmd", "enabled"))
+            if not player.playing and (player.queue or player.auto_queue):
+                await player.play(player.queue.get(), volume=30)
+        else:
+            player.autoplay = wavelink.AutoPlayMode.disabled
+            await ctx.send(self.t("cmd", "disabled"))
+
+    @commands.hybrid_command(aliases=["q", "fila"])
+    async def queue(self, ctx: commands.Context) -> None:
+        player = cast(wavelink.Player, ctx.voice_client)
+        if not player:
+            await ctx.reply(self.t("not_in_voice"))
+            return
         if not player.playing:
-            await player.play(await player.queue.get_wait(), volume=30)
+            await ctx.reply(self.t("not_playing"))
+            return
+
+        # if not player.queue:
+        #     await ctx.reply(self.t("cmd", "queue_empty"))
+        #     return
+
+        print("QUEUE -> " + ", ".join([track.title for track in player.queue]))
+        print(
+            "AUTO_QUEUE -> " + ", ".join([track.title for track in player.auto_queue])
+        )
+
+        # embed = discord.Embed(
+        #     title=self.t("embed", "title", mcommand_name="queue"),
+        #     description=self.t("embed", "description", mcommand_name="queue"),
+        # )
+
+        # paginator = Paginator(ctx, embed, player.queue, 10)
+        # await paginator.paginate()
 
     @commands.hybrid_command(aliases=["s"])
     async def skip(self, ctx: commands.Context) -> None:
@@ -481,7 +566,7 @@ class Music(commands.Cog):
 
         return total_size
 
-    @commands.hybrid_command(aliases=["transferir"])
+    @commands.hybrid_command(aliases=["transferir", "dl"])
     async def download(self, ctx: commands.Context, *, query: str) -> None:
         query = query.strip("<>")
 
@@ -548,7 +633,11 @@ class Music(commands.Cog):
 
                 # get the file name
                 file_name = ydl.prepare_filename(info)
-                file_name = file_name.replace("webm", "mp3")
+
+                # change whatever extension is to .mp3
+                last_dot_index = file_name.rfind(".")
+                file_extension = file_name[last_dot_index:]
+                file_name = file_name.replace(file_extension, ".mp3")
 
                 # send the file
                 await ctx.send(file=discord.File(file_name))

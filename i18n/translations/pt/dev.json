@@ -3,8 +3,6 @@
         "command_name": "recarregar",
         "group_name": "recarregar",
         "group_description": "Recarrega alguns valores do bot.",
-
-
         "cmd": {
             "cog_output": "**{cog_name}** foi recarregado com sucesso.\n",
             "translations_output": "Traduções recarregadas com sucesso.\n",
@@ -20,7 +18,6 @@
     "unload": {
         "command_name": "descarregar",
         "command_description": "Descarrega um cog.",
-
         "cmd": {
             "unloaded": "**{cog_name}** foi descarregado com sucesso.\n"
         },
@@ -33,7 +30,6 @@
     "load": {
         "command_name": "carregar",
         "command_description": "Carrega um cog.",
-
         "cmd": {
             "loaded": "**{cog_name}** foi carregado com sucesso.\n"
         },
@@ -47,7 +43,6 @@
     "all": {
         "command_name": "todos",
         "command_description": "Carrega ou descarrega todos os cogs.",
-
         "err": {
             "all_cogs_loaded": "Todos os cogs já estão carregados.",
             "all_cogs_unloaded": "Todos os cogs já estão descarregados."
@@ -57,26 +52,20 @@
         "command_name": "sincronizar",
         "group_name": "sincronizar",
         "group_description": "Sincroniza o bot.",
-
         "cmd": {
             "output": "**{guild}** foi sincronizado com o bot."
         }
     },
-
     "sync_global": {
         "command_name": "global",
         "command_description": "Sincroniza o bot globalmente.",
-
         "cmd": {
             "output": "O bot foi sincronizado globalmente."
         }
     },
-
-
     "cog": {
         "command_name": "cog",
         "command_description": "Mostra o estadado de um cog.",
-
         "cmd": {
             "is_loaded_output": "**{cog_name}** está carregado.",
             "is_unloaded_output": "**{cog_name}** está descarregado."
@@ -88,7 +77,6 @@
     "cogs": {
         "command_name": "cogs",
         "command_description": "Mostra o estado de todos os cogs.",
-
         "embed_fields": {
             "loaded": "Carregados",
             "unloaded": "Descarregados"
@@ -97,7 +85,6 @@
     "print": {
         "command_name": "print",
         "command_description": "Mostra um valor do bot.",
-
         "err": {
             "exception": "Deu merda: {error}"
         }
@@ -105,15 +92,13 @@
     "restart": {
         "command_name": "reiniciar",
         "command_description": "Reinicia o bot.",
-
         "cmd": {
-            "output": "Reiniciando..."
+            "output": "A reiniciar..."
         }
     },
     "clear": {
         "command_name": "limpar",
         "command_description": "Limpa o terminal.",
-
         "cmd": {
             "output": "Terminal limpo."
         }
