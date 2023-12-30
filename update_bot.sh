@@ -18,7 +18,7 @@ if [ "$1" == "lavalink" ]; then
     fi
 
     echo "Starting lavalink" > log.txt
-    tmux new-session -d -s lavalink "$USER/.sdkman/candidates/java/current/bin/java -jar Lavalink.jar" # using sdkman
+    tmux new-session -d -s lavalink "$HOME/.sdkman/candidates/java/current/bin/java -jar Lavalink.jar" # using sdkman
     exit 0
 fi
 
