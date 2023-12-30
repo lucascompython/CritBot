@@ -4,10 +4,10 @@ After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/home/$USER/critbot # change to your own path/user
+WorkingDirectory=%h/critbot
 ExecStart=/usr/bin/tmux new-session -d -s critbot 'source .venv/bin/activate && pdm start -l 0.0.0.0:2333'
 Restart=always
 RestartSec=3
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
