@@ -13,7 +13,9 @@ if [ "$1" == "lavalink" ]; then
         cd $HOME/critbot/config
     fi
 
-    tmux kill-session -t lavalink
+    if tmux has-session -t lavalink 2>/dev/null; then
+        tmux kill-session -t lavalink
+    fi
 
     tmux new-session -d -s lavalink "java -jar Lavalink.jar"
     exit 0
@@ -29,7 +31,9 @@ export PATH=/home/$USER/.local/bin:$PATH # for pdm
 
 git pull
 
-tmux kill-session -t critbot
+if tmux has-session -t critbot 2>/dev/null; then
+    tmux kill-session -t critbot
+fi
 
 tmux new-session -d -s critbot "source .venv/bin/activate && pdm start -l 0.0.0.0:2333"
 
