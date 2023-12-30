@@ -13,8 +13,6 @@ if [ "$1" == "lavalink" ]; then
         cd $HOME/critbot/config
     fi
 
-    git pull
-
     tmux kill-session -t lavalink
 
     tmux new-session -d -s lavalink "java -jar Lavalink.jar"
