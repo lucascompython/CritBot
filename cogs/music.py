@@ -59,6 +59,9 @@ class Music(commands.Cog):
 
         player: wavelink.Player = payload.player
 
+        if player.current.author == "flowery-tts":
+            return
+
         await player.ctx.send(
             f"A tocar agora: **{payload.track.title}** - {payload.track.author}"
         )

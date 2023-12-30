@@ -1,13 +1,14 @@
 [Unit]
 Description=CritBot Service
-After=network.target
+After=network.target lavalink.service
+Wants=lavalink.service
 
 [Service]
 Type=simple
 WorkingDirectory=%h/critbot
 ExecStart=%h/critbot/update_bot.sh
-Restart=always
-RestartSec=3
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=default.target

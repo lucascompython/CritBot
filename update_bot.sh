@@ -15,3 +15,6 @@ git pull
 tmux kill-session -t critbot
 
 tmux new-session -d -s critbot "source .venv/bin/activate && pdm start -l 0.0.0.0:2333"
+
+# crontab -e
+# 0 2 * * * /usr/bin/systemctl --user restart critbot.service
