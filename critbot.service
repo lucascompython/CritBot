@@ -1,3 +1,5 @@
+# cp critbot.service ~/.config/systemd/user/critbot.service
+
 [Unit]
 Description=CritBot Service
 After=network.target lavalink.service

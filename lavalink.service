@@ -1,3 +1,5 @@
+# cp lavalink.service ~/.config/systemd/user/lavalink.service
+
 [Unit]
 Description=Lavalink Service
 After=syslog.target network.target
