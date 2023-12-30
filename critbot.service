@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=%h/critbot
-ExecStart=/usr/bin/tmux new-session -d -s critbot 'source .venv/bin/activate && pdm start -l 0.0.0.0:2333'
+ExecStart=/usr/bin/tmux new-session -d -s critbot 'source %h/critbot/.venv/bin/activate && pdm start -l 0.0.0.0:2333'
 Restart=always
 RestartSec=3
 
