@@ -577,8 +577,8 @@ class Music(commands.Cog):
                 ),
             )
 
-    @commands.hybrid_command()
-    async def seek(self, ctx: commands.Context, secs: int) -> None:
+    @commands.hybrid_command(help="+10 -10")
+    async def seek(self, ctx: commands.Context, secs: str) -> None:
         player = cast(wavelink.Player, ctx.voice_client)
         if not player:
             await ctx.send(self.t("not_in_voice"))
@@ -586,6 +586,13 @@ class Music(commands.Cog):
         if not player.playing:
             await ctx.send(self.t("not_playing"))
             return
+
+        if secs.startswith("+"):
+            secs = round((player.position / 1000) + int(secs[1:]))
+        elif secs.startswith("-"):
+            secs = round((player.position / 1000) - int(secs[1:]))
+        else:
+            secs = int(secs)
 
         time = secs * 1000
         position = self.parse_duration(round(player.position / 1000))
