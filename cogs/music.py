@@ -588,11 +588,20 @@ class Music(commands.Cog):
             return
 
         if secs.startswith("+"):
-            secs = round((player.position / 1000) + int(secs[1:]))
+            if (int(secs[1:]) * 1000) + player.position > player.current.length:
+                secs = round(player.current.length / 1000)
+            else:
+                secs = round((player.position / 1000) + int(secs[1:]))
         elif secs.startswith("-"):
-            secs = round((player.position / 1000) - int(secs[1:]))
+            if player.position - (int(secs[1:]) * 1000) < 0:
+                secs = 0
+            else:
+                secs = round((player.position / 1000) - int(secs[1:]))
         else:
-            secs = int(secs)
+            if int(secs) > (current_length_secs := round(player.current.length / 1000)):
+                secs = current_length_secs
+            else:
+                secs = int(secs)
 
         time = secs * 1000
         position = self.parse_duration(round(player.position / 1000))
