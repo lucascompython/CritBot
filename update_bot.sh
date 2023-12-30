@@ -1,10 +1,29 @@
 #!/bin/bash
 
-# This script is used to update the bot from the git repository
+# This script is used to update the bot from the git repository and start the bot.
+# This is used by the systemd service.
+# And the cronjob will use the systemd service to restart the bot at 02 AM.
 
 
-if [ "$PWD" != "/home/$USER/critbot" ]; then
-    cd /home/$USER/critbot
+
+# check if it is for lavalink
+if [ "$1" == "lavalink" ]; then
+
+    if [ "$PWD" != "$HOME/critbot/config" ]; then
+        cd $HOME/critbot/config
+    fi
+
+    git pull
+
+    tmux kill-session -t lavalink
+
+    tmux new-session -d -s lavalink "java -jar Lavalink.jar"
+    exit 0
+fi
+
+
+if [ "$PWD" != "$HOME/critbot" ]; then
+    cd $HOME/critbot
 fi
 
 

@@ -7,7 +7,7 @@ After=syslog.target network.target
 [Service]
 Type=simple
 WorkingDirectory=%h/critbot/config
-ExecStart=%h/.sdkman/candidates/java/current/bin/java -jar %h/critbot/config/Lavalink.jar # using sdkman
+ExecStart=%h/critbot/update_bot.sh lavalink
 Restart=on-failure
 RestartSec=5s
 
