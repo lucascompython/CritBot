@@ -17,7 +17,6 @@ if [ "$1" == "lavalink" ]; then
         tmux kill-session -t lavalink
     fi
 
-    echo "Starting lavalink" > log.txt
     tmux new-session -d -s lavalink "$HOME/.sdkman/candidates/java/current/bin/java -jar Lavalink.jar" # using sdkman
     exit 0
 fi
@@ -28,9 +27,19 @@ if [ "$PWD" != "$HOME/critbot" ]; then
 fi
 
 
-export PATH=/home/$USER/.local/bin:$PATH # for pdm
 
-git pull
+
+
+# check if there are any changes
+git fetch 
+
+if [ "$(git rev-parse HEAD)" == "$(git rev-parse @{u})" ]; then
+    echo "No changes"
+    exit 0
+fi
+
+# update the bot
+export PATH=/home/$USER/.local/bin:$PATH # for pdm
 
 if tmux has-session -t critbot 2>/dev/null; then
     tmux kill-session -t critbot
