@@ -39,6 +39,8 @@ if [ "$(git rev-parse HEAD)" == "$(git rev-parse @{u})" ]; then
 fi
 
 # update the bot
+git pull
+
 export PATH=/home/$USER/.local/bin:$PATH # for pdm
 
 if tmux has-session -t critbot 2>/dev/null; then
