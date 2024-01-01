@@ -686,6 +686,7 @@ class Music(commands.Cog):
                     info = info["entries"][0]
 
                 # check if the file is bigger than 25MB
+                # TODO: This can mostly be removed, we can just check if the duration is bigger than 660 seconds (11 minutes aprox. 25MB)
                 if self.get_expected_file_size(info["duration"]) > 25 * 1024 * 1024:
                     await msg.edit(content=self.t("err", "file_too_big"))
                     return

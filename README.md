@@ -1,19 +1,30 @@
 # CritBot (the discord bot)<img src="https://cdn.discordapp.com/attachments/628637327878520872/1017256259138900030/unknown.png" width="3.5%" heigth="3.5%"/>
 
-This is discord bot written with discord.py v2.0 that aims at exploring the possibilities of a discord bot.  
-Right now the bot is quite simple and most of the code aims at extensibility.  
-The bot has a custom implementation of [i18n](i18n/).  
-The only supported languages for now are Portuguese and English.  
-Shoutout to the team behind <https://returnyoutubedislike.com> for being awesome.
+This is a discord bot written with discord.py v2.0.  
+The bot has a custom [i18n](i18n/) system.  
+The only translated languages for now are Portuguese and English.  
+
+## Features
+
++ Translations - For now only English and Portuguese
++ High quality audio
++ Youtube's Dislikes - <https://returnyoutubedislike.com>
++ [Sponsorblock](https://sponsor.ajay.app/) - <https://github.com/topi314/Sponsorblock-Plugin>
++ Music AutoPlay - When enabled the bot will play music based on the music played that session
++ Downloading Music - Download anything (get's converted to mp3) that [yt-dlp](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md) supports, at 320kbps. Discord limits files bigger than 25MB (around, 11min.)
++ Audio Filters - Nightcore, 8d, reverb, etc.
++ Reddit memes
++ Both prefixed and slash commands
 
 ## Installation & Execution
 
 This bot was only tested on Linux.  
 Python 3.12+ is required.  
 You can invite him [here](https://discord.com/api/oauth2/authorize?client_id=931322447117053972&permissions=8&scope=bot).  
+Nightly version [here](https://discord.com/api/oauth2/authorize?client_id=888100964534456361&permissions=8&scope=bot).  
 The installation steps are as follows:
 
-I have only tested PostgreSQL 15.2 but it should work with other versions.
+I have only tested PostgreSQL >=15.2 but it should work with other versions.
 
 Create a database and a user with the `psql` tool:
 
@@ -36,35 +47,35 @@ eval $(pdm venv activate)
 # install dependencies
 pdm install
 
+#change the appsettings.yaml file with your token and information
+
 pdm run setup
 pdm run start --help
 
-#change the appsettings.yaml file with your token and information
 ```
 
 ## Todo's (mostly by order)
 
-- [X] add internationalization
-- [X] add i18n to app_commands and on commands descriptions
-- [X] add Music
-- [X] get a real database probably PostgreSql
-- [ ] update to wavelink 3.0
-- [ ] update help menu on specific command
-- [ ] add support for other languages with Google Translate
-- [ ] add Docker support
++ [X] add internationalization
++ [X] add i18n to app_commands and on commands descriptions
++ [X] add Music
++ [X] get a real database probably PostgreSql
++ [ ] update to wavelink 3.0
++ [ ] remake the i18n system
++ [ ] update help menu on specific command
++ [ ] add support for other languages with Google Translate
++ [ ] add Docker support
 
 ## Known "bugs"
 
-- URGENT - Probably on commands that take more time to execute, if another command is invoked while the other is executing the translations might get mixed up. 
-- The interaction name, description, choices, etc. are set per user locale while everything else is set per guild language.
-- The helper.py file is a mess and probably has some bugs.
++ If two translations are being processed at the same time, it might error. I know this is stupid.
++ The interaction name, description, choices, etc. are set per user locale while everything else is set per guild language.
 
 ## Contributions
 
 Feel free to help.  
-If you have any questions on the code you can send me a DM on my Discord (Lucas cheio da drip#0230)  
-I recommend using [PDM](https://pdm.fming.dev/) as the build tool. [Ruff](https://beta.ruff.rs/docs/) as a linter and [Mypy](https://mypy.readthedocs.io/en/stable/) as a type checker.
+If you have any questions on the code you can send me a DM on my Discord (lucas_delinhares)  
 
-# License
+## License
 
 This project is licensed under the GPL3 license.
