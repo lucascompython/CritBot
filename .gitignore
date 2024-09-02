@@ -14,3 +14,4 @@ bug_reports.json
 .pdm-python
 *cache
 config/plugins/*
+plugins/

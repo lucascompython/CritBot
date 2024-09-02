@@ -4,38 +4,38 @@ version = "0.2.0"
 description = "A really cool Discord Bot"
 authors = [{ name = "Lucas de Linhares", email = "lucasdelinhares@gmail.com" }]
 dependencies = [
-    "aiofiles==23.2.1",
-    "aiohttp>=3.9.1",
+    "aiofiles==24.1.0",
+    "aiohttp>=3.10.5",
     "asyncpg==0.29.0",
-    "colorlog==6.8.0",
-    "discord-py[speed]==2.3.2",
-    "discord-py[voice]==2.3.2",
-    "PyYAML==6.0.1",
-    "uvloop==0.19.0",
-    "wavelink==3.1.0",
-    "psutil==5.9.6",
-    "yt-dlp==2023.11.16",
+    "colorlog==6.8.2",
+    "PyYAML==6.0.2",
+    "uvloop==0.20.0",
+    "wavelink==3.4.1",
+    "yt-dlp==2024.8.6",
     "lru-dict==1.3.0",
-    "lxml==4.9.3",
-    "asyncpraw==7.7.1",
+    "lxml==5.3.0",
+    "asyncpraw @ git+https://github.com/praw-dev/asyncpraw",
+    "discord-py==2.4.0",
+    "orjson>=3.10.7",
+    "pynacl>=1.5.0",
 ]
 requires-python = ">=3.12"
 license = { text = "GPL-3.0" }
 readme = "README.md"
 
-[build-system]
-requires = ["pdm-backend"]
-build-backend = "pdm.backend"
+# [build-system]
+# requires = ["pdm-backend"]
+# build-backend = "pdm.backend"
 
-[tool.pdm.dev-dependencies]
-dev = ["ruff>=0.0.275", "mypy>=1.4.1"]
+# [tool.pdm.dev-dependencies]
+# dev = ["ruff>=0.0.275", "mypy>=1.4.1"]
 
-[tool.pdm.resolution.overrides]
-aiofiles = "23.2.1"
+# [tool.pdm.resolution.overrides]
+# aiofiles = "23.2.1"
 
-[tool.pdm.scripts]
-lint = "ruff lint ."
-types = "mypy . --explicit-package-bases"
-all = { composite = ["lint", "types"] }
-start = "python3 launcher.py {args}"      # yes, I could use call but then I would have to rewrite the args part
-setup = "./setup.sh"
+# [tool.pdm.scripts]
+# lint = "ruff lint ."
+# types = "mypy . --explicit-package-bases"
+# all = { composite = ["lint", "types"] }
+# start = "python3 launcher.py {args}"      # yes, I could use call but then I would have to rewrite the args part
+# setup = "./setup.sh"

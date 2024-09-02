@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-echo "To install dependencies, run 'pdm install'"
+echo "To install dependencies, run 'uv sync'"
 
 echo "Downloading Lavalink..."
-wget "https://github.com/freyacodes/Lavalink/releases/download/4.0.0/Lavalink.jar" -O ./config/Lavalink.jar
+wget "https://github.com/freyacodes/Lavalink/releases/download/4.0.7/Lavalink.jar" -O ./config/Lavalink.jar
 echo "Done!"
 
 echo "Installing config files..."
