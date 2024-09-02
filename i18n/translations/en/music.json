@@ -241,5 +241,9 @@
             "enabled": "Enabled autoplay!",
             "disabled": "Disabled autoplay!"
         }
+    },
+    "play_next": {
+        "command_name": "play_next",
+        "command_description": "Queue a song to play next, ignoring the current queue"
     }
 }

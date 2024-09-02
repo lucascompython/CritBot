@@ -241,5 +241,9 @@
             "enabled": "O autoplay foi ativado!",
             "disabled": "O autoplay foi desativado!"
         }
+    },
+    "play_next": {
+        "command_name": "play_next",
+        "command_description": "Enfileira uma música para tocar a seguir, ignorando a fila"
     }
 }

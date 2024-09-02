@@ -167,8 +167,17 @@ class Music(commands.Cog):
         num_hash = int((progress / total) * length)
         return "⎯" * num_hash + ":radio_button:" + "⎯" * (length - num_hash - 1)
 
-    @commands.hybrid_command(aliases=["p"])
-    async def play(self, ctx: commands.Context, *, query: str) -> None:
+    def put_playlist_at_beginning(
+        self, player: wavelink.Player, playlist: wavelink.Playlist
+    ) -> None:
+        length = len(playlist)
+
+        for i in range(length - 1, -1, -1):
+            player.queue.put_at(0, playlist[i])
+
+    async def play_logic(
+        self, ctx: commands.Context, query: str, play_next: bool
+    ) -> None:
         if not await self.ensure_voice(ctx):
             return
 
@@ -185,7 +194,7 @@ class Music(commands.Cog):
 
         if isinstance(tracks, wavelink.Playlist):
             if not player.playing:
-                await asyncio.gather(
+                tasks = {
                     ctx.send(
                         self.t(
                             "cmd",
@@ -195,27 +204,39 @@ class Music(commands.Cog):
                         )
                     ),
                     player.play(tracks[0], volume=30),
-                    player.queue.put_wait(tracks[1:]),
-                )
+                }
+
+                if play_next:
+                    tasks.add(player.queue.put_wait(tracks[1:]))
+
+                else:
+                    self.put_playlist_at_beginning(player, tracks[1:])
+
+                await asyncio.gather(*tasks)
+
             else:
-                await asyncio.gather(
-                    player.queue.put_wait(tracks),
+                tasks = {
                     ctx.send(
                         self.t(
                             "cmd",
                             "queued_playlist",
                             playlist=tracks.name,
                             length=len(tracks),
-                        ),
+                        )
                     ),
-                )
+                }
+                if play_next:
+                    self.put_playlist_at_beginning(player, tracks)
+                else:
+                    tasks.add(player.queue.put_wait(tracks))
+
+                await asyncio.gather(*tasks)
 
         else:
             if not player.playing:
                 await player.play(tracks[0], volume=30)
             else:
-                await asyncio.gather(
-                    player.queue.put_wait(tracks[0]),
+                tasks = {
                     ctx.send(
                         self.t(
                             "cmd",
@@ -223,8 +244,24 @@ class Music(commands.Cog):
                             track=tracks[0].title,
                             author=tracks[0].author,
                         )
-                    ),
-                )
+                    )
+                }
+                if play_next:
+                    player.queue.put_at(0, tracks[0])
+                else:
+                    tasks.add(
+                        player.queue.put_wait(tracks[0]),
+                    )
+                await asyncio.gather(*tasks)
+
+    @commands.hybrid_command(aliases=["p"])
+    async def play(self, ctx: commands.Context, *, query: str) -> None:
+        await self.play_logic(ctx, query, False)
+
+    @commands.hybrid_command(aliases=["pn"])
+    async def play_next(self, ctx: commands.Context, *, query: str) -> None:
+        self.bot.i18n.command_name = "play"  # use the play command translations
+        await self.play_logic(ctx, query, True)
 
     @commands.hybrid_command(aliases=["autoplay", "ap"])
     async def auto_play(
@@ -291,7 +328,7 @@ class Music(commands.Cog):
             return
 
         await asyncio.gather(
-            player.skip(force=True), self.send_reaction(ctx, "\u23ED\ufe0f")
+            player.skip(force=True), self.send_reaction(ctx, "\u23ed\ufe0f")
         )
 
     @commands.hybrid_command(aliases=["pausa"])
@@ -335,7 +372,7 @@ class Music(commands.Cog):
             return
 
         await asyncio.gather(
-            self.stop_logic(player), self.send_reaction(ctx, "\u23F9\ufe0f")
+            self.stop_logic(player), self.send_reaction(ctx, "\u23f9\ufe0f")
         )
 
     @commands.hybrid_command(aliases=["sai", "sair"])
@@ -346,7 +383,7 @@ class Music(commands.Cog):
             return
 
         await asyncio.gather(
-            self.send_reaction(ctx, "\u23F9\ufe0f"), ctx.voice_client.disconnect()
+            self.send_reaction(ctx, "\u23f9\ufe0f"), ctx.voice_client.disconnect()
         )
 
     @commands.hybrid_command(aliases=["entra"])
