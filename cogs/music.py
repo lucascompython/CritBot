@@ -588,7 +588,7 @@ class Music(commands.Cog):
         # URI encode the text
         text = urllib.parse.quote(text)
         lang = self.bot.i18n.get_lang(ctx.guild.id)
-        voice = "Carolina" if lang == "pt" else "Olivia"
+        voice = "Joana" if lang == "pt" else "Olivia"
         if not await self.ensure_voice(ctx):
             return
 
