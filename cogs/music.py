@@ -194,7 +194,7 @@ class Music(commands.Cog):
 
         if isinstance(tracks, wavelink.Playlist):
             if not player.playing:
-                tasks = {
+                tasks = [
                     ctx.send(
                         self.t(
                             "cmd",
@@ -204,10 +204,10 @@ class Music(commands.Cog):
                         )
                     ),
                     player.play(tracks[0], volume=30),
-                }
+                ]
 
                 if play_next:
-                    tasks.add(player.queue.put_wait(tracks[1:]))
+                    tasks.append(player.queue.put_wait(tracks[1:]))
 
                 else:
                     self.put_playlist_at_beginning(player, tracks[1:])
@@ -215,7 +215,7 @@ class Music(commands.Cog):
                 await asyncio.gather(*tasks)
 
             else:
-                tasks = {
+                tasks = [
                     ctx.send(
                         self.t(
                             "cmd",
@@ -224,11 +224,11 @@ class Music(commands.Cog):
                             length=len(tracks),
                         )
                     ),
-                }
+                ]
                 if play_next:
                     self.put_playlist_at_beginning(player, tracks)
                 else:
-                    tasks.add(player.queue.put_wait(tracks))
+                    tasks.append(player.queue.put_wait(tracks))
 
                 await asyncio.gather(*tasks)
 
@@ -236,7 +236,7 @@ class Music(commands.Cog):
             if not player.playing:
                 await player.play(tracks[0], volume=30)
             else:
-                tasks = {
+                tasks = [
                     ctx.send(
                         self.t(
                             "cmd",
@@ -245,11 +245,11 @@ class Music(commands.Cog):
                             author=tracks[0].author,
                         )
                     )
-                }
+                ]
                 if play_next:
                     player.queue.put_at(0, tracks[0])
                 else:
-                    tasks.add(
+                    tasks.append(
                         player.queue.put_wait(tracks[0]),
                     )
                 await asyncio.gather(*tasks)
