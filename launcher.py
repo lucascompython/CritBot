@@ -232,14 +232,7 @@ async def main(args: ArgumentParser) -> None:
 if __name__ == "__main__":
     try:
         args = arg_parser()
-        if int(uvloop.__version__.split(".")[1]) >= 18:
-            uvloop.run(main(args), debug=args.dev)
-        elif version_info >= (3, 11):
-            with asyncio.Runner(loop_factory=uvloop.new_event_loop) as runner:
-                runner.run(main())
-        else:
-            uvloop.install()
-            asyncio.run(main(), debug=args.dev)
+        uvloop.run(main(args), debug=args.dev)
     except KeyboardInterrupt:
         print("\nInterrupted by user.")
         exit(0)
