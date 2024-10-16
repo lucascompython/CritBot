@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 
 import argparse
-import asyncio
 import logging
 import os
 import subprocess
 from dataclasses import dataclass
-from sys import version_info
 from argparse import ArgumentParser
 from time import sleep
 

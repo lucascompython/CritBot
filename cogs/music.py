@@ -189,54 +189,39 @@ class Music(commands.Cog):
         player.ctx = ctx
 
         if not tracks:
-            await ctx.reply(self.t("err", "no_tracks_found", query=query))
+            asyncio.create_task(
+                ctx.reply(self.t("err", "no_tracks_found", query=query))
+            )
             return
 
         if isinstance(tracks, wavelink.Playlist):
+            asyncio.create_task(
+                ctx.send(
+                    self.t(
+                        "cmd",
+                        "queued_playlist",
+                        playlist=tracks.name,
+                        length=len(tracks),
+                    )
+                )
+            )
+
             if not player.playing:
-                tasks = [
-                    ctx.send(
-                        self.t(
-                            "cmd",
-                            "queued_playlist",
-                            playlist=tracks.name,
-                            length=len(tracks),
-                        )
-                    ),
-                    player.play(tracks[0], volume=30),
-                ]
+                asyncio.create_task(player.play(tracks[0], volume=30))
 
-                if play_next:
-                    tasks.append(player.queue.put_wait(tracks[1:]))
-
-                else:
-                    self.put_playlist_at_beginning(player, tracks[1:])
-
-                await asyncio.gather(*tasks)
+                asyncio.create_task(player.queue.put_wait(tracks[1:]))
 
             else:
-                tasks = [
-                    ctx.send(
-                        self.t(
-                            "cmd",
-                            "queued_playlist",
-                            playlist=tracks.name,
-                            length=len(tracks),
-                        )
-                    ),
-                ]
                 if play_next:
                     self.put_playlist_at_beginning(player, tracks)
                 else:
-                    tasks.append(player.queue.put_wait(tracks))
-
-                await asyncio.gather(*tasks)
+                    asyncio.create_task(player.queue.put_wait(tracks))
 
         else:
             if not player.playing:
-                await player.play(tracks[0], volume=30)
+                asyncio.create_task(player.play(tracks[0], volume=30))
             else:
-                tasks = [
+                asyncio.create_task(
                     ctx.send(
                         self.t(
                             "cmd",
@@ -245,14 +230,13 @@ class Music(commands.Cog):
                             author=tracks[0].author,
                         )
                     )
-                ]
+                )
                 if play_next:
                     player.queue.put_at(0, tracks[0])
                 else:
-                    tasks.append(
+                    asyncio.create_task(
                         player.queue.put_wait(tracks[0]),
                     )
-                await asyncio.gather(*tasks)
 
     @commands.hybrid_command(aliases=["p"])
     async def play(self, ctx: commands.Context, *, query: str) -> None:
