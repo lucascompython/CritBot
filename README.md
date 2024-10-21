@@ -39,19 +39,16 @@ And then
 ```bash
 git clone https://github.com/lucascompython/CritBot.git
 cd CritBot
-# install PDM (build tool)
-pip install pdm # Also, fuck PEP 668
+# install uv https://github.com/astral-sh/uv (build tool)
 
 # activate virtual environmet
-eval $(pdm venv activate)
+source ./venv/bin/activate
 
 # install dependencies
-pdm install
+uv pip install
 
-#change the appsettings.yaml file with your token and information
-
-pdm run setup
-pdm run start --help
+# change the appsettings.yaml file with your token and information
+python3 launcher.py -l 0.0.0.0:2333
 
 ```
 
@@ -61,7 +58,7 @@ pdm run start --help
 + [X] add i18n to app_commands and on commands descriptions
 + [X] add Music
 + [X] get a real database probably PostgreSql
-+ [ ] update to wavelink 3.0
++ [X] update to wavelink 3
 + [ ] remake the i18n system
 + [ ] update help menu on specific command
 + [ ] add support for other languages with Google Translate
