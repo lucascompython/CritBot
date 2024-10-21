@@ -13,7 +13,7 @@ The only translated languages for now are Portuguese and English.
 + Music AutoPlay - When enabled the bot will play music based on the music played that session
 + Downloading Music - Download anything (get's converted to mp3) that [yt-dlp](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md) supports, at 320kbps. Discord limits files bigger than 25MB (around, 11min.)
 + Audio Filters - Nightcore, 8d, reverb, etc.
-+ Multiple Platform Support - Youtube, YT Music, Spotify and Sondcloud
++ Multiple Platform Support - Youtube, YT Music, Spotify, Apple Music, Twitch and Sondcloud
 + Reddit memes
 + Both prefixed and slash commands
 
