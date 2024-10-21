@@ -92,12 +92,8 @@ class Music(commands.Cog):
                         category=payload.data["segment"]["category"]
                         .replace("_", " ")
                         .title(),
-                        start=self.parse_duration(
-                            round(payload.data["segment"]["start"] / 1000)
-                        ),
-                        end=self.parse_duration(
-                            round(payload.data["segment"]["end"] / 1000)
-                        ),
+                        start=self.parse_duration(payload.data["segment"]["start"]),
+                        end=self.parse_duration(payload.data["segment"]["end"]),
                         mcommand_name="sponsorblock_segment_skipped",
                     )
                 )
@@ -117,7 +113,15 @@ class Music(commands.Cog):
 
     @staticmethod
     def parse_duration(duration: float | int) -> str:
-        value = str(datetime.timedelta(seconds=duration))
+        """Converts a duration in seconds to a human readable format.
+
+        Args:
+            duration (float | int): The duration in milliseconds.
+
+        Returns:
+            str: The duration in a human readable format.
+        """
+        value = str(datetime.timedelta(milliseconds=duration)).split(".")[0]
         if value.startswith("0:"):
             value = value[2:]
         return value
@@ -205,6 +209,8 @@ class Music(commands.Cog):
                     )
                 )
             )
+            for track in tracks:
+                track.ctx = ctx
 
             if not player.playing:
                 asyncio.create_task(player.play(tracks[0], volume=30))
@@ -218,6 +224,7 @@ class Music(commands.Cog):
                     asyncio.create_task(player.queue.put_wait(tracks))
 
         else:
+            tracks[0].ctx = ctx
             if not player.playing:
                 asyncio.create_task(player.play(tracks[0], volume=30))
             else:
@@ -274,32 +281,101 @@ class Music(commands.Cog):
             player.autoplay = wavelink.AutoPlayMode.disabled
             await ctx.send(self.t("cmd", "disabled"))
 
+    def _estimate_time_until(
+        self, track: wavelink.Playable, player: wavelink.Player
+    ) -> str:
+        """Get the estimated until the given track is played.
+
+        Args:
+            track (wavelink.Playable): The track to estimate the time until.
+            player (wavelink.Player): The player to get the current position.
+
+        Returns:
+            str: The estimated time until the track is played.
+        """
+
+        track_index = player.queue.index(track)
+        total_time = 0
+        for i in range(track_index):
+            if player.queue[i].is_stream:
+                total_time += 0
+            else:
+                total_time += player.queue[i].length
+
+        if player.playing:
+            total_time += player.position
+
+        return self.parse_duration(total_time)
+
     @commands.hybrid_command(aliases=["q", "fila"])
     async def queue(self, ctx: commands.Context) -> None:
         player = cast(wavelink.Player, ctx.voice_client)
         if not player:
-            await ctx.reply(self.t("not_in_voice"))
+            asyncio.create_task(ctx.reply(self.t("not_in_voice")))
             return
         if not player.playing:
-            await ctx.reply(self.t("not_playing"))
+            asyncio.create_task(ctx.reply(self.t("not_playing")))
             return
 
-        # if not player.queue:
-        #     await ctx.reply(self.t("cmd", "queue_empty"))
-        #     return
+        if len(player.queue) == 0:
+            embed = discord.Embed(
+                description=self.t(
+                    "embed",
+                    "description",
+                    track=player.current.title,
+                    user=player.current.ctx.author,
+                    current_time=self.parse_duration(player.position),
+                    total_time=self.parse_duration(player.current.length)
+                    if not player.current.is_stream
+                    else "N/A",
+                )
+            )
+            embed.set_author(
+                icon_url=ctx.author.avatar.url, name=self.t("embed", "title")
+            )
+            asyncio.create_task(ctx.send(embed=embed))
+            return
 
-        print("QUEUE -> " + ", ".join([track.title for track in player.queue]))
-        print(
-            "AUTO_QUEUE -> " + ", ".join([track.title for track in player.auto_queue])
-        )
+        embeds = []
+        j = 0
+        embed = None
+        for i, track in enumerate(player.queue):
+            if j == 0:  # reset embed
+                embed = discord.Embed(
+                    description=self.t(
+                        "embed",
+                        "description",
+                        track=player.current.title,
+                        user=player.ctx.author,
+                        current_time=self.parse_duration(player.position),
+                        total_time=self.parse_duration(player.current.length)
+                        if not player.current.is_stream
+                        else "N/A",
+                    )
+                )
+                embed.set_author(
+                    icon_url=ctx.author.avatar.url, name=self.t("embed", "title")
+                )
 
-        # embed = discord.Embed(
-        #     title=self.t("embed", "title", mcommand_name="queue"),
-        #     description=self.t("embed", "description", mcommand_name="queue"),
-        # )
+            if track.is_stream:
+                length_and_estimated = (
+                    f"N/A / Est. {self._estimate_time_until(track, player)}"
+                )
+            else:
+                length_and_estimated = f"{self.parse_duration(track.length)} / Est. {self._estimate_time_until(track, player)}"
 
-        # paginator = Paginator(ctx, embed, player.queue, 10)
-        # await paginator.paginate()
+            embed.add_field(name=f"{i+1}. {track.title}", value=length_and_estimated)
+
+            if j >= 8:
+                embeds.append(embed)
+                j = 0
+                continue
+
+            if i == len(player.queue) - 1:
+                embeds.append(embed)
+            j += 1
+
+        await Paginator.Simple(ephemeral=True).start(ctx, pages=embeds)
 
     @commands.hybrid_command(aliases=["s"])
     async def skip(self, ctx: commands.Context) -> None:
@@ -770,11 +846,10 @@ class Music(commands.Cog):
             return
 
         track = player.current
-        position = round(player.position / 1000)
-        parsed_position = self.parse_duration(position)
+        parsed_position = self.parse_duration(player.position)
         total = track.length
         parsed_length = self.parse_duration(total)
-        progress_bar = self.make_progress_bar(position, total)
+        progress_bar = self.make_progress_bar(round(player.position / 1000), total)
 
         embed = discord.Embed()
         embed.set_author(icon_url=ctx.author.avatar.url, name=self.t("embed", "title"))
