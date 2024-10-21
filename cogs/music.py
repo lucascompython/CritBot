@@ -303,7 +303,7 @@ class Music(commands.Cog):
                 total_time += player.queue[i].length
 
         if player.playing:
-            total_time += player.position
+            total_time += player.current.length - player.position
 
         return self.parse_duration(total_time)
 
