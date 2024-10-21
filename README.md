@@ -21,8 +21,7 @@ The only translated languages for now are Portuguese and English.
 
 This bot was only tested on Linux.  
 Python 3.12+ is required.  
-You can invite him [here](https://discord.com/api/oauth2/authorize?client_id=931322447117053972&permissions=8&scope=bot).  
-Nightly version [here](https://discord.com/api/oauth2/authorize?client_id=888100964534456361&permissions=8&scope=bot).  
+You can invite him [here](https://discord.com/oauth2/authorize?client_id=888100964534456361&permissions=8&integration_type=0&scope=bot).  
 The installation steps are as follows:
 
 I have only tested PostgreSQL >=15.2 but it should work with other versions.
@@ -46,6 +45,9 @@ source ./venv/bin/activate
 
 # install dependencies
 uv pip install
+
+./setup.sh
+java -jar .config/Lavalink.jar
 
 # change the appsettings.yaml file with your token and information
 python3 launcher.py -l 0.0.0.0:2333
