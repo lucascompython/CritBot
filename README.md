@@ -21,7 +21,7 @@ The only translated languages for now are Portuguese and English.
 
 This bot was only tested on Linux.  
 Python 3.12+ is required.  
-You can invite him [here](https://discord.com/oauth2/authorize?client_id=888100964534456361&permissions=8&integration_type=0&scope=bot).  
+You can invite it [here](https://discord.com/oauth2/authorize?client_id=888100964534456361&permissions=8&integration_type=0&scope=bot).  
 The installation steps are as follows:
 
 I have only tested PostgreSQL >=15.2 but it should work with other versions.
