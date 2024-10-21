@@ -688,28 +688,22 @@ class Music(commands.Cog):
             return
 
         if secs.startswith("+"):
-            if (int(secs[1:]) * 1000) + player.position > player.current.length:
-                secs = round(player.current.length / 1000)
-            else:
-                secs = round((player.position / 1000) + int(secs[1:]))
+            seek_to = (int(secs[1:]) * 1000) + player.position
         elif secs.startswith("-"):
-            if player.position - (int(secs[1:]) * 1000) < 0:
-                secs = 0
-            else:
-                secs = round((player.position / 1000) - int(secs[1:]))
+            seek_to = player.position - (int(secs[1:]) * 1000)
         else:
-            if int(secs) > (current_length_secs := round(player.current.length / 1000)):
-                secs = current_length_secs
-            else:
-                secs = int(secs)
+            seek_to = int(secs) * 1000
 
-        time = secs * 1000
-        position = self.parse_duration(round(player.position / 1000))
-        time_to_seek = self.parse_duration(secs)
-
-        await asyncio.gather(
-            player.seek(time),
-            ctx.send(self.t("cmd", "output", position=position, time=time_to_seek)),
+        asyncio.create_task(player.seek(seek_to))
+        asyncio.create_task(
+            ctx.send(
+                self.t(
+                    "cmd",
+                    "output",
+                    position=self.parse_duration(player.position),
+                    time=self.parse_duration(seek_to),
+                )
+            )
         )
 
     @commands.hybrid_command(aliases=["vol", "v"])
