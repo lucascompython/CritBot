@@ -193,13 +193,13 @@ class Music(commands.Cog):
         player.ctx = ctx
 
         if not tracks:
-            asyncio.create_task(
+            self.bot.loop.create_task(
                 ctx.reply(self.t("err", "no_tracks_found", query=query))
             )
             return
 
         if isinstance(tracks, wavelink.Playlist):
-            asyncio.create_task(
+            self.bot.loop.create_task(
                 ctx.send(
                     self.t(
                         "cmd",
@@ -213,22 +213,22 @@ class Music(commands.Cog):
                 track.ctx = ctx
 
             if not player.playing:
-                asyncio.create_task(player.play(tracks[0], volume=30))
+                self.bot.loop.create_task(player.play(tracks[0], volume=30))
 
-                asyncio.create_task(player.queue.put_wait(tracks[1:]))
+                self.bot.loop.create_task(player.queue.put_wait(tracks[1:]))
 
             else:
                 if play_next:
                     self.put_playlist_at_beginning(player, tracks)
                 else:
-                    asyncio.create_task(player.queue.put_wait(tracks))
+                    self.bot.loop.create_task(player.queue.put_wait(tracks))
 
         else:
             tracks[0].ctx = ctx
             if not player.playing:
-                asyncio.create_task(player.play(tracks[0], volume=30))
+                self.bot.loop.create_task(player.play(tracks[0], volume=30))
             else:
-                asyncio.create_task(
+                self.bot.loop.create_task(
                     ctx.send(
                         self.t(
                             "cmd",
@@ -241,7 +241,7 @@ class Music(commands.Cog):
                 if play_next:
                     player.queue.put_at(0, tracks[0])
                 else:
-                    asyncio.create_task(
+                    self.bot.loop.create_task(
                         player.queue.put_wait(tracks[0]),
                     )
 
@@ -311,10 +311,10 @@ class Music(commands.Cog):
     async def queue(self, ctx: commands.Context) -> None:
         player = cast(wavelink.Player, ctx.voice_client)
         if not player:
-            asyncio.create_task(ctx.reply(self.t("not_in_voice")))
+            self.bot.loop.create_task(ctx.reply(self.t("not_in_voice")))
             return
         if not player.playing:
-            asyncio.create_task(ctx.reply(self.t("not_playing")))
+            self.bot.loop.create_task(ctx.reply(self.t("not_playing")))
             return
 
         if len(player.queue) == 0:
@@ -333,7 +333,7 @@ class Music(commands.Cog):
             embed.set_author(
                 icon_url=ctx.author.avatar.url, name=self.t("embed", "title")
             )
-            asyncio.create_task(ctx.send(embed=embed))
+            self.bot.loop.create_task(ctx.send(embed=embed))
             return
 
         embeds = []
@@ -694,8 +694,8 @@ class Music(commands.Cog):
         else:
             seek_to = int(secs) * 1000
 
-        asyncio.create_task(player.seek(seek_to))
-        asyncio.create_task(
+        self.bot.loop.create_task(player.seek(seek_to))
+        self.bot.loop.create_task(
             ctx.send(
                 self.t(
                     "cmd",

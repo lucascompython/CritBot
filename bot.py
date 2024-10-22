@@ -9,6 +9,7 @@ from typing import Optional
 import asyncpg
 import asyncpraw
 import discord
+import uvloop
 import wavelink
 from aiohttp import ClientSession
 from discord.ext import commands, tasks
@@ -85,6 +86,8 @@ class CritBot(commands.Bot):
             "outro",
             "music_offtopic",
         ]  # has to be a list because sets are not json serializable
+
+        self.loop: uvloop.Loop = asyncio.get_event_loop()
 
         if self.dev:
             self.last_cmds = deque(maxlen=10)  # cache the 10 last commands
