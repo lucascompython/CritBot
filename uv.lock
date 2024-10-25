@@ -304,12 +304,12 @@ requires-dist = [
     { name = "discord-py", extras = ["voice"], specifier = "==2.4.0" },
     { name = "lru-dict", specifier = "==1.3.0" },
     { name = "lxml", specifier = "==5.3.0" },
-    { name = "orjson", specifier = ">=3.10.9" },
+    { name = "orjson", specifier = ">=3.10.10" },
     { name = "pynacl", specifier = ">=1.5.0" },
     { name = "pyyaml", specifier = "==6.0.2" },
     { name = "uvloop", specifier = "==0.21.0" },
     { name = "wavelink", specifier = "==3.4.1" },
-    { name = "yt-dlp", specifier = "==2024.10.7" },
+    { name = "yt-dlp", extras = ["default"], specifier = "==2024.10.22" },
 ]
 
 [[package]]
@@ -398,16 +398,17 @@ wheels = [
 
 [[package]]
 name = "orjson"
-version = "3.10.9"
+version = "3.10.10"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/ae/9f/645b533f73bd49adaa4cab46921276c8ad8b3aff44959f2e717ac7533e92/orjson-3.10.9.tar.gz", hash = "sha256:c378074e0c46035dc66e57006993233ec66bf8487d501bab41649b4b7289ed4d", size = 5399823 }
+sdist = { url = "https://files.pythonhosted.org/packages/80/44/d36e86b33fc84f224b5f2cdf525adf3b8f9f475753e721c402b1ddef731e/orjson-3.10.10.tar.gz", hash = "sha256:37949383c4df7b4337ce82ee35b6d7471e55195efa7dcb45ab8226ceadb0fe3b", size = 5404170 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/73/c1/9a181520a9967cb5c2dc40ca9a067e7ea49154d886a7aadbd1088efc0c0c/orjson-3.10.9-cp313-cp313-macosx_10_15_x86_64.macosx_11_0_arm64.macosx_10_15_universal2.whl", hash = "sha256:0ab6e3ad10e964392f0e838751bcce2ef9c8fa8be7deddffff83088e5791566d", size = 270592 },
-    { url = "https://files.pythonhosted.org/packages/c0/c5/575448b3e22062880cc9d1490d329b75897407b6bab5a1e50bcc5848925d/orjson-3.10.9-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:68ef65223baab00f469c8698f771ab3e6ccf6af2a987e77de5b566b4ec651150", size = 144805 },
-    { url = "https://files.pythonhosted.org/packages/98/77/7c503ac20e044e9bd3ee8c9a8e6cc5cd2900138a5f52f873e951f819d211/orjson-3.10.9-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:6f130848205fea90a2cb9fa2b11cafff9a9f31f4efad225800bc8b9e4a702f24", size = 171992 },
-    { url = "https://files.pythonhosted.org/packages/fc/76/3bd20cae3a2a16c83137446dda1dcd4b16ef74626f625777844e09e3c7a0/orjson-3.10.9-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:2ea7a98f3295ed8adb6730a5788cc78dafea28300d19932a1d2143457f7db802", size = 170460 },
-    { url = "https://files.pythonhosted.org/packages/6a/62/6a8f2a64be762f40acac779be37a3edef7ea0bd4809d314e8b4d7ccc4b35/orjson-3.10.9-cp313-none-win32.whl", hash = "sha256:bdce39f96149a74fddeb2674c54f1da5e57724d32952eb6df2ac719b66d453cc", size = 145089 },
-    { url = "https://files.pythonhosted.org/packages/1a/55/3b41acf8c5f96e8fbde86fb56c7d80fa359de0020937618f558d81785ae9/orjson-3.10.9-cp313-none-win_amd64.whl", hash = "sha256:d11383701d4b58e795039b662ada46987744293d57bfa2719e7379b8d67bc796", size = 139223 },
+    { url = "https://files.pythonhosted.org/packages/0c/69/f1c4382cd44bdaf10006c4e82cb85d2bcae735369f84031e203c4e5d87de/orjson-3.10.10-cp313-cp313-macosx_10_15_x86_64.macosx_11_0_arm64.macosx_10_15_universal2.whl", hash = "sha256:44bffae68c291f94ff5a9b4149fe9d1bdd4cd0ff0fb575bcea8351d48db629a1", size = 270695 },
+    { url = "https://files.pythonhosted.org/packages/61/29/aeb5153271d4953872b06ed239eb54993a5f344353727c42d3aabb2046f6/orjson-3.10.10-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:e27b4c6437315df3024f0835887127dac2a0a3ff643500ec27088d2588fa5ae1", size = 141632 },
+    { url = "https://files.pythonhosted.org/packages/bc/a2/c8ac38d8fb461a9b717c766fbe1f7d3acf9bde2f12488eb13194960782e4/orjson-3.10.10-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:bca84df16d6b49325a4084fd8b2fe2229cb415e15c46c529f868c3387bb1339d", size = 144854 },
+    { url = "https://files.pythonhosted.org/packages/79/51/e7698fdb28bdec633888cc667edc29fd5376fce9ade0a5b3e22f5ebe0343/orjson-3.10.10-cp313-cp313-musllinux_1_2_aarch64.whl", hash = "sha256:c14ce70e8f39bd71f9f80423801b5d10bf93d1dceffdecd04df0f64d2c69bc01", size = 172023 },
+    { url = "https://files.pythonhosted.org/packages/02/2d/0d99c20878658c7e33b90e6a4bb75cf2924d6ff29c2365262cff3c26589a/orjson-3.10.10-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:24ac62336da9bda1bd93c0491eff0613003b48d3cb5d01470842e7b52a40d5b4", size = 170429 },
+    { url = "https://files.pythonhosted.org/packages/cd/45/6a4a446f4fb29bb4703c3537d5c6a2bf7fed768cb4d7b7dce9d71b72fc93/orjson-3.10.10-cp313-none-win32.whl", hash = "sha256:eb0a42831372ec2b05acc9ee45af77bcaccbd91257345f93780a8e654efc75db", size = 145099 },
+    { url = "https://files.pythonhosted.org/packages/72/6e/4631fe219a4203aa111e9bb763ad2e2e0cdd1a03805029e4da124d96863f/orjson-3.10.10-cp313-none-win_amd64.whl", hash = "sha256:f0c4f37f8bf3f1075c6cc8dd8a9f843689a4b618628f8812d0a71e6968b95ffd", size = 139176 },
 ]
 
 [[package]]
@@ -628,7 +629,7 @@ wheels = [
 
 [[package]]
 name = "yt-dlp"
-version = "2024.10.7"
+version = "2024.10.22"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "brotli", marker = "implementation_name == 'cpython'" },
@@ -640,7 +641,7 @@ dependencies = [
     { name = "urllib3" },
     { name = "websockets" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2e/b1/08679efb4c1932dc6420deda8a89f03d7440d6462b7f61d339db2732a497/yt_dlp-2024.10.7.tar.gz", hash = "sha256:0baf1ab517c9748d7e337ced91c5543c36fc16246a9ebedac32ebf20c1998ceb", size = 2877443 }
+sdist = { url = "https://files.pythonhosted.org/packages/2f/79/acfe1c2bf64ed83e1b465e6550c0f5bc2214ea447a900b102f5ca6e4186e/yt_dlp-2024.10.22.tar.gz", hash = "sha256:47b82a1fd22411b5c95ef2f0a1ae1af4e6dfd736ea99fdb2a0ea41445abc62ba", size = 2885622 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6e/91/ecb07d66110334cdb01e94b187577af3b041897090203c9957728825d46f/yt_dlp-2024.10.7-py3-none-any.whl", hash = "sha256:9e336ae663bfd7ad3ea1c02e722747388172719efc0fc39a807dace3073aa704", size = 3149082 },
+    { url = "https://files.pythonhosted.org/packages/bb/68/548f9819b41d53561d4f3d39588111cf39993c066b6e5300b4ae118eb2e6/yt_dlp-2024.10.22-py3-none-any.whl", hash = "sha256:ba166602ebe22a220e4dc1ead45bf00eb469ed812b22f4fb8bb54734f9b02084", size = 3155189 },
 ]
