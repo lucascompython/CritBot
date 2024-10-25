@@ -74,20 +74,17 @@ class SpotifyTrackInfo:
         playcount = []
         date = []
         current = 159  # 159 is the index of the first byte of the name which is the first "dynamic" field
-        left_brackets = 0
         done_playcount = False
         while True:
-            if data[current] == 123:  # Count left brackets
-                left_brackets += 1
-
             if (
-                left_brackets == 1 and not done_playcount
-            ):  # the playcount is 51 bytes after the first left bracket
+                data[current] == 123 and not done_playcount
+            ):  # 123 is the ascii for '{', the playcount is 51 bytes after the first left bracket
                 current += 51
 
-                while data[current] != 34:
+                while data[current] != 34:  # while the byte is not a double quote
                     playcount.append(chr(data[current]))
                     current += 1
+
                 current += 266  # 266 is the max number of "static" bytes between the playcount and the release date this puts the index at the first byte of the copyright text
                 done_playcount = True
 
@@ -134,7 +131,7 @@ if __name__ == "__main__":
 
     async def main() -> None:
         artist_id = "5K4W6rqBFWDnAN6FQUkS6x"
-        spotify_track = "4zfgnW5p7C2QAFauTn09Mh"
+        spotify_track = "2ph0vvxsYbMZXN5rjfRRWf"
 
         async with aiohttp.ClientSession() as session:
             spotify_track_info = SpotifyTrackInfo(session)
