@@ -193,7 +193,7 @@ class Music(commands.Cog):
                 None, self.ytdlp.extract_info, track.uri, False
             )
         except ExtractorError:
-            self.bot.loop.create_task(track.ctx.send(self.t("err", "drm_protection")))
+            self.bot.create_task(track.ctx.send(self.t("err", "drm_protection")))
 
         return info
 
@@ -211,13 +211,13 @@ class Music(commands.Cog):
         player.ctx = ctx
 
         if not tracks:
-            self.bot.loop.create_task(
+            self.bot.create_task(
                 ctx.reply(self.t("err", "no_tracks_found", query=query))
             )
             return
 
         if isinstance(tracks, wavelink.Playlist):
-            self.bot.loop.create_task(
+            self.bot.create_task(
                 ctx.send(
                     self.t(
                         "cmd",
@@ -231,22 +231,22 @@ class Music(commands.Cog):
                 track.ctx = ctx
 
             if not player.playing:
-                self.bot.loop.create_task(player.play(tracks[0], volume=30))
+                self.bot.create_task(player.play(tracks[0], volume=30))
 
-                self.bot.loop.create_task(player.queue.put_wait(tracks[1:]))
+                self.bot.create_task(player.queue.put_wait(tracks[1:]))
 
             else:
                 if play_next:
                     self.put_playlist_at_beginning(player, tracks)
                 else:
-                    self.bot.loop.create_task(player.queue.put_wait(tracks))
+                    self.bot.create_task(player.queue.put_wait(tracks))
 
         else:
             tracks[0].ctx = ctx
             if not player.playing:
-                self.bot.loop.create_task(player.play(tracks[0], volume=30))
+                self.bot.create_task(player.play(tracks[0], volume=30))
             else:
-                self.bot.loop.create_task(
+                self.bot.create_task(
                     ctx.send(
                         self.t(
                             "cmd",
@@ -259,7 +259,7 @@ class Music(commands.Cog):
                 if play_next:
                     player.queue.put_at(0, tracks[0])
                 else:
-                    self.bot.loop.create_task(
+                    self.bot.create_task(
                         player.queue.put_wait(tracks[0]),
                     )
 
@@ -329,10 +329,10 @@ class Music(commands.Cog):
     async def queue(self, ctx: commands.Context) -> None:
         player = cast(wavelink.Player, ctx.voice_client)
         if not player:
-            self.bot.loop.create_task(ctx.reply(self.t("not_in_voice")))
+            self.bot.create_task(ctx.reply(self.t("not_in_voice")))
             return
         if not player.playing:
-            self.bot.loop.create_task(ctx.reply(self.t("not_playing")))
+            self.bot.create_task(ctx.reply(self.t("not_playing")))
             return
 
         if len(player.queue) == 0:
@@ -351,7 +351,7 @@ class Music(commands.Cog):
             embed.set_author(
                 icon_url=ctx.author.avatar.url, name=self.t("embed", "title")
             )
-            self.bot.loop.create_task(ctx.send(embed=embed))
+            self.bot.create_task(ctx.send(embed=embed))
             return
 
         embeds = []
@@ -712,8 +712,8 @@ class Music(commands.Cog):
         else:
             seek_to = int(secs) * 1000
 
-        self.bot.loop.create_task(player.seek(seek_to))
-        self.bot.loop.create_task(
+        self.bot.create_task(player.seek(seek_to))
+        self.bot.create_task(
             ctx.send(
                 self.t(
                     "cmd",
@@ -779,9 +779,7 @@ class Music(commands.Cog):
             # check if the file is bigger than 25MB
             # TODO: This can mostly be removed, we can just check if the duration is bigger than 660 seconds (11 minutes aprox. 25MB)
             if self.get_expected_file_size(info["duration"]) > 25 * 1024 * 1024:
-                self.bot.loop.create_task(
-                    msg.edit(content=self.t("err", "file_too_big"))
-                )
+                self.bot.create_task(msg.edit(content=self.t("err", "file_too_big")))
                 return
 
             # check if the /tmp folder is bigger than 1GB, if it is, wait 5 seconds and try again
@@ -797,7 +795,7 @@ class Music(commands.Cog):
                     )
                     total_time += 5
                     if total_time > 60:
-                        self.bot.loop.create_task(
+                        self.bot.create_task(
                             msg.edit(content=self.t("err", "too_many_downloads"))
                         )
                         return
@@ -810,7 +808,7 @@ class Music(commands.Cog):
                 msg.edit(content=self.t("cmd", "downloading")),
             )
 
-            self.bot.loop.create_task(msg.edit(content=self.t("cmd", "sending")))
+            self.bot.create_task(msg.edit(content=self.t("cmd", "sending")))
 
             # get the file name
             file_name = self.ytdlp_download.prepare_filename(info)
@@ -821,16 +819,16 @@ class Music(commands.Cog):
             file_name = file_name.replace(file_extension, ".mp3")
 
             # send the file
-            self.bot.loop.create_task(ctx.send(file=discord.File(file_name)))
+            self.bot.create_task(ctx.send(file=discord.File(file_name)))
 
-            self.bot.loop.create_task(
+            self.bot.create_task(
                 msg.edit(
                     content=self.t(
                         "cmd", "finished", title=info["title"], author=info["uploader"]
                     )
                 )
             )
-            self.bot.loop.create_task(aiofiles.os.remove(file_name))
+            self.bot.create_task(aiofiles.os.remove(file_name))
 
     # TODO: actually implement this
     @commands.hybrid_command(

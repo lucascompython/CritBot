@@ -88,9 +88,16 @@ class CritBot(commands.Bot):
         ]  # has to be a list because sets are not json serializable
 
         self.loop: uvloop.Loop = asyncio.get_event_loop()
+        self.background_tasks = set()
 
         if self.dev:
             self.last_cmds = deque(maxlen=10)  # cache the 10 last commands
+
+    # need to keep a strong reference of the tasks to avoid them disappearing: https://docs.python.org/3.13/library/asyncio-task.html#asyncio.create_task
+    def create_task(self, coro) -> None:
+        task = self.loop.create_task(coro)
+        self.background_tasks.add(task)
+        task.add_done_callback(self.background_tasks.discard)
 
     # TODO if all the commands can be hybrid command check the new (2.1 feature) interaction.translate to translate per user locale instead of per guild locale
 
