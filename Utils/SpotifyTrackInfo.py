@@ -45,7 +45,7 @@ class SpotifyTrackInfo:
         spotify_track: str,
         bearer_token: str,
     ) -> bytes:
-        """Fetches the track info from the Spotify API. Usually this payload is huge, but we only aproximatapproximately the first 900 bytes. Im still getting the first 1024 just to be sure that songs with long titles are covered.
+        """Fetches the track info from the Spotify API. Usually this payload is huge, but we only need approximately the first 900 bytes. Im still getting the first 1024 just to be sure that songs with long titles are covered.
 
         Args:
             spotify_track (str): The Spotify track ID.
