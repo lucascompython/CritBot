@@ -1,37 +1,20 @@
 import asyncio
 import datetime
-import urllib.parse
-from enum import Enum
-from typing import Optional, cast, override
 import os
+import urllib.parse
+from typing import Optional, cast
 
+import aiofiles.os
 import discord
 import wavelink
-import yt_dlp
+from yt_dlp import YoutubeDL
+from yt_dlp.utils import ExtractorError
 from discord import app_commands
 from discord.ext import commands
-import aiofiles.os
 
 # import the bot class from bot.py
 from bot import CritBot
-from Utils import GeniusLyrics, Paginator, SongNotFound, BoolConverter
-
-
-class Platform(Enum):
-    YOUTUBE = ("youtube", "yt")
-    SPOTIFY = ("spotify", "sp")
-    SOUNDCLOUD = ("soundcloud", "sc")
-    YOUTUBE_MUSIC = ("youtube_music", "ytm")
-
-    @classmethod
-    def from_string(cls, value: str) -> "Platform":
-        for platform in cls:
-            if value.lower() in platform.value:
-                return platform
-        return cls.YOUTUBE  # default to Youtube if no match is found
-
-    def __str__(self) -> str:
-        return self.value[0]
+from Utils import BoolConverter, GeniusLyrics, Paginator, SongNotFound
 
 
 class Music(commands.Cog):
@@ -39,6 +22,31 @@ class Music(commands.Cog):
         self.bot = bot
         self.t = self.bot.i18n.t
         self.log = self.bot.logger.log
+        self.ytdlp_download_opts = {
+            "format": "bestaudio/best",
+            "outtmpl": "/tmp/%(title)s.%(ext)s",
+            "noplaylist": True,
+            "nocheckcertificate": True,
+            "ignoreerrors": True,
+            "logtostderr": False,
+            "quiet": True,
+            "no_warnings": True,
+            "default_search": "auto",
+            "postprocessors": [
+                {
+                    "key": "FFmpegExtractAudio",
+                    "preferredcodec": "mp3",
+                    "preferredquality": "320",
+                }
+            ],
+        }
+        self.ytdlp_extract_info_opts = {
+            "quiet": True,
+            "skip_download": True,
+        }
+
+        self.ytdlp_extract = YoutubeDL(self.ytdlp_extract_info_opts)
+        self.ytdlp_download = YoutubeDL(self.ytdlp_download_opts)
 
     @commands.Cog.listener()
     async def on_wavelink_node_ready(
@@ -178,6 +186,16 @@ class Music(commands.Cog):
 
         for i in range(length - 1, -1, -1):
             player.queue.put_at(0, playlist[i])
+
+    async def get_track_info(self, track: wavelink.Playable) -> dict[str, str]:
+        try:
+            info = await self.bot.loop.run_in_executor(
+                None, self.ytdlp.extract_info, track.uri, False
+            )
+        except ExtractorError:
+            self.bot.loop.create_task(track.ctx.send(self.t("err", "drm_protection")))
+
+        return info
 
     async def play_logic(
         self, ctx: commands.Context, query: str, play_next: bool
@@ -744,87 +762,75 @@ class Music(commands.Cog):
     async def download(self, ctx: commands.Context, *, query: str) -> None:
         query = query.strip("<>")
 
-        ydl_opts = {
-            "format": "bestaudio/best",
-            "outtmpl": "/tmp/%(title)s.%(ext)s",
-            "noplaylist": True,
-            "nocheckcertificate": True,
-            "ignoreerrors": True,
-            "logtostderr": False,
-            "quiet": True,
-            "no_warnings": True,
-            "default_search": "auto",
-            "postprocessors": [
-                {
-                    "key": "FFmpegExtractAudio",
-                    "preferredcodec": "mp3",
-                    "preferredquality": "320",
-                }
-            ],
-        }
+        # download with info
+        msg: discord.Message
+        async with ctx.typing():
+            info, msg = await asyncio.gather(
+                self.bot.loop.run_in_executor(
+                    None, self.ytdlp_download.extract_info, query, False
+                ),
+                ctx.send(self.t("cmd", "checking")),
+            )
 
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            # download with info
-            msg: discord.Message
-            async with ctx.typing():
-                info, msg = await asyncio.gather(
-                    asyncio.to_thread(ydl.extract_info, query, download=False),
-                    ctx.send(self.t("cmd", "checking")),
+            # check for query
+            if "entries" in info:
+                info = info["entries"][0]
+
+            # check if the file is bigger than 25MB
+            # TODO: This can mostly be removed, we can just check if the duration is bigger than 660 seconds (11 minutes aprox. 25MB)
+            if self.get_expected_file_size(info["duration"]) > 25 * 1024 * 1024:
+                self.bot.loop.create_task(
+                    msg.edit(content=self.t("err", "file_too_big"))
                 )
+                return
 
-                # check for query
-                if "entries" in info:
-                    info = info["entries"][0]
-
-                # check if the file is bigger than 25MB
-                # TODO: This can mostly be removed, we can just check if the duration is bigger than 660 seconds (11 minutes aprox. 25MB)
-                if self.get_expected_file_size(info["duration"]) > 25 * 1024 * 1024:
-                    await msg.edit(content=self.t("err", "file_too_big"))
-                    return
-
-                # check if the /tmp folder is bigger than 1GB, if it is, wait 5 seconds and try again
-                if self.get_tmp_size() > 1024 * 1024 * 1024:
-                    total_time = 0
+            # check if the /tmp folder is bigger than 1GB, if it is, wait 5 seconds and try again
+            if self.get_tmp_size() > 1024 * 1024 * 1024:
+                total_time = 0
+                await msg.edit(
+                    content=self.t("cmd", "too_many_downloads", time=total_time)
+                )
+                while self.get_tmp_size() > 1024 * 1024 * 1024:
+                    await asyncio.sleep(5)
                     await msg.edit(
                         content=self.t("cmd", "too_many_downloads", time=total_time)
                     )
-                    while self.get_tmp_size() > 1024 * 1024 * 1024:
-                        await asyncio.sleep(5)
-                        await msg.edit(
-                            content=self.t("cmd", "too_many_downloads", time=total_time)
+                    total_time += 5
+                    if total_time > 60:
+                        self.bot.loop.create_task(
+                            msg.edit(content=self.t("err", "too_many_downloads"))
                         )
-                        total_time += 5
-                        if total_time > 60:
-                            await msg.edit(content=self.t("err", "too_many_downloads"))
-                            return
+                        return
 
-                # download the file
-                await asyncio.gather(
-                    asyncio.to_thread(ydl.download, [query]),
-                    msg.edit(content=self.t("cmd", "downloading")),
-                )
-
-                await msg.edit(content=self.t("cmd", "sending"))
-
-                # get the file name
-                file_name = ydl.prepare_filename(info)
-
-                # change whatever extension is to .mp3
-                last_dot_index = file_name.rfind(".")
-                file_extension = file_name[last_dot_index:]
-                file_name = file_name.replace(file_extension, ".mp3")
-
-                # send the file
-                await ctx.send(file=discord.File(file_name))
-
+            # download the file
             await asyncio.gather(
+                self.bot.loop.run_in_executor(
+                    None, self.ytdlp_download.download, [query]
+                ),
+                msg.edit(content=self.t("cmd", "downloading")),
+            )
+
+            self.bot.loop.create_task(msg.edit(content=self.t("cmd", "sending")))
+
+            # get the file name
+            file_name = self.ytdlp_download.prepare_filename(info)
+
+            # change whatever extension is to .mp3
+            last_dot_index = file_name.rfind(".")
+            file_extension = file_name[last_dot_index:]
+            file_name = file_name.replace(file_extension, ".mp3")
+
+            # send the file
+            self.bot.loop.create_task(ctx.send(file=discord.File(file_name)))
+
+            self.bot.loop.create_task(
                 msg.edit(
                     content=self.t(
                         "cmd", "finished", title=info["title"], author=info["uploader"]
                     )
-                ),
-                aiofiles.os.remove(file_name),
+                )
             )
+            self.bot.loop.create_task(aiofiles.os.remove(file_name))
 
     # TODO: actually implement this
     @commands.hybrid_command(
