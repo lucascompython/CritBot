@@ -16,29 +16,54 @@ class SpotifyTrackInfo:
         self.artist_url = "https://open.spotify.com/artist/{artist_id}"
         self.api_partner_url = 'https://api-partner.spotify.com/pathfinder/v1/query?operationName=getTrack&variables={{"uri":"spotify:track:{spotify_track}"}}&extensions={{"persistedQuery":{{"version":1,"sha256Hash":"ae85b52abb74d20a4c331d4143d4772c95f34757bfa8c625474b912b9055b5c0"}}}}'
 
-    @staticmethod
-    def __extract_access_token_and_monthly_listeners(text: str) -> tuple[str, str]:
-        html = lxml.html.fromstring(text)
+    async def __get_artist_page(self, artist_id: str) -> bytes:
+        """Fetches the artist page from Spotify. This page is huge, we only need the first 27648 bytes.
+        The monthly listeners are in beggining of the page and the access token is in the 26000+ bytes of the page.
 
-        script_content = html.xpath(
-            '//script[@id="session" and @data-testid="session"]'
-        )[0].text_content()
+        Args:
+            artist_id (str): The Spotify artist ID.
+
+        Returns:
+            bytes: The first 27648 bytes of the response.
+        """
+        url = self.artist_url.format(artist_id=artist_id)
+        async with self.session.get(url) as resp:
+            # The access_token is in the 26000+ bytes
+            # return await resp.content.read(27648)
+            data = bytearray()
+            async for chunk in resp.content.iter_chunked(1024):
+                data.extend(chunk)
+                if len(data) >= 27648:
+                    break
+            return bytes(data)
+
+    def __parse_partial_artist_page(self, data: bytes) -> tuple[str, str]:
+        monthly_listeners = []
+        current = 1700  # 1700 is approximately a good index to start looking for the monthly listeners
+
+        # doing this is almost 3 times faster than using lxml
+        while True:
+            if data[current] == 183:  # 183 is the ascii code for ·
+                current += 2
+                while (
+                    data[current] != 32
+                ):  # 109 is the ascii code for space, meaning the monthly listeners are over
+                    monthly_listeners.append(chr(data[current]))
+                    current += 1
+                break
+            current += 1
+        monthly_listeners = "".join(monthly_listeners)
+
+        html = lxml.html.fromstring(
+            data[26000:]
+        )  # the token is in the 26000+ bytes so we can skip the first 26000 bytes
+
+        script_content = html.xpath('//script[@id="session"]')[0].text_content()
 
         # The token is 115 chars long and ignore the first 16 chars because they are the '{"accessToken":"' part
         access_token = script_content[16:131]
 
-        # The first 9 chars are "Artist · " and the last 18 are " monthly listeners."
-        monthly_listeners = html.xpath('//meta[@property="og:description"]')[0].attrib[
-            "content"
-        ][9:-19]
-
         return access_token, monthly_listeners
-
-    async def __get_artist_page(self, artist_id: str) -> str:
-        url = self.artist_url.format(artist_id=artist_id)
-
-        async with self.session.get(url) as resp:
-            return await resp.text()
 
     async def __get_track_info(
         self,
@@ -113,11 +138,9 @@ class SpotifyTrackInfo:
         Returns:
             tuple[str, str, str, bool]: The monthly listeners, playcount, release date and content rating. The content rating is a boolean. True if the track is explicit, False if it's not and None if it's unknown.
         """
-        text = await self.__get_artist_page(artist_id)
+        artist_page = await self.__get_artist_page(artist_id)
 
-        bearer_token, monthly_listeners = (
-            self.__extract_access_token_and_monthly_listeners(text)
-        )
+        bearer_token, monthly_listeners = self.__parse_partial_artist_page(artist_page)
         response = await self.__get_track_info(spotify_track, bearer_token)
 
         return (
@@ -130,7 +153,7 @@ if __name__ == "__main__":
     import uvloop
 
     async def main() -> None:
-        artist_id = "5K4W6rqBFWDnAN6FQUkS6x"
+        artist_id = "3qiHUAX7zY4Qnjx8TNUzVx"
         spotify_track = "2ph0vvxsYbMZXN5rjfRRWf"
 
         async with aiohttp.ClientSession() as session:
