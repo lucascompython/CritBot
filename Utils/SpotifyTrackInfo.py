@@ -29,7 +29,6 @@ class SpotifyTrackInfo:
         url = self.artist_url.format(artist_id=artist_id)
         async with self.session.get(url) as resp:
             # The access_token is in the 26000+ bytes
-            # return await resp.content.read(27648)
             data = bytearray()
             async for chunk in resp.content.iter_chunked(1024):
                 data.extend(chunk)
@@ -46,7 +45,7 @@ class SpotifyTrackInfo:
                 current += 2
                 while (
                     data[current] != 32
-                ):  # 109 is the ascii code for space, meaning the monthly listeners are over
+                ):  # 32 is the ascii code for space, meaning the monthly listeners are over
                     monthly_listeners.append(chr(data[current]))
                     current += 1
                 break
