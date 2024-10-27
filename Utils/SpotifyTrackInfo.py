@@ -1,5 +1,6 @@
 import lxml.html
 import aiohttp
+from time import perf_counter
 
 
 class SpotifyTrackInfo:
@@ -34,8 +35,7 @@ class SpotifyTrackInfo:
             async for chunk in resp.content.iter_chunked(1024):
                 data.extend(chunk)
                 if len(data) >= 27648:
-                    break
-            return bytes(data)
+                    return bytes(data)
 
     def __parse_partial_artist_page(self, data: bytes) -> tuple[str, str]:
         monthly_listeners = []
@@ -158,13 +158,14 @@ if __name__ == "__main__":
 
         async with aiohttp.ClientSession() as session:
             spotify_track_info = SpotifyTrackInfo(session)
-
+            start = perf_counter()
             (
                 monthly_listeners,
                 playcount,
                 release_date,
                 content_rating,
             ) = await spotify_track_info.get_info(artist_id, spotify_track)
+            print(f"Time taken: {perf_counter() - start:.2f}s")
 
             print(f"Monthly Listeners: {monthly_listeners}")
             print(f"Playcount: {playcount}")
