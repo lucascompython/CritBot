@@ -170,8 +170,9 @@ class Music(commands.Cog):
         num_hash = int((progress / total) * length)
         return "⎯" * num_hash + ":radio_button:" + "⎯" * (length - num_hash - 1)
 
+    @staticmethod
     def put_playlist_at_beginning(
-        self, player: wavelink.Player, playlist: wavelink.Playlist
+        player: wavelink.Player, playlist: wavelink.Playlist
     ) -> None:
         length = len(playlist)
 
