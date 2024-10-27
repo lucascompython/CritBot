@@ -303,7 +303,7 @@ class Music(commands.Cog):
         embed.add_field(
             name=self.t("embed", "artist", mcommand_name="play"),
             value=f"[{track.author}]({track.artist.url if track.source != "youtube" else info["uploader_url"]})"
-            if track.artist.url
+            if track.artist.url or track.source == "youtube"
             else track.author,
         )
         embed.add_field(
