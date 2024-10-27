@@ -61,6 +61,10 @@ class Music(commands.Cog):
         )
 
     @commands.Cog.listener()
+    async def on_wavelink_inactive_player(self, player: wavelink.Player) -> None:
+        self.bot.create_task(player.disconnect())
+
+    @commands.Cog.listener()
     async def on_wavelink_track_end(
         self, payload: wavelink.TrackEndEventPayload
     ) -> None:
@@ -75,6 +79,28 @@ class Music(commands.Cog):
                 track.source != "flowery-tts" and not track.first_playing
             ):  # the info message is already sent if the track is the first one and it's not a tts track
                 self.bot.create_task(self.send_info_message(player.ctx, track))
+
+    @commands.Cog.listener()
+    async def on_voice_state_update(
+        self,
+        member: discord.Member,
+        _before: discord.VoiceState,
+        after: discord.VoiceState,
+    ) -> None:
+        player = cast(wavelink.Player, member.guild.voice_client)
+        if player is None:
+            return
+
+        if after.channel != player.channel and member.id != self.bot.user.id:
+            real_members = 0
+            for m in player.channel.members:
+                if not m.bot:
+                    real_members += 1
+            if real_members == 0:
+                player.inactive_timeout = 300
+
+        elif after.channel == player.channel:
+            player.inactive_timeout = 0  # disable the inactive timeout so that while there is someone in the voice channel the bot won't disconnect
 
     @commands.Cog.listener()
     async def on_wavelink_extra_event(

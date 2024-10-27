@@ -125,6 +125,8 @@ class CritBot(commands.Bot):
         self.wavelink_node = wavelink.Node(
             uri=self.lavalink["ip"] + ":" + self.lavalink["port"],
             password=self.lavalink["password"],
+            inactive_channel_tokens=3,
+            inactive_player_timeout=None,
         )
         nodes = [self.wavelink_node]
 
