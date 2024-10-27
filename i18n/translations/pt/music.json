@@ -10,18 +10,24 @@
         "cmd": {
             "queued": "Enfileirado **{track}** por **{author}**",
             "queued_playlist": "Enfileirado **{playlist}** com **{length}** musicas",
-            "queued_spotify_playlist": "Enfileirado **{length}** musicas"
+            "queued_spotify_playlist": "Enfileirado **{length}** musicas",
+            "now_playing": "A tocar **{track}** por **{author}**"
         },
         "embed": {
             "title": "A tocar do {source}",
             "author": "Requisitado por {user}",
             "duration": "Duração",
-            "uploader": "Uploader",
+            "artist": "Artista",
             "click": "[Clica]({url})",
             "views": "Visualizações",
             "likes_dislikes": "Likes / Dislikes",
             "footer": "Data de upload: {upload_date}",
-            "subs": "Inscritos"
+            "subs": "Inscritos",
+            "monthly_listeners": "Ouvintes mensais",
+            "playcount": "Número de reproduções",
+            "explicit": "Explicito",
+            "yes": "Sim",
+            "no": "Não"
         },
         "err": {
             "no_tracks_found": "Nenhuma musica encontrada para `{query}`!",

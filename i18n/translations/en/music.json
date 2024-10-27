@@ -10,18 +10,24 @@
         "cmd": {
             "queued": "Queued **{track}** by **{author}**",
             "queued_playlist": "Queued **{playlist}** with **{length}** tracks",
-            "queued_spotify_playlist": "Queued **{length}** tracks"
+            "queued_spotify_playlist": "Queued **{length}** tracks",
+            "now_playing": "Now playing **{track}** by **{author}**"
         },
         "embed": {
             "title": "Now Playing from {source}",
             "author": "Requested by {user}",
             "duration": "Duration",
-            "uploader": "Uploader",
+            "artist": "Artist",
             "click": "[Click]({url})",
             "views": "Views",
             "likes_dislikes": "Likes / Dislikes",
             "footer": "Upload date: {upload_date}",
-            "subs": "Subscribers"
+            "subs": "Subscribers",
+            "monthly_listeners": "Monthly Listeners",
+            "playcount": "Play Count",
+            "explicit": "Explicit",
+            "yes": "Yes",
+            "no": "No"
         },
         "err": {
             "no_tracks_found": "No tracks found for `{query}`!",

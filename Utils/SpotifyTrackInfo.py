@@ -112,9 +112,11 @@ class SpotifyTrackInfo:
                 current += 266  # 266 is the max number of "static" bytes between the playcount and the release date this puts the index at the first byte of the copyright text
                 done_playcount = True
 
-            if data[current] == 90:  # 90 is the ascii code for Z
+            if (
+                data[current] == 90 and data[current - 3] == 58
+            ):  # 90 is the ascii code for Z and the 58 is the ascii code for :, we check the Z because it's the last byte of the timestamp and the : because it's a good indicator that we are actually looking at the release date
                 current -= 19  # the Z represents the end of the timestamp, so we go back 19 bytes to get the full date
-                for _ in range(20):
+                for _ in range(10):  # only get the date not the time
                     date.append(chr(data[current]))
                     current += 1
                 break
@@ -122,6 +124,7 @@ class SpotifyTrackInfo:
 
         playcount = "".join(playcount)
         release_date = "".join(date)
+        release_date = f"{release_date[8:10]}-{release_date[5:7]}-{release_date[:4]}"  # format the date to dd-mm-yyyy
 
         return playcount, release_date, explicit
 

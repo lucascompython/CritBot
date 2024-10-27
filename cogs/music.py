@@ -6,15 +6,16 @@ from typing import Optional, cast
 
 import aiofiles.os
 import discord
+import orjson
 import wavelink
-from yt_dlp import YoutubeDL
-from yt_dlp.utils import ExtractorError
 from discord import app_commands
 from discord.ext import commands
+from yt_dlp import YoutubeDL
+from yt_dlp.utils import ExtractorError
 
 # import the bot class from bot.py
 from bot import CritBot
-from Utils import BoolConverter, GeniusLyrics, Paginator, SongNotFound
+from Utils import BoolConverter, GeniusLyrics, Paginator, SongNotFound, SpotifyTrackInfo
 
 
 class Music(commands.Cog):
@@ -47,6 +48,7 @@ class Music(commands.Cog):
 
         self.ytdlp_extract = YoutubeDL(self.ytdlp_extract_info_opts)
         self.ytdlp_download = YoutubeDL(self.ytdlp_download_opts)
+        self.SpotifyTrackInfo = SpotifyTrackInfo(self.bot.web_client)
 
     @commands.Cog.listener()
     async def on_wavelink_node_ready(
@@ -59,22 +61,6 @@ class Music(commands.Cog):
         )
 
     @commands.Cog.listener()
-    async def on_wavelink_track_start(
-        self, payload: wavelink.TrackStartEventPayload
-    ) -> None:
-        self.log(20, f"Wavelink track <{payload.track.title}> started!")
-        self.log(20, f"Original {payload.original.title}")
-
-        player: wavelink.Player = payload.player
-
-        if player.current.author == "flowery-tts":
-            return
-
-        await player.ctx.send(
-            f"A tocar agora: **{payload.track.title}** - {payload.track.author}"
-        )
-
-    @commands.Cog.listener()
     async def on_wavelink_track_end(
         self, payload: wavelink.TrackEndEventPayload
     ) -> None:
@@ -83,7 +69,12 @@ class Music(commands.Cog):
             return
 
         if player.queue and player.autoplay == wavelink.AutoPlayMode.disabled:
-            await player.play(player.queue.get())
+            track = player.queue.get()
+            self.bot.create_task(player.play(track))
+            if (
+                track.source != "flowery-tts" and not track.first_playing
+            ):  # the info message is already sent if the track is the first one and it's not a tts track
+                self.bot.create_task(self.send_info_message(player.ctx, track))
 
     @commands.Cog.listener()
     async def on_wavelink_extra_event(
@@ -187,15 +178,169 @@ class Music(commands.Cog):
         for i in range(length - 1, -1, -1):
             player.queue.put_at(0, playlist[i])
 
-    async def get_track_info(self, track: wavelink.Playable) -> dict[str, str]:
-        try:
-            info = await self.bot.loop.run_in_executor(
-                None, self.ytdlp.extract_info, track.uri, False
-            )
-        except ExtractorError:
-            self.bot.create_task(track.ctx.send(self.t("err", "drm_protection")))
+    @staticmethod
+    def human_format(num: int) -> str:
+        if not isinstance(num, int):
+            return num
 
-        return info
+        suffixes = ("", "K", "M", "B", "T")
+        magnitude = 0
+        while abs(num) >= 1000 and magnitude < len(suffixes) - 1:
+            magnitude += 1
+            num /= 1000.0
+        return f"{num:.3g}{suffixes[magnitude]}"
+
+    async def get_dislikes(self, identifier: str) -> int:
+        """This function already assumes this a youtube track.
+
+        Args:
+            track (wavelink.Playable): The youtube track
+
+        Returns:
+            str: The number of dislikes
+        """
+        async with self.bot.web_client.get(
+            f"https://returnyoutubedislikeapi.com/votes?videoId={identifier}"
+        ) as resp:
+            dislikes = await resp.json(loads=orjson.loads)
+            return dislikes["dislikes"]
+
+    async def get_track_info(self, track: wavelink.Playable) -> dict[str, str] | None:
+        match track.source:
+            case "youtube":
+                dislikes_task = self.bot.loop.create_task(
+                    self.get_dislikes(track.identifier)
+                )
+                info = await self.bot.loop.run_in_executor(
+                    None, self.ytdlp_extract.extract_info, track.identifier, False
+                )
+
+                view_count = self.human_format(info.get("view_count", "N/A"))
+                like_count = self.human_format(info.get("like_count", "N/A"))
+                subs = self.human_format(info.get("channel_follower_count", "N/A"))
+                uploader_url = info.get("uploader_url", "N/A")
+                date = info.get("upload_date", "N/A")
+                if date != "N/A":
+                    upload_date = f"{date[6:8]}-{date[4:6]}-{date[:4]}"
+
+                dislikes = await dislikes_task
+
+                return {
+                    "view_count": view_count,
+                    "like_count": like_count,
+                    "dislike_count": self.human_format(dislikes),
+                    "subs": subs,
+                    "release_date": upload_date,
+                    "uploader_url": uploader_url,
+                }
+            case "spotify":
+                (
+                    monthly_listeners,
+                    playcount,
+                    release_date,
+                    explicit,
+                ) = await self.SpotifyTrackInfo.get_info(
+                    track.artist.url[-22:], track.identifier
+                )
+
+                return {
+                    "monthly_listeners": monthly_listeners,
+                    "playcount": self.human_format(int(playcount)),
+                    "release_date": release_date,
+                    "explicit": explicit,
+                }
+            case _:
+                return None
+
+    async def send_info_message(
+        self, ctx: commands.Context, track: wavelink.Playable
+    ) -> None:
+        info = await self.get_track_info(track)
+
+        if track.source == "flowery-tts":
+            self.bot.create_task(
+                ctx.send(
+                    self.t(
+                        "cmd",
+                        "now_playing",
+                        track=track.title,
+                        author=track.author,
+                        mcommand_name="play",
+                    )
+                )
+            )
+            return
+
+        track_length = self.parse_duration(track.length)
+        embed = discord.Embed(
+            title=self.t(
+                "embed",
+                "title",
+                source=track.source.capitalize(),
+                description=f"```{track.title}```",
+                mcommand_name="play",
+            )
+        )
+        embed.set_thumbnail(url=track.artwork)
+        embed.set_author(
+            name=self.t(
+                "embed", "author", user=track.ctx.author.name, mcommand_name="play"
+            ),
+            icon_url=track.ctx.author.avatar.url,
+        )
+        if info:
+            embed.set_footer(
+                text=self.t(
+                    "embed",
+                    "footer",
+                    upload_date=info.get("release_date", "N/A"),
+                    mcommand_name="play",
+                )
+            )
+        embed.add_field(
+            name=self.t("embed", "duration", mcommand_name="play"), value=track_length
+        )
+        embed.add_field(
+            name=self.t("embed", "artist", mcommand_name="play"),
+            value=f"[{track.author}]({track.artist.url if track.source != "youtube" else info["uploader_url"]})"
+            if track.artist.url
+            else track.author,
+        )
+        embed.add_field(
+            name="URL",
+            value=self.t("embed", "click", url=track.uri, mcommand_name="play"),
+        )
+        match track.source:
+            case "youtube":
+                embed.add_field(
+                    name=self.t("embed", "views", mcommand_name="play"),
+                    value=info["view_count"],
+                )
+                embed.add_field(
+                    name=self.t("embed", "likes_dislikes", mcommand_name="play"),
+                    value=f"{info["like_count"]} 👍 / {info["dislike_count"]} 👎",
+                )
+                embed.add_field(
+                    name=self.t("embed", "subs", mcommand_name="play"),
+                    value=info["subs"],
+                )
+            case "spotify":
+                embed.add_field(
+                    name=self.t("embed", "monthly_listeners", mcommand_name="play"),
+                    value=info["monthly_listeners"],
+                )
+                embed.add_field(
+                    name=self.t("embed", "playcount", mcommand_name="play"),
+                    value=info["playcount"],
+                )
+                embed.add_field(
+                    name=self.t("embed", "explicit", mcommand_name="play"),
+                    value=self.t("embed", "yes", mcommand_name="play")
+                    if info["explicit"]
+                    else self.t("embed", "no", mcommand_name="play"),
+                )
+
+        self.bot.create_task(ctx.send(embed=embed))
 
     async def play_logic(
         self, ctx: commands.Context, query: str, play_next: bool
@@ -229,11 +374,12 @@ class Music(commands.Cog):
             )
             for track in tracks:
                 track.ctx = ctx
+                track.first_playing = not player.playing
 
             if not player.playing:
                 self.bot.create_task(player.play(tracks[0], volume=30))
-
                 self.bot.create_task(player.queue.put_wait(tracks[1:]))
+                self.bot.create_task(self.send_info_message(ctx, tracks[0]))
 
             else:
                 if play_next:
@@ -243,8 +389,10 @@ class Music(commands.Cog):
 
         else:
             tracks[0].ctx = ctx
+            tracks[0].first_playing = not player.playing
             if not player.playing:
                 self.bot.create_task(player.play(tracks[0], volume=30))
+                self.bot.create_task(self.send_info_message(ctx, tracks[0]))
             else:
                 self.bot.create_task(
                     ctx.send(
