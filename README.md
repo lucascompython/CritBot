@@ -20,7 +20,7 @@ The only translated languages for now are Portuguese and English.
 ## Installation & Execution
 
 This bot was only tested on Linux.  
-Python 3.12+ is required.  
+Python 3.13+ is required.  
 You can invite it [here](https://discord.com/oauth2/authorize?client_id=888100964534456361&permissions=8&integration_type=0&scope=bot).  
 The installation steps are as follows:
 
