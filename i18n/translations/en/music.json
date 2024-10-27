@@ -20,14 +20,14 @@
             "artist": "Artist",
             "click": "[Click]({url})",
             "views": "Views",
-            "likes_dislikes": "Likes / Dislikes",
             "footer": "Upload date: {upload_date}",
             "subs": "Subscribers",
             "monthly_listeners": "Monthly Listeners",
             "playcount": "Play Count",
             "explicit": "Explicit",
             "yes": "Yes",
-            "no": "No"
+            "no": "No",
+            "reposts": "Reposts"
         },
         "err": {
             "no_tracks_found": "No tracks found for `{query}`!",

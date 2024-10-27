@@ -276,6 +276,28 @@ class Music(commands.Cog):
                     "release_date": release_date,
                     "explicit": explicit,
                 }
+            case "soundcloud":
+                info = await self.bot.loop.run_in_executor(
+                    None, self.ytdlp_extract.extract_info, track.uri, False
+                )
+
+                playcount = self.human_format(info.get("view_count", "N/A"))
+                likes = self.human_format(info.get("like_count", "N/A"))
+                reposts = self.human_format(info.get("repost_count", "N/A"))
+                uploader_url = info.get("uploader_url", "N/A")
+                release_date = info.get("upload_date", "N/A")
+                release_date = (
+                    f"{release_date[6:8]}-{release_date[4:6]}-{release_date[:4]}"
+                )
+
+                return {
+                    "playcount": playcount,
+                    "likes": likes,
+                    "reposts": reposts,
+                    "release_date": release_date,
+                    "uploader_url": uploader_url,
+                }
+
             case _:
                 return None
 
@@ -327,10 +349,16 @@ class Music(commands.Cog):
         embed.add_field(
             name=self.t("embed", "duration", mcommand_name="play"), value=track_length
         )
+
+        if track.source == "youtube" or track.source == "soundcloud":
+            track.artist.url = info[
+                "uploader_url"
+            ]  # for some reason lavalink doesn't set the artist url
+
         embed.add_field(
             name=self.t("embed", "artist", mcommand_name="play"),
-            value=f"[{track.author}]({track.artist.url if track.source != "youtube" else info["uploader_url"]})"
-            if track.artist.url or track.source == "youtube"
+            value=f"[{track.author}]({track.artist.url})"
+            if track.artist.url
             else track.author,
         )
         embed.add_field(
@@ -344,7 +372,7 @@ class Music(commands.Cog):
                     value=info["view_count"],
                 )
                 embed.add_field(
-                    name=self.t("embed", "likes_dislikes", mcommand_name="play"),
+                    name="Likes / Dislikes",
                     value=f"{info["like_count"]} 👍 / {info["dislike_count"]} 👎",
                 )
                 embed.add_field(
@@ -365,6 +393,19 @@ class Music(commands.Cog):
                     value=self.t("embed", "yes", mcommand_name="play")
                     if info["explicit"]
                     else self.t("embed", "no", mcommand_name="play"),
+                )
+            case "soundcloud":
+                embed.add_field(
+                    name=self.t("embed", "playcount", mcommand_name="play"),
+                    value=info["playcount"],
+                )
+                embed.add_field(
+                    name="Likes",
+                    value=info["likes"],
+                )
+                embed.add_field(
+                    name=self.t("embed", "reposts", mcommand_name="play"),
+                    value=info["reposts"],
                 )
 
         self.bot.create_task(ctx.send(embed=embed))

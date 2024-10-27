@@ -20,14 +20,14 @@
             "artist": "Artista",
             "click": "[Clica]({url})",
             "views": "Visualizações",
-            "likes_dislikes": "Likes / Dislikes",
             "footer": "Data de upload: {upload_date}",
             "subs": "Inscritos",
             "monthly_listeners": "Ouvintes mensais",
-            "playcount": "Número de reproduções",
+            "playcount": "Reproduções",
             "explicit": "Explicito",
             "yes": "Sim",
-            "no": "Não"
+            "no": "Não",
+            "reposts": "Republicações"
         },
         "err": {
             "no_tracks_found": "Nenhuma musica encontrada para `{query}`!",
