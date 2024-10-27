@@ -1,6 +1,5 @@
 import lxml.html
 import aiohttp
-from time import perf_counter
 
 
 class SpotifyTrackInfo:
@@ -158,14 +157,12 @@ if __name__ == "__main__":
 
         async with aiohttp.ClientSession() as session:
             spotify_track_info = SpotifyTrackInfo(session)
-            start = perf_counter()
             (
                 monthly_listeners,
                 playcount,
                 release_date,
                 content_rating,
             ) = await spotify_track_info.get_info(artist_id, spotify_track)
-            print(f"Time taken: {perf_counter() - start:.2f}s")
 
             print(f"Monthly Listeners: {monthly_listeners}")
             print(f"Playcount: {playcount}")
