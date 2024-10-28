@@ -471,9 +471,9 @@ class Music(commands.Cog):
             )
             for track in tracks:
                 track.ctx = ctx
-                track.first_playing = not player.playing
 
             if not player.playing:
+                tracks[0].first_playing = True
                 self.bot.create_task(player.play(tracks[0], volume=30))
                 self.bot.create_task(player.queue.put_wait(tracks[1:]))
                 self.bot.create_task(self.send_info_message(ctx, tracks[0]))
