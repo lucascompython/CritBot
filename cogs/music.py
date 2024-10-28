@@ -327,10 +327,10 @@ class Music(commands.Cog):
                 "embed",
                 "title",
                 source=track.source.capitalize(),
-                description=f"```{track.title}```",
                 mcog_name="music",
                 mcommand_name="play",
-            )
+            ),
+            description=f"```{track.title}```",
         )
         embed.set_thumbnail(url=track.artwork)
         embed.set_author(
