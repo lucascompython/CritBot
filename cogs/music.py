@@ -245,8 +245,13 @@ class Music(commands.Cog):
                 view_count = self.human_format(info.get("view_count", "N/A"))
                 like_count = self.human_format(info.get("like_count", "N/A"))
                 subs = self.human_format(info.get("channel_follower_count", "N/A"))
-                uploader_url = info.get("uploader_url", "N/A")
+                uploader_url = info.get("uploader_url")
                 date = info.get("upload_date", "N/A")
+
+                # get uploader_url on topic channels
+                if not uploader_url:
+                    uploader_url = f"https://www.youtube.com/channel/{info.get('channel_id', 'N/A')}"
+
                 if date != "N/A":
                     upload_date = f"{date[6:8]}-{date[4:6]}-{date[:4]}"
 
