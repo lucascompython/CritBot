@@ -471,6 +471,7 @@ class Music(commands.Cog):
             )
             for track in tracks:
                 track.ctx = ctx
+                track.first_playing = False
 
             if not player.playing:
                 tracks[0].first_playing = True
