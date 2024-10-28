@@ -314,6 +314,7 @@ class Music(commands.Cog):
                         "now_playing",
                         track=track.title,
                         author=track.author,
+                        mcog_name="music",
                         mcommand_name="play",
                     )
                 )
@@ -327,13 +328,18 @@ class Music(commands.Cog):
                 "title",
                 source=track.source.capitalize(),
                 description=f"```{track.title}```",
+                mcog_name="music",
                 mcommand_name="play",
             )
         )
         embed.set_thumbnail(url=track.artwork)
         embed.set_author(
             name=self.t(
-                "embed", "author", user=track.ctx.author.name, mcommand_name="play"
+                "embed",
+                "author",
+                user=track.ctx.author.name,
+                mcog_name="music",
+                mcommand_name="play",
             ),
             icon_url=track.ctx.author.avatar.url,
         )
@@ -343,11 +349,13 @@ class Music(commands.Cog):
                     "embed",
                     "footer",
                     upload_date=info.get("release_date", "N/A"),
+                    mcog_name="music",
                     mcommand_name="play",
                 )
             )
         embed.add_field(
-            name=self.t("embed", "duration", mcommand_name="play"), value=track_length
+            name=self.t("embed", "duration", mcog_name="music", mcommand_name="play"),
+            value=track_length,
         )
 
         if track.source == "youtube" or track.source == "soundcloud":
@@ -356,19 +364,23 @@ class Music(commands.Cog):
             ]  # for some reason lavalink doesn't set the artist url
 
         embed.add_field(
-            name=self.t("embed", "artist", mcommand_name="play"),
+            name=self.t("embed", "artist", mcog_name="music", mcommand_name="play"),
             value=f"[{track.author}]({track.artist.url})"
             if track.artist.url
             else track.author,
         )
         embed.add_field(
             name="URL",
-            value=self.t("embed", "click", url=track.uri, mcommand_name="play"),
+            value=self.t(
+                "embed", "click", url=track.uri, mcog_name="music", mcommand_name="play"
+            ),
         )
         match track.source:
             case "youtube":
                 embed.add_field(
-                    name=self.t("embed", "views", mcommand_name="play"),
+                    name=self.t(
+                        "embed", "views", mcog_name="music", mcommand_name="play"
+                    ),
                     value=info["view_count"],
                 )
                 embed.add_field(
@@ -376,27 +388,42 @@ class Music(commands.Cog):
                     value=f"{info["like_count"]} 👍 / {info["dislike_count"]} 👎",
                 )
                 embed.add_field(
-                    name=self.t("embed", "subs", mcommand_name="play"),
+                    name=self.t(
+                        "embed", "subs", mcog_name="music", mcommand_name="play"
+                    ),
                     value=info["subs"],
                 )
             case "spotify":
                 embed.add_field(
-                    name=self.t("embed", "monthly_listeners", mcommand_name="play"),
+                    name=self.t(
+                        "embed",
+                        "monthly_listeners",
+                        mcog_name="music",
+                        mcommand_name="play",
+                    ),
                     value=info["monthly_listeners"],
                 )
                 embed.add_field(
-                    name=self.t("embed", "playcount", mcommand_name="play"),
+                    name=self.t(
+                        "embed", "playcount", mcog_name="music", mcommand_name="play"
+                    ),
                     value=info["playcount"],
                 )
                 embed.add_field(
-                    name=self.t("embed", "explicit", mcommand_name="play"),
-                    value=self.t("embed", "yes", mcommand_name="play")
+                    name=self.t(
+                        "embed", "explicit", mcog_name="music", mcommand_name="play"
+                    ),
+                    value=self.t(
+                        "embed", "yes", mcog_name="music", mcommand_name="play"
+                    )
                     if info["explicit"]
-                    else self.t("embed", "no", mcommand_name="play"),
+                    else self.t("embed", "no", mcog_name="music", mcommand_name="play"),
                 )
             case "soundcloud":
                 embed.add_field(
-                    name=self.t("embed", "playcount", mcommand_name="play"),
+                    name=self.t(
+                        "embed", "playcount", mcog_name="music", mcommand_name="play"
+                    ),
                     value=info["playcount"],
                 )
                 embed.add_field(
@@ -404,7 +431,9 @@ class Music(commands.Cog):
                     value=info["likes"],
                 )
                 embed.add_field(
-                    name=self.t("embed", "reposts", mcommand_name="play"),
+                    name=self.t(
+                        "embed", "reposts", mcog_name="music", mcommand_name="play"
+                    ),
                     value=info["reposts"],
                 )
 
