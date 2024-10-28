@@ -17,14 +17,14 @@ class SpotifyTrackInfo:
         self.api_partner_url = 'https://api-partner.spotify.com/pathfinder/v1/query?operationName=getTrack&variables={{"uri":"spotify:track:{spotify_track}"}}&extensions={{"persistedQuery":{{"version":1,"sha256Hash":"ae85b52abb74d20a4c331d4143d4772c95f34757bfa8c625474b912b9055b5c0"}}}}'
 
     async def __get_artist_page(self, artist_id: str) -> bytes:
-        """Fetches the artist page from Spotify. This page is huge, we only need the first 27648 bytes.
+        """Fetches the artist page from Spotify. This page is huge, we only need the first 32768 bytes.
         The monthly listeners are in beggining of the page and the access token is in the 26000+ bytes of the page.
 
         Args:
             artist_id (str): The Spotify artist ID.
 
         Returns:
-            bytes: The first 27648 bytes of the response.
+            bytes: The first 32768 bytes of the response.
         """
         url = self.artist_url.format(artist_id=artist_id)
         async with self.session.get(url) as resp:
@@ -32,7 +32,7 @@ class SpotifyTrackInfo:
             data = bytearray()
             async for chunk in resp.content.iter_chunked(1024):
                 data.extend(chunk)
-                if len(data) >= 27648:
+                if len(data) >= 32768:
                     return bytes(data)
 
     def __parse_partial_artist_page(self, data: bytes) -> tuple[str, str]:
