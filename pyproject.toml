@@ -3,7 +3,7 @@ dependencies = [
     "aiofiles==24.1.0",
     "aiohttp>=3.10.10",
     "asyncpg==0.30.0",
-    "colorlog==6.8.2",
+    "colorlog==6.9.0",
     "PyYAML==6.0.2",
     "uvloop==0.21.0",
     "wavelink==3.4.1",
@@ -13,7 +13,7 @@ dependencies = [
     "asyncpraw @ git+https://github.com/praw-dev/asyncpraw",
     "discord-py[voice]==2.4.0",
     "audioop-lts==0.2.1",                                    # remove this when discord.py supports python 3.13
-    "orjson>=3.10.10",
+    "orjson>=3.10.11",
     "pynacl>=1.5.0",
 ]
 name = "CritBot"

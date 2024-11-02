@@ -112,8 +112,13 @@ class SpotifyTrackInfo:
                 done_playcount = True
 
             if (
-                data[current] == 90 and data[current - 3] == 58
-            ):  # 90 is the ascii code for Z and the 58 is the ascii code for :, we check the Z because it's the last byte of the timestamp and the : because it's a good indicator that we are actually looking at the release date
+                data[current] == 90
+                and data[current - 3] == 58
+                and data[current - 9] == 84
+                and data[current - 6] == 58
+            ):
+                # check if the byte is Z, the byte 3 bytes before is :, the byte 9 bytes before is T and the byte 6 bytes before is :
+                # this is good indicator this is the timestamp
                 current -= 19  # the Z represents the end of the timestamp, so we go back 19 bytes to get the full date
                 for _ in range(10):  # only get the date not the time
                     date.append(chr(data[current]))
