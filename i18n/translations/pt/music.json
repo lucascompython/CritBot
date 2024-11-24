@@ -27,7 +27,8 @@
             "explicit": "Explicito",
             "yes": "Sim",
             "no": "Não",
-            "reposts": "Republicações"
+            "reposts": "Republicações",
+            "recommended": "Recomendado via {source}"
         },
         "err": {
             "no_tracks_found": "Nenhuma musica encontrada para `{query}`!",

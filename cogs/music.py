@@ -72,13 +72,36 @@ class Music(commands.Cog):
         if player is None:
             return
 
-        if player.queue and player.autoplay == wavelink.AutoPlayMode.disabled:
-            track = player.queue.get()
-            self.bot.create_task(player.play(track))
+        if player.queue:
+            track: wavelink.Playable
+            if player.autoplay == wavelink.AutoPlayMode.disabled:
+                track = player.queue.get()
+                self.bot.create_task(player.play(track))
+            else:
+                track = player.queue[
+                    0
+                ]  # get the next track without removing it from the queue because the autoplay will already remove it
+
             if (
                 track.source != "flowery-tts" and not track.first_playing
             ):  # the info message is already sent if the track is the first one and it's not a tts track
                 self.bot.create_task(self.send_info_message(player.ctx, track))
+
+    @commands.Cog.listener()
+    async def on_wavelink_track_start(
+        self, payload: wavelink.TrackStartEventPayload
+    ) -> None:
+        player: wavelink.Player | None = payload.player
+        if not player:
+            return
+
+        is_recommended = payload.original and payload.original.recommended
+
+        if player.autoplay == wavelink.AutoPlayMode.enabled and is_recommended:
+            payload.track.ctx = player.ctx
+            self.bot.create_task(
+                self.send_info_message(player.ctx, payload.track, is_recommended)
+            )
 
     @commands.Cog.listener()
     async def on_voice_state_update(
@@ -307,9 +330,12 @@ class Music(commands.Cog):
                 return None
 
     async def send_info_message(
-        self, ctx: commands.Context, track: wavelink.Playable
+        self,
+        ctx: commands.Context,
+        track: wavelink.Playable,
+        is_recommended: bool = False,
     ) -> None:
-        info = await self.get_track_info(track)
+        info = self.bot.loop.create_task(self.get_track_info(track))
 
         if track.source == "flowery-tts":
             self.bot.create_task(
@@ -348,16 +374,39 @@ class Music(commands.Cog):
             ),
             icon_url=track.ctx.author.avatar.url,
         )
+
+        info = await info
+
         if info:
-            embed.set_footer(
-                text=self.t(
+            if is_recommended:
+                text = (
+                    self.t(
+                        "embed",
+                        "footer",
+                        upload_date=info.get("release_date", "N/A"),
+                        mcog_name="music",
+                        mcommand_name="play",
+                    )
+                    + " | "
+                    + self.t(
+                        "embed",
+                        "recommended",
+                        source=track.source.capitalize(),
+                        mcog_name="music",
+                        mcommand_name="play",
+                    )
+                )
+            else:
+                text = self.t(
                     "embed",
                     "footer",
                     upload_date=info.get("release_date", "N/A"),
                     mcog_name="music",
                     mcommand_name="play",
                 )
-            )
+
+            embed.set_footer(text=text)
+
         embed.add_field(
             name=self.t("embed", "duration", mcog_name="music", mcommand_name="play"),
             value=track_length,

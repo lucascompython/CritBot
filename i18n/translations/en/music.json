@@ -27,7 +27,8 @@
             "explicit": "Explicit",
             "yes": "Yes",
             "no": "No",
-            "reposts": "Reposts"
+            "reposts": "Reposts",
+            "recommended": "Recommended via {source}"
         },
         "err": {
             "no_tracks_found": "No tracks found for `{query}`!",
