@@ -99,6 +99,7 @@ class Music(commands.Cog):
 
         if player.autoplay == wavelink.AutoPlayMode.enabled and is_recommended:
             payload.track.ctx = player.ctx
+            player.current.ctx = player.ctx
             self.bot.create_task(
                 self.send_info_message(player.ctx, payload.track, is_recommended)
             )
