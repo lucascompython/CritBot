@@ -73,14 +73,14 @@ plugins:
     # Clients are queried in the order they are given (so the first client is queried first and so on...)
     clients:
       - MUSIC
-      - ANDROID_TESTSUITE
       - WEB
-      - TVHTML5EMBEDDED
-      - ANDROID
       - WEBEMBEDDED
+      - MWEB
+      - ANDROID_VR
+      - ANDROID
       - ANDROID_MUSIC
-      - MEDIA_CONNECT
       - IOS
+      - TVHTML5EMBEDDED
     clientOptions:
       TVHTML5EMBEDDED:
         videoLoading: false
@@ -91,7 +91,7 @@ lavalink:
       snapshot: false
     - dependency: "com.github.topi314.sponsorblock:sponsorblock-plugin:3.0.1"
       snapshot: false
-    - dependency: "dev.lavalink.youtube:youtube-plugin:1.8.3"
+    - dependency: "dev.lavalink.youtube:youtube-plugin:1.10.2"
       snapshot: false
 
   server:
