@@ -1,0 +1,18 @@
+[package]
+name = "critbot"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+mimalloc = "0.1"
+poise = "0.6.1"
+serde = {version = "1", features = ["derive"] }
+serenity = { version = "0.12", default-features = false, features = ["builder", "cache", "chrono", "client", "gateway", "http", "model", "utils", "default_no_backend", "rustls_backend", "simd-json"] }
+simd-json = {version = "0.17", default-features = false, features = ["serde_impl", "swar-number-parsing"]}
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+
+[profile.release]
+codegen-units = 1 # Allows LLVM to perform better optimization.
+lto = true        # Enables link-time-optimizations.
+panic = "abort"   # Higher performance by disabling panic handlers.
+strip = true      # Ensures debug symbols are removed.
