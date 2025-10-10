@@ -7,7 +7,6 @@ pub struct Config {
 
 impl Config {
     pub fn new() -> Result<Self, simd_json::Error> {
-        // read appconfig.json file
         let mut config_data =
             std::fs::read_to_string("appconfig.json").expect("Failed to read appconfig.json file");
 
