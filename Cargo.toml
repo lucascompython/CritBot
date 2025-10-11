@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 mimalloc = "0.1"
-poise = "0.6.1"
+poise = "0.6"
 serde = {version = "1", features = ["derive"] }
 serenity = { version = "0.12", default-features = false, features = ["builder", "cache", "chrono", "client", "gateway", "http", "model", "utils", "default_no_backend", "rustls_backend", "simd-json"] }
 simd-json = {version = "0.17", default-features = false, features = ["serde_impl", "swar-number-parsing"]}

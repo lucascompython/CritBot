@@ -30,7 +30,7 @@ async fn main() {
     let options = poise::FrameworkOptions {
         commands: vec![commands::misc::ping(), commands::misc::help()],
         prefix_options: poise::PrefixFrameworkOptions {
-            prefix: Some("!".into()),
+            prefix: Some(".".into()),
             mention_as_prefix: true,
             ignore_bots: true,
             case_insensitive_commands: true,
