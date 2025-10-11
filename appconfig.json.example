@@ -1,3 +1,6 @@
 {
-  "discord_token": "YOUR_DISCORD_BOT_TOKEN"
+  "discord": {
+    "token": "YOUR_BOT_TOKEN",
+    "invite_link": "YOUR_INVITE_LINK"
+  }
 }
