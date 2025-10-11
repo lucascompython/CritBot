@@ -18,6 +18,7 @@ async fn event_handler(
     _ctx: &Context,
     event: &FullEvent,
     _framework: poise::FrameworkContext<'_, Data, serenity::Error>,
+    data: &Data,
 ) -> Result<(), serenity::Error> {
     match event {
         FullEvent::Ready { data_about_bot, .. } => {
@@ -26,6 +27,21 @@ async fn event_handler(
         FullEvent::GuildCreate { guild, is_new } => {
             if *is_new == Some(true) {
                 info!("Joined new guild: {} (id {})", guild.name, guild.id);
+
+                // Create a new entry in the guilds table
+
+                let pool = data.pool.get().await.unwrap();
+                let stmt = pool
+                    .prepare_cached(
+                        "INSERT INTO guilds (id) VALUES ($1) ON CONFLICT (id) DO NOTHING",
+                    )
+                    .await
+                    .unwrap();
+                let guild_id = guild.id.get() as i64;
+
+                if let Err(e) = pool.execute(&stmt, &[&guild_id]).await {
+                    error!("Failed to insert guild into database: {}", e);
+                }
             }
         }
 
@@ -53,7 +69,11 @@ async fn main() {
     let config = Config::new().expect("Failed to load config");
 
     let options = poise::FrameworkOptions::<Data, serenity::Error> {
-        commands: vec![commands::misc::ping(), commands::misc::help()],
+        commands: vec![
+            commands::misc::ping(),
+            commands::misc::help(),
+            commands::misc::invite(),
+        ],
         prefix_options: poise::PrefixFrameworkOptions {
             prefix: Some(".".into()),
             mention_as_prefix: true,
@@ -62,8 +82,8 @@ async fn main() {
             ..Default::default()
         },
 
-        event_handler: |ctx, event, framework, _data| {
-            Box::pin(event_handler(ctx, event, framework))
+        event_handler: |ctx, event, framework, data| {
+            Box::pin(event_handler(ctx, event, framework, data))
         },
         ..Default::default()
     };

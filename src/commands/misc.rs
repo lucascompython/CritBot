@@ -26,3 +26,16 @@ pub async fn ping(ctx: Context<'_>) -> Result<(), Error> {
 
     Ok(())
 }
+
+/// Get the bot's invite link.
+#[command(prefix_command, slash_command)]
+pub async fn invite(ctx: Context<'_>) -> Result<(), Error> {
+    let invite_link = "https://discord.com/oauth2/authorize?client_id=832679098740506644&permissions=8&integration_type=0&scope=bot";
+    ctx.say(format!(
+        "Invite me to your server by clicking [here]({})!",
+        invite_link
+    ))
+    .await?;
+
+    Ok(())
+}
