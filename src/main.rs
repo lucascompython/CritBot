@@ -5,7 +5,7 @@ use serenity::{
 };
 use tracing::{error, info};
 
-use crate::{config::Config, context::Data};
+use crate::{config::Config, context::BotData};
 
 mod commands;
 mod config;
@@ -17,8 +17,8 @@ static GLOBAL: MiMalloc = MiMalloc;
 async fn event_handler(
     _ctx: &Context,
     event: &FullEvent,
-    _framework: poise::FrameworkContext<'_, Data, serenity::Error>,
-    data: &Data,
+    _framework: poise::FrameworkContext<'_, BotData, serenity::Error>,
+    data: &BotData,
 ) -> Result<(), serenity::Error> {
     match event {
         FullEvent::Ready { data_about_bot, .. } => {
@@ -27,8 +27,6 @@ async fn event_handler(
         FullEvent::GuildCreate { guild, is_new } => {
             if *is_new == Some(true) {
                 info!("Joined new guild: {} (id {})", guild.name, guild.id);
-
-                // Create a new entry in the guilds table
 
                 let pool = data.pool.get().await.unwrap();
                 let stmt = pool
@@ -66,9 +64,10 @@ async fn event_handler(
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
-    let config = Config::new().expect("Failed to load config");
+    let bot_config: &'static Config =
+        Box::leak(Box::new(Config::new().expect("Failed to load config")));
 
-    let options = poise::FrameworkOptions::<Data, serenity::Error> {
+    let options = poise::FrameworkOptions::<BotData, serenity::Error> {
         commands: vec![
             commands::misc::ping(),
             commands::misc::help(),
@@ -109,7 +108,7 @@ async fn main() {
                     .expect("Failed to create pool");
 
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
-                Ok(Data { pool })
+                Ok(BotData { pool, bot_config })
             })
         })
         .options(options)
@@ -119,7 +118,7 @@ async fn main() {
         | GatewayIntents::MESSAGE_CONTENT
         | GatewayIntents::DIRECT_MESSAGES;
 
-    let mut client = ClientBuilder::new(&config.discord_token, intents)
+    let mut client = ClientBuilder::new(&bot_config.discord.token, intents)
         .framework(framework)
         .await
         .expect("Err creating client");

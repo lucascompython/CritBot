@@ -5,7 +5,7 @@ use crate::context::Context;
 type Error = serenity::Error;
 
 /// A command to display help information about the bot's commands.
-#[command(prefix_command, slash_command)]
+#[command(prefix_command, slash_command, aliases("h"))]
 pub async fn help(ctx: Context<'_>, command: Option<String>) -> Result<(), Error> {
     let configuration = poise::builtins::HelpConfiguration {
         extra_text_at_bottom: "Type `.help <command>` for more info on a command.",
@@ -20,7 +20,7 @@ pub async fn help(ctx: Context<'_>, command: Option<String>) -> Result<(), Error
 }
 
 /// A simple ping command to check if the bot is online.
-#[command(prefix_command, slash_command)]
+#[command(prefix_command, slash_command, category = "Misc")]
 pub async fn ping(ctx: Context<'_>) -> Result<(), Error> {
     ctx.reply("Pong!").await?;
 
@@ -28,9 +28,9 @@ pub async fn ping(ctx: Context<'_>) -> Result<(), Error> {
 }
 
 /// Get the bot's invite link.
-#[command(prefix_command, slash_command)]
+#[command(prefix_command, slash_command, category = "Misc")]
 pub async fn invite(ctx: Context<'_>) -> Result<(), Error> {
-    let invite_link = "https://discord.com/oauth2/authorize?client_id=832679098740506644&permissions=8&integration_type=0&scope=bot";
+    let invite_link = &ctx.data().bot_config.discord.invite_link;
     ctx.say(format!(
         "Invite me to your server by clicking [here]({})!",
         invite_link

@@ -1,8 +1,14 @@
 use serde::Deserialize;
 
 #[derive(Deserialize)]
+pub struct DiscordConfig {
+    pub token: String,
+    pub invite_link: String,
+}
+
+#[derive(Deserialize)]
 pub struct Config {
-    pub discord_token: String,
+    pub discord: DiscordConfig,
 }
 
 impl Config {
