@@ -131,6 +131,8 @@ macro_rules! t {
     }};
 }
 
+// TODO: Re-enable tests
+
 // pub use i18n_macro::i18n;
 
 // #[cfg(test)]
