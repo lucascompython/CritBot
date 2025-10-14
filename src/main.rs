@@ -1,15 +1,21 @@
+use ahash::RandomState;
 use mimalloc::MiMalloc;
+use papaya::HashMap;
 use serenity::{
     client::{ClientBuilder, FullEvent},
     prelude::*,
 };
 use tracing::{error, info};
 
-use crate::{config::Config, context::BotData};
+use i18n::do_translate;
+
+use crate::{config::Config, context::BotData, i18n::translations::Locale};
 
 mod commands;
 mod config;
 mod context;
+mod db;
+mod i18n;
 
 #[global_allocator]
 static GLOBAL: MiMalloc = MiMalloc;
@@ -28,7 +34,7 @@ async fn event_handler(
             if *is_new == Some(true) {
                 info!("Joined new guild: {} (id {})", guild.name, guild.id);
 
-                let pool = data.pool.get().await.unwrap();
+                let pool = data.db.get_pool().await;
                 let stmt = pool
                     .prepare_cached(
                         "INSERT INTO guilds (id) VALUES ($1) ON CONFLICT (id) DO NOTHING",
@@ -51,6 +57,16 @@ async fn event_handler(
                     "Unknown"
                 };
                 info!("Removed from guild: {} (id {})", guild_name, incomplete.id);
+
+                let pool = data.db.get_pool().await;
+                let stmt = pool
+                    .prepare_cached("DELETE FROM guilds WHERE id = $1")
+                    .await
+                    .unwrap();
+                let guild_id = incomplete.id.get() as i64;
+                if let Err(e) = pool.execute(&stmt, &[&guild_id]).await {
+                    error!("Failed to remove guild from database: {}", e);
+                }
             } else if let Some(full) = full {
                 info!("Guild became unavailable: {} (id {})", full.name, full.id);
             }
@@ -72,6 +88,8 @@ async fn main() {
             commands::misc::ping(),
             commands::misc::help(),
             commands::misc::invite(),
+            commands::misc::locale(),
+            commands::misc::hey(),
         ],
         prefix_options: poise::PrefixFrameworkOptions {
             prefix: Some(".".into()),
@@ -90,25 +108,39 @@ async fn main() {
     let framework = poise::Framework::builder()
         .setup(move |ctx, _ready, framework| {
             Box::pin(async move {
-                let config = deadpool_postgres::Config {
-                    user: Some("lucas".to_string()),
-                    dbname: Some("crit".to_string()),
-                    manager: Some(deadpool_postgres::ManagerConfig {
-                        recycling_method: deadpool_postgres::RecyclingMethod::Fast,
-                    }),
-                    host: Some("/run/postgresql".to_string()),
-                    ..Default::default()
+                let db = db::Db::new().expect("Failed to create database pool");
+
+                let guild_cache = {
+                    let cache = HashMap::builder()
+                        .hasher(RandomState::new())
+                        .capacity(ctx.cache.guild_count())
+                        .build();
+
+                    let db_pool = db.get_pool().await;
+                    let stmt = db_pool
+                        .prepare_cached("SELECT id, locale FROM guilds")
+                        .await
+                        .unwrap();
+                    let rows = db_pool.query(&stmt, &[]).await.unwrap();
+
+                    let pinned_guild_cache = cache.pin();
+                    for row in rows {
+                        let guild_id: i64 = row.get(0);
+                        let locale: Option<Locale> = row.get(1);
+                        pinned_guild_cache.insert(guild_id as u64, context::Guild { locale });
+                    }
+
+                    drop(pinned_guild_cache);
+
+                    cache
                 };
 
-                let pool = config
-                    .create_pool(
-                        Some(deadpool_postgres::Runtime::Tokio1),
-                        tokio_postgres::NoTls,
-                    )
-                    .expect("Failed to create pool");
-
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
-                Ok(BotData { pool, bot_config })
+                Ok(BotData {
+                    db,
+                    bot_config,
+                    guild_cache,
+                })
             })
         })
         .options(options)

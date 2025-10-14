@@ -3,9 +3,18 @@ name = "critbot"
 version = "0.1.0"
 edition = "2024"
 
+[workspace]
+members = [
+    # ".",
+    # "i18n",
+    "i18n_macro"
+]
+
 [dependencies]
+ahash = "0.8"
 deadpool-postgres = "0.14"
 mimalloc = "0.1"
+papaya = "0.2"
 poise = "0.6"
 serde = { version = "1", features = ["derive"] }
 serenity = { version = "0.12", default-features = false, features = ["builder", "cache", "chrono", "client", "gateway", "http", "model", "utils", "default_no_backend", "rustls_backend", "simd-json"] }
@@ -14,6 +23,8 @@ tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 tokio-postgres = "0.7"
 tracing = "0.1"
 tracing-subscriber = "0.3"
+i18n_macro = { path = "./i18n_macro" }
+postgres-types = { version = "0.2", features = ["derive"] }
 
 [profile.release]
 codegen-units = 1 # Allows LLVM to perform better optimization.
