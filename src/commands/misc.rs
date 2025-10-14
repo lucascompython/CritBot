@@ -41,6 +41,8 @@ pub async fn hey(ctx: Context<'_>) -> Result<(), Error> {
     Ok(())
 }
 
+// TODO: Translate descriptions, etc.
+
 /// Change the bot's locale for the current guild.
 #[command(prefix_command, slash_command, category = "Misc")]
 pub async fn locale(ctx: Context<'_>, locale: Locale) -> Result<(), Error> {
