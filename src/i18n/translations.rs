@@ -82,7 +82,7 @@ pub async fn change_locale(ctx: crate::context::Context<'_>, locale: Locale) -> 
         }
         Action::Update => {
             update_guild_locale(&ctx, locale).await?;
-            ctx.say(t!(ctx, ChangeLocale::Updated, locale = "TODO"))
+            ctx.say(t!(ctx, ChangeLocale::Updated, locale = locale.code()))
                 .await?;
             Ok(())
         }

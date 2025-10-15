@@ -259,6 +259,12 @@ pub fn i18n(input: TokenStream) -> TokenStream {
                     Locale::En
                 }
             }
+
+            pub fn code(self) -> &'static str {
+                match self {
+                    #(Locale::#locale_variants => stringify!(#locale_variants),)*
+                }
+            }
         }
 
         #(#nested_modules)*
