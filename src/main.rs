@@ -108,7 +108,7 @@ async fn main() {
     let framework = poise::Framework::builder()
         .setup(move |ctx, _ready, framework| {
             Box::pin(async move {
-                let db = db::Db::new().expect("Failed to create database pool");
+                let db = db::Db::new().await.expect("Failed to create database pool");
 
                 let guild_cache = {
                     let cache = HashMap::builder()

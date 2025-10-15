@@ -2,9 +2,10 @@ use deadpool_postgres::Pool;
 
 pub struct Db(Pool);
 
+const SCHEMA: &str = include_str!("../sql/schema.sql");
+
 impl Db {
-    pub fn new() -> Result<Self, deadpool_postgres::CreatePoolError> {
-        // TODO: Run the schema here
+    pub async fn new() -> Result<Self, deadpool_postgres::CreatePoolError> {
         let config = deadpool_postgres::Config {
             user: Some("lucas".to_string()),
             dbname: Some("crit".to_string()),
@@ -21,7 +22,12 @@ impl Db {
         );
 
         match pool {
-            Ok(p) => Ok(Db(p)),
+            Ok(p) => {
+                let client = p.get().await.unwrap();
+                client.batch_execute(SCHEMA).await.unwrap();
+
+                Ok(Db(p))
+            }
             Err(e) => Err(e),
         }
     }
