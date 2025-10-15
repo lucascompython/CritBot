@@ -64,13 +64,8 @@ pub fn get_locale(ctx: Context) -> Locale {
     if let Some(code) = ctx.locale() {
         Locale::from_code(code)
     } else if let Some(guild_id) = ctx.guild_id()
-        && let Some(custom_locale) = ctx
-            .data()
-            .guild_cache
-            .pin()
-            .get(&guild_id.get())
-            .unwrap()
-            .locale
+        && let Some(cached_guild) = ctx.data().guild_cache.pin().get(&guild_id.get())
+        && let Some(custom_locale) = cached_guild.locale
     {
         custom_locale
     } else {
