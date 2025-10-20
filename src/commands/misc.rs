@@ -91,12 +91,12 @@ async fn change_locale(ctx: crate::bot_data::Context<'_>, locale: Locale) -> Res
                 .update_guild_locale(locale, guild_id)
                 .await
                 .unwrap();
-            ctx.say(crate::t!(
-                &ctx,
-                ChangeLocale::Updated,
-                locale = locale.code()
-            ))
-            .await?;
+            let locale_str = match locale {
+                Locale::En => crate::t!(&ctx, ChangeLocale::En),
+                Locale::Pt => crate::t!(&ctx, ChangeLocale::Pt),
+            };
+            ctx.say(crate::t!(&ctx, ChangeLocale::Updated, locale = &locale_str))
+                .await?;
             Ok(())
         }
     }

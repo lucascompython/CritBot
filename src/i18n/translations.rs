@@ -6,7 +6,10 @@ i18n! {
         change_locale => {
             already_set => { Pt: "O seu idioma já está definido para este valor.", En: "Your locale is already set to this value." },
             updated => { Pt: "Idioma atualizado para {locale}", En: "Locale updated to {locale}" },
-            error_updating => { Pt: "Erro ao atualizar o idioma", En: "Error updating locale" }
+            error_updating => { Pt: "Erro ao atualizar o idioma", En: "Error updating locale" },
+            pt => { Pt: "Português", En: "Portuguese" },
+            en => { Pt: "Inglês", En: "English" }
+
         },
         hey => { Pt: "Olá", En: "Hey" }
     }
