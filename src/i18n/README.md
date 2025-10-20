@@ -1,4 +1,5 @@
 # Custom I18N system for CritBot
+Proc-macro [here](/i18n_macro/)
 
 
 ## Features
