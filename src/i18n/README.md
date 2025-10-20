@@ -13,7 +13,6 @@
 
 ```rust
 use i18n_macro::{i18n, i18n_command};
-
 use i18n_macro::i18n;
 
 i18n! {
