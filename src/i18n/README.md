@@ -1,5 +1,14 @@
 # Custom I18N system for CritBot
 
+
+## Features
+- Type-safe translations: translations keys are generated as enums at compile time
+- IDE autocompletion: full IDE support for translations keys and nested namespaces
+- Performance-focused: uses unsafe optimizations and thread-local buffers for fast string interpolation (I think - this could still be worked on)
+- Nested namespaces: organize translations in logical groups (e.g., Embed::Title, Message::Body)
+- Shorthand syntax for arguments that have the same name as the variable (e.g., `t!(ctx, Welcome, name)` instead of `t!(ctx, Welcome, name = name)`)
+- `i18n_command` attribute macro that injects the `t!` macro into command scopes for easier usage (no need to pass `ctx` every time we use `t!`)
+
 ## Usage
 
 ```rust
