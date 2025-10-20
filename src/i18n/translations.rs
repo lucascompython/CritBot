@@ -1,4 +1,3 @@
-use crate::i18n::get_locale;
 use i18n_macro::i18n;
 
 use crate::t;
@@ -15,7 +14,7 @@ i18n! {
     }
 }
 
-// TODO: Handle errors properly
+// TODO: Handle errors properly and move this logic away from this file
 type Error = Box<dyn std::error::Error + Send + Sync>;
 
 /// Insert or update the guild locale in the database and cache
@@ -77,12 +76,12 @@ pub async fn change_locale(ctx: crate::context::Context<'_>, locale: Locale) -> 
 
     match action {
         Action::AlreadySet => {
-            ctx.say(t!(ctx, ChangeLocale::AlreadySet)).await?;
+            ctx.say(t!(&ctx, ChangeLocale::AlreadySet)).await?;
             Ok(())
         }
         Action::Update => {
             update_guild_locale(&ctx, locale).await?;
-            ctx.say(t!(ctx, ChangeLocale::Updated, locale = locale.code()))
+            ctx.say(t!(&ctx, ChangeLocale::Updated, locale = locale.code()))
                 .await?;
             Ok(())
         }

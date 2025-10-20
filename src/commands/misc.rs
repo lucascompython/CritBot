@@ -1,12 +1,10 @@
-use crate::i18n::get_locale;
-use crate::i18n::translations::{ChangeLocale, TransKey};
+use i18n_macro::i18n_command;
 use poise::command;
 use tracing::error;
 
 use crate::{
     context::Context,
     i18n::translations::{Locale, change_locale},
-    t,
 };
 
 type Error = serenity::Error;
@@ -34,9 +32,9 @@ pub async fn ping(ctx: Context<'_>) -> Result<(), Error> {
     Ok(())
 }
 
-#[command(prefix_command, slash_command, category = "Misc")]
+#[i18n_command(prefix_command, slash_command, category = "Misc")]
 pub async fn hey(ctx: Context<'_>) -> Result<(), Error> {
-    ctx.reply(t!(ctx, Hey)).await?;
+    ctx.reply(t!(Hey)).await?;
 
     Ok(())
 }
@@ -44,13 +42,11 @@ pub async fn hey(ctx: Context<'_>) -> Result<(), Error> {
 // TODO: Translate descriptions, etc.
 
 /// Change the bot's locale for the current guild.
-#[command(prefix_command, slash_command, category = "Misc")]
+#[i18n_command(prefix_command, slash_command, category = "Misc")]
 pub async fn locale(ctx: Context<'_>, locale: Locale) -> Result<(), Error> {
-    // ctx.say(format!("You entered {:?}", choice)).await?;
-
     if let Err(e) = change_locale(ctx, locale).await {
         error!("Error changing locale: {}", e);
-        ctx.say(t!(ctx, ChangeLocale::ErrorUpdating)).await?;
+        ctx.say(t!(ChangeLocale::ErrorUpdating)).await?;
     }
 
     Ok(())

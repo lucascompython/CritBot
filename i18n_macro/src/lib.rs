@@ -144,20 +144,9 @@ pub fn i18n(input: TokenStream) -> TokenStream {
         .iter()
         .map(|locale| {
             let locale_str = locale.to_string();
-            let first_char = locale_str
-                .chars()
-                .next()
-                .unwrap()
-                .to_lowercase()
-                .next()
-                .unwrap() as u8;
-            let second_char = locale_str
-                .chars()
-                .nth(1)
-                .unwrap()
-                .to_lowercase()
-                .next()
-                .unwrap() as u8;
+            let mut chars = locale_str.chars();
+            let first_char = chars.next().unwrap().to_lowercase().next().unwrap() as u8;
+            let second_char = chars.next().unwrap().to_lowercase().next().unwrap() as u8;
             quote! {
                 (#first_char, #second_char) => Locale::#locale
             }
@@ -295,4 +284,41 @@ pub fn i18n(input: TokenStream) -> TokenStream {
     };
 
     TokenStream::from(expanded)
+}
+
+/// Attribute macro to inject the t! macro into the function, so that we don't have to pass ctx every call to t! and also support poise command attribute macro and it's arguments.
+#[proc_macro_attribute]
+pub fn i18n_command(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let attr_ts: proc_macro2::TokenStream = attr.into();
+
+    let mut func = parse_macro_input!(item as syn::ItemFn);
+
+    let original_body = &func.block;
+
+    let injected_block = quote! {
+        {
+            macro_rules! t {
+                ($($tt:tt)*) => {
+                    crate::t!(&ctx, $($tt)*)
+                };
+            }
+
+            #original_body
+        }
+    };
+
+    func.block = syn::parse_quote!(#injected_block);
+
+    let poise_attr = if attr_ts.is_empty() {
+        quote! { #[poise::command] }
+    } else {
+        quote! { #[poise::command(#attr_ts)] }
+    };
+
+    let output = quote! {
+        #poise_attr
+        #func
+    };
+
+    output.into()
 }

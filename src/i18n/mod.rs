@@ -9,6 +9,10 @@ thread_local! {
 
 pub fn do_translate(template: &str, args: &[(&str, &str)]) -> String {
     STRING_BUFFER.with(|buf| {
+        if args.is_empty() {
+            return template.to_string();
+        }
+
         let mut buffer = buf.borrow_mut();
         buffer.clear();
 
@@ -60,7 +64,7 @@ pub fn do_translate(template: &str, args: &[(&str, &str)]) -> String {
     })
 }
 
-pub fn get_locale(ctx: Context) -> Locale {
+pub fn get_locale(ctx: &Context) -> Locale {
     if let Some(code) = ctx.locale() {
         Locale::from_code(code)
     } else if let Some(guild_id) = ctx.guild_id()
@@ -75,55 +79,33 @@ pub fn get_locale(ctx: Context) -> Locale {
 
 #[macro_export]
 macro_rules! t {
-    // simple key without args: t!(ctx, Hey)
-    ($ctx:expr, $key:ident) => {{
-        let locale = get_locale($ctx);
-        let args_slice: &[(&str, &str)] = &[];
-        TransKey::$key.translate(locale, args_slice)
+    // simple key: t!(ctx, Hey) or t!(ctx, Hey, name = "John") or t!(ctx, Hey, name)
+    ($ctx:expr, $key:ident $(, $($rest:tt)*)?) => {{
+        let locale = $crate::i18n::get_locale($ctx);
+        let args_slice: &[(&str, &str)] = $crate::t!(@args $($($rest)*)?);
+        $crate::i18n::translations::TransKey::$key.translate(locale, args_slice)
     }};
 
-    // simple key with named args: t!(ctx, Hey, name = "John")
-    ($ctx:expr, $key:ident, $($arg_name:ident = $arg_val:expr),+ $(,)?) => {{
-        let locale = get_locale($ctx);
-        let args_slice: &[(&str, &str)] = &[
-            $((stringify!($arg_name), $arg_val)),+
-        ];
-        TransKey::$key.translate(locale, args_slice)
+    // nested key: t!(ctx, Namespace::Key) or t!(ctx, Namespace::Key, title = "Hello") or t!(ctx, Namespace::Key, title)
+    // expands to TransKey::Namespace(translations::Namespace::Key)
+    ($ctx:expr, $namespace:ident :: $key:ident $(, $($rest:tt)*)?) => {{
+        let locale = $crate::i18n::get_locale($ctx);
+        let args_slice: &[(&str, &str)] = $crate::t!(@args $($($rest)*)?);
+        $crate::i18n::translations::TransKey::$namespace(
+            $crate::i18n::translations::$namespace::$key
+        ).translate(locale, args_slice)
     }};
 
-    // simple key with shorthand args: t!(ctx, Hey, name)
-    ($ctx:expr, $key:ident, $($arg_name:ident),+ $(,)?) => {{
-        let locale = get_locale($ctx);
-        let args_slice: &[(&str, &str)] = &[
-            $((stringify!($arg_name), $arg_name)),+
-        ];
-        TransKey::$key.translate(locale, args_slice)
-    }};
+    // args helpers
+    (@args) => (&[]);
 
-    // nested key without args: t!(ctx, Embed::Title)
-    ($ctx:expr, $namespace:ident :: $key:ident) => {{
-        let locale = get_locale($ctx);
-        let args_slice: &[(&str, &str)] = &[];
-        TransKey::$namespace($namespace::$key).translate(locale, args_slice)
-    }};
+    (@args $($name:ident = $value:expr),+ $(,)?) => (&[
+        $((stringify!($name), $value)),+
+    ]);
 
-    // nested key with named args: t!(ctx, Embed::Title, title = "Hello")
-    ($ctx:expr, $namespace:ident :: $key:ident, $($arg_name:ident = $arg_val:expr),+ $(,)?) => {{
-        let locale = get_locale($ctx);
-        let args_slice: &[(&str, &str)] = &[
-            $((stringify!($arg_name), $arg_val)),+
-        ];
-        TransKey::$namespace($namespace::$key).translate(locale, args_slice)
-    }};
-
-    // nested key with shorthand args: t!(ctx, Embed::Title, title)
-    ($ctx:expr, $namespace:ident :: $key:ident, $($arg_name:ident),+ $(,)?) => {{
-        let locale = get_locale($ctx);
-        let args_slice: &[(&str, &str)] = &[
-            $((stringify!($arg_name), $arg_name)),+
-        ];
-        TransKey::$namespace($namespace::$key).translate(locale, args_slice)
-    }};
+    (@args $($name:ident),+ $(,)?) => (&[
+        $((stringify!($name), $name)),+
+    ]);
 }
 
 // TODO: Re-enable tests
