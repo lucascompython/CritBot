@@ -4,6 +4,10 @@ This is a discord bot written with discord.py v2.0.
 The bot has a custom [i18n](i18n/) system.  
 The only translated languages for now are Portuguese and English.  
 
+# Rewrite!
+Since Wavelink is now archived, I decided I might as well rewrite the whole thing!  
+This project is currently being rewritten [here](https://github.com/lucascompython/CritBot/tree/rust-rewrite).
+
 ## Features
 
 + Translations - For now only English and Portuguese
