@@ -9,11 +9,11 @@ use tracing::{error, info};
 
 use i18n::do_translate;
 
-use crate::{config::Config, context::BotData, i18n::translations::Locale};
+use crate::{bot_data::BotData, config::Config, i18n::translations::Locale};
 
+mod bot_data;
 mod commands;
 mod config;
-mod context;
 mod db;
 mod i18n;
 
@@ -127,7 +127,7 @@ async fn main() {
                     for row in rows {
                         let guild_id: i64 = row.get(0);
                         let locale: Option<Locale> = row.get(1);
-                        pinned_guild_cache.insert(guild_id as u64, context::Guild { locale });
+                        pinned_guild_cache.insert(guild_id as u64, bot_data::Guild { locale });
                     }
 
                     drop(pinned_guild_cache);

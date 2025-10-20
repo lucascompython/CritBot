@@ -2,10 +2,7 @@ use i18n_macro::i18n_command;
 use poise::command;
 use tracing::error;
 
-use crate::{
-    context::Context,
-    i18n::translations::{Locale, change_locale},
-};
+use crate::{bot_data::Context, i18n::translations::Locale};
 
 type Error = serenity::Error;
 
@@ -50,6 +47,59 @@ pub async fn locale(ctx: Context<'_>, locale: Locale) -> Result<(), Error> {
     }
 
     Ok(())
+}
+
+async fn change_locale(ctx: crate::bot_data::Context<'_>, locale: Locale) -> Result<(), Error> {
+    let guild_id = ctx.guild_id().unwrap().get();
+
+    let pref = ctx.guild().unwrap().preferred_locale.clone();
+
+    let ctx_data = &ctx.data();
+
+    enum Action {
+        AlreadySet,
+        Update,
+    }
+
+    let action = {
+        let pinned_guild_cache = ctx_data.guild_cache.pin();
+        match pinned_guild_cache.get(&guild_id) {
+            Some(guild) => {
+                if let Some(custom_locale) = &guild.locale {
+                    if custom_locale == &locale {
+                        Action::AlreadySet
+                    } else {
+                        Action::Update
+                    }
+                } else if Locale::from_code(&pref) == locale {
+                    Action::AlreadySet
+                } else {
+                    Action::Update
+                }
+            }
+            None => Action::Update,
+        }
+    };
+
+    match action {
+        Action::AlreadySet => {
+            ctx.say(crate::t!(&ctx, ChangeLocale::AlreadySet)).await?;
+            Ok(())
+        }
+        Action::Update => {
+            ctx.data()
+                .update_guild_locale(locale, guild_id)
+                .await
+                .unwrap();
+            ctx.say(crate::t!(
+                &ctx,
+                ChangeLocale::Updated,
+                locale = locale.code()
+            ))
+            .await?;
+            Ok(())
+        }
+    }
 }
 
 /// Get the bot's invite link.

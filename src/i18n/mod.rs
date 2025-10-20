@@ -1,4 +1,4 @@
-use crate::{context::Context, i18n::translations::Locale};
+use crate::{bot_data::Context, i18n::translations::Locale};
 
 pub mod translations;
 
