@@ -38,8 +38,15 @@ pub async fn hey(ctx: Context<'_>) -> Result<(), Error> {
 
 // TODO: Translate descriptions, etc.
 
-/// Change the bot's locale for the current guild.
-#[i18n_command(prefix_command, slash_command, category = "Misc")]
+#[i18n_command(
+    prefix_command,
+    slash_command,
+    category = "Misc",
+    name_localized("en-US", "locale"),
+    name_localized("pt-BR", "idioma"),
+    description_localized("en-US", "Change the bot's locale for the current server."),
+    description_localized("pt-BR", "Altera o idioma do bot para o servidor atual.")
+)]
 pub async fn locale(ctx: Context<'_>, locale: Locale) -> Result<(), Error> {
     if let Err(e) = change_locale(ctx, locale).await {
         error!("Error changing locale: {}", e);
@@ -83,7 +90,8 @@ async fn change_locale(ctx: crate::bot_data::Context<'_>, locale: Locale) -> Res
 
     match action {
         Action::AlreadySet => {
-            ctx.say(crate::t!(&ctx, ChangeLocale::AlreadySet)).await?;
+            ctx.say(crate::i18n::t!(&ctx, ChangeLocale::AlreadySet))
+                .await?;
             Ok(())
         }
         Action::Update => {
@@ -92,11 +100,15 @@ async fn change_locale(ctx: crate::bot_data::Context<'_>, locale: Locale) -> Res
                 .await
                 .unwrap();
             let locale_str = match locale {
-                Locale::En => crate::t!(&ctx, ChangeLocale::En),
-                Locale::Pt => crate::t!(&ctx, ChangeLocale::Pt),
+                Locale::En => crate::i18n::t!(&ctx, ChangeLocale::En),
+                Locale::Pt => crate::i18n::t!(&ctx, ChangeLocale::Pt),
             };
-            ctx.say(crate::t!(&ctx, ChangeLocale::Updated, locale = &locale_str))
-                .await?;
+            ctx.say(crate::i18n::t!(
+                &ctx,
+                ChangeLocale::Updated,
+                locale = &locale_str
+            ))
+            .await?;
             Ok(())
         }
     }

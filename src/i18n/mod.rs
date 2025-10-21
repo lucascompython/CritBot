@@ -9,10 +9,6 @@ thread_local! {
 
 pub fn do_translate(template: &str, args: &[(&str, &str)]) -> String {
     STRING_BUFFER.with(|buf| {
-        if args.is_empty() {
-            return template.to_string();
-        }
-
         let mut buffer = buf.borrow_mut();
         buffer.clear();
 
@@ -77,12 +73,11 @@ pub fn get_locale(ctx: &Context) -> Locale {
     }
 }
 
-#[macro_export]
 macro_rules! t {
     // simple key: t!(ctx, Hey) or t!(ctx, Hey, name = "John") or t!(ctx, Hey, name)
     ($ctx:expr, $key:ident $(, $($rest:tt)*)?) => {{
         let locale = $crate::i18n::get_locale($ctx);
-        let args_slice: &[(&str, &str)] = $crate::t!(@args $($($rest)*)?);
+        let args_slice: &[(&str, &str)] = $crate::i18n::t!(@args $($($rest)*)?);
         $crate::i18n::translations::TransKey::$key.translate(locale, args_slice)
     }};
 
@@ -90,7 +85,7 @@ macro_rules! t {
     // expands to TransKey::Namespace(translations::Namespace::Key)
     ($ctx:expr, $namespace:ident :: $key:ident $(, $($rest:tt)*)?) => {{
         let locale = $crate::i18n::get_locale($ctx);
-        let args_slice: &[(&str, &str)] = $crate::t!(@args $($($rest)*)?);
+        let args_slice: &[(&str, &str)] = $crate::i18n::t!(@args $($($rest)*)?);
         $crate::i18n::translations::TransKey::$namespace(
             $crate::i18n::translations::$namespace::$key
         ).translate(locale, args_slice)
@@ -107,6 +102,7 @@ macro_rules! t {
         $((stringify!($name), $name)),+
     ]);
 }
+pub(crate) use t;
 
 // TODO: Re-enable tests
 

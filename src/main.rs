@@ -135,7 +135,9 @@ async fn main() {
                     cache
                 };
 
-                poise::builtins::register_globally(ctx, &framework.options().commands).await?;
+                let commands = &framework.options().commands;
+
+                poise::builtins::register_globally(ctx, commands).await?;
                 Ok(BotData {
                     db,
                     bot_config,

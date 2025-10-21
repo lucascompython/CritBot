@@ -206,7 +206,11 @@ pub fn i18n(input: TokenStream) -> TokenStream {
 
                         pub fn translate(self, locale: Locale, args: &[(&str, &str)]) -> String {
                             let template = self.get_template(locale);
-                            crate::do_translate(template, args)
+                            if args.is_empty() {
+                                template.to_string()
+                            } else {
+                                crate::do_translate(template, args)
+                            }
                         }
                     }
                 });
@@ -299,7 +303,7 @@ pub fn i18n_command(attr: TokenStream, item: TokenStream) -> TokenStream {
         {
             macro_rules! t {
                 ($($tt:tt)*) => {
-                    crate::t!(&ctx, $($tt)*)
+                    crate::i18n::t!(&ctx, $($tt)*)
                 };
             }
 
