@@ -1,5 +1,7 @@
 use i18n_macros::i18n;
 
+use crate::bot_data::BotData;
+
 i18n! {
     locales: [Pt, En],
     commands: {
@@ -69,4 +71,8 @@ i18n! {
             }
         }
     }
+}
+
+pub fn apply_translations(commands: &mut Vec<poise::Command<BotData, serenity::Error>>) {
+    for cmd in commands.iter_mut() {}
 }

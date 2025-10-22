@@ -7,7 +7,11 @@ use serenity::{
 };
 use tracing::{error, info};
 
-use crate::{bot_data::BotData, config::Config, i18n::translations::Locale};
+use crate::{
+    bot_data::BotData,
+    config::Config,
+    i18n::translations::{Locale, apply_translations},
+};
 
 mod bot_data;
 mod commands;
@@ -81,7 +85,7 @@ async fn main() {
     let bot_config: &'static Config =
         Box::leak(Box::new(Config::new().expect("Failed to load config")));
 
-    let commands = vec![
+    let mut commands = vec![
         commands::misc::ping(),
         commands::misc::help(),
         commands::misc::invite(),
@@ -89,6 +93,7 @@ async fn main() {
         commands::misc::hey(),
     ];
     // TODO: apply translations
+    apply_translations(&mut commands);
 
     let options = poise::FrameworkOptions::<BotData, serenity::Error> {
         commands,
