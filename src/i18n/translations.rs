@@ -13,7 +13,7 @@ i18n! {
                     En: "Changes the bot's language for this server"
                 },
                 args: {
-                    locale => {
+                    new_locale => {
                         name: { Pt: "idioma", En: "locale" },
                         description: {
                             Pt: "O idioma a definir",
@@ -52,10 +52,6 @@ i18n! {
                         greeting => {
                             Pt: "Olá, {user}! Bem-vindo!",
                             En: "Hey, {user}! Welcome!"
-                        },
-                        farewell => {
-                            Pt: "Adeus, {user}!",
-                            En: "Goodbye, {user}!"
                         }
                     }
                 }
@@ -63,7 +59,7 @@ i18n! {
         }
     },
     global: {
-        bot_name => { Pt: "CritBot", En: "CritBot" },
+        // TODO: handle errors
         errors => {
             unknown_error => {
                 Pt: "Ocorreu um erro desconhecido",
@@ -73,6 +69,59 @@ i18n! {
     }
 }
 
-pub fn apply_translations(commands: &mut Vec<poise::Command<BotData, serenity::Error>>) {
-    for cmd in commands.iter_mut() {}
+// TODO: this could be generated and "unrolled" by a macro, and there wouldn't be a need to all this COMMANDS_META boilerplate, thus making the i18n! macro simpler
+pub fn apply_translations(commands: &mut [poise::Command<BotData, serenity::Error>]) {
+    for cmd_meta in COMMANDS_META {
+        if let Some(cmd) = commands
+            .iter_mut()
+            .find(|c| c.name.as_str() == cmd_meta.name)
+        {
+            // set defaults to English
+            cmd.name = (cmd_meta.get_name)(Locale::En).to_string();
+            cmd.description = Some((cmd_meta.get_help)(Locale::En).to_string());
+
+            for &locale in Locale::ALL {
+                let locale_code = locale.discord_code();
+
+                let localized_name = (cmd_meta.get_name)(locale).to_string();
+
+                cmd.name_localizations
+                    .insert(locale_code.to_string(), localized_name.clone());
+                cmd.description_localizations.insert(
+                    locale_code.to_string(),
+                    (cmd_meta.get_help)(locale).to_string(),
+                );
+
+                // set aliases for the commands nmes for locales other than english
+
+                if locale != Locale::En && !cmd.aliases.contains(&localized_name) {
+                    cmd.aliases.push(localized_name);
+                }
+            }
+
+            for arg_meta in cmd_meta.args {
+                if let Some(param) = cmd
+                    .parameters
+                    .iter_mut()
+                    .find(|p| p.name.as_str() == arg_meta.name)
+                {
+                    param.name = (arg_meta.get_name)(Locale::En).to_string();
+                    param.description = Some((arg_meta.get_description)(Locale::En).to_string());
+
+                    for &locale in Locale::ALL {
+                        let locale_code = locale.discord_code();
+
+                        param.name_localizations.insert(
+                            locale_code.to_string(),
+                            (arg_meta.get_name)(locale).to_string(),
+                        );
+                        param.description_localizations.insert(
+                            locale_code.to_string(),
+                            (arg_meta.get_description)(locale).to_string(),
+                        );
+                    }
+                }
+            }
+        }
+    }
 }

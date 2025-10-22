@@ -85,14 +85,14 @@ async fn main() {
     let bot_config: &'static Config =
         Box::leak(Box::new(Config::new().expect("Failed to load config")));
 
-    let mut commands = vec![
+    let mut commands: Vec<poise::Command<BotData, SerenityError>> = vec![
         commands::misc::ping(),
         commands::misc::help(),
         commands::misc::invite(),
         commands::config::change_locale(),
         commands::misc::hey(),
     ];
-    // TODO: apply translations
+
     apply_translations(&mut commands);
 
     let options = poise::FrameworkOptions::<BotData, serenity::Error> {

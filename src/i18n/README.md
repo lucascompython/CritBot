@@ -33,7 +33,7 @@ i18n! {
                     En: "This command welcomes a mentioned user."
                 },
 
-                // optional:cCommand argument translations
+                // optional: command argument translations
                 args: {
                     user => {
                         name: { Pt: "utilizador", En: "user" },
@@ -324,6 +324,159 @@ i18n! {
                         }
                     }
                 }
+            }
+        }
+    }
+}
+```
+
+## Iterating Over Locales and Commands
+
+The i18n system generates metadata that allows you to iterate over all locales and commands. This is useful for applying translations to command metadata programmatically.
+
+### Available Metadata
+
+```rust
+use crate::i18n::translations::{Locale, COMMANDS_META, CommandMeta, ArgMeta};
+
+// All available locales
+Locale::ALL // &'static [Locale]
+
+// All command metadata
+COMMANDS_META // &'static [CommandMeta]
+```
+
+### CommandMeta Structure
+
+```rust
+pub struct CommandMeta {
+    pub group: &'static str,           // e.g., "misc", "config"
+    pub name: &'static str,            // e.g., "hey", "change_locale"
+    pub get_name: fn(Locale) -> &'static str,    // Get localized command name
+    pub get_help: fn(Locale) -> &'static str,    // Get localized help text
+    pub args: &'static [ArgMeta],      // Argument metadata
+}
+
+pub struct ArgMeta {
+    pub name: &'static str,            // Argument name
+    pub get_name: fn(Locale) -> &'static str,           // Get localized arg name
+    pub get_description: fn(Locale) -> &'static str,    // Get localized arg description
+}
+```
+
+### Example: Applying Translations to Poise Commands
+
+```rust
+use crate::i18n::translations::{Locale, COMMANDS_META};
+
+pub fn apply_translations(commands: &mut [poise::Command<BotData, serenity::Error>]) {
+    for cmd_meta in COMMANDS_META {
+        if let Some(cmd) = commands
+            .iter_mut()
+            .find(|c| c.name.as_str() == cmd_meta.name)
+        {
+            // set defaults to English
+            cmd.name = (cmd_meta.get_name)(Locale::En).to_string();
+            cmd.description = Some((cmd_meta.get_help)(Locale::En).to_string());
+
+            for &locale in Locale::ALL {
+                let locale_code = locale.discord_code();
+
+                let localized_name = (cmd_meta.get_name)(locale).to_string();
+
+                cmd.name_localizations
+                    .insert(locale_code.to_string(), localized_name.clone());
+                cmd.description_localizations.insert(
+                    locale_code.to_string(),
+                    (cmd_meta.get_help)(locale).to_string(),
+                );
+
+                // set aliases for the commands nmes for locales other than english
+
+                if locale != Locale::En && !cmd.aliases.contains(&localized_name) {
+                    cmd.aliases.push(localized_name);
+                }
+            }
+
+            for arg_meta in cmd_meta.args {
+                if let Some(param) = cmd
+                    .parameters
+                    .iter_mut()
+                    .find(|p| p.name.as_str() == arg_meta.name)
+                {
+                    param.name = (arg_meta.get_name)(Locale::En).to_string();
+                    param.description = Some((arg_meta.get_description)(Locale::En).to_string());
+
+                    for &locale in Locale::ALL {
+                        let locale_code = locale.discord_code();
+
+                        param.name_localizations.insert(
+                            locale_code.to_string(),
+                            (arg_meta.get_name)(locale).to_string(),
+                        );
+                        param.description_localizations.insert(
+                            locale_code.to_string(),
+                            (arg_meta.get_description)(locale).to_string(),
+                        );
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+### Example: Generate Documentation
+
+```rust
+use crate::i18n::translations::{Locale, COMMANDS_META};
+
+fn generate_command_docs() {
+    for cmd_meta in COMMANDS_META {
+        println!("## Command: {} (group: {})", cmd_meta.name, cmd_meta.group);
+
+        for &locale in Locale::ALL {
+            let name = (cmd_meta.get_name)(locale);
+            let help = (cmd_meta.get_help)(locale);
+            println!("  [{}] {}: {}", locale.code(), name, help);
+        }
+
+        if !cmd_meta.args.is_empty() {
+            println!("  Arguments:");
+            for arg_meta in cmd_meta.args {
+                println!("    - {}", arg_meta.name);
+                for &locale in Locale::ALL {
+                    let name = (arg_meta.get_name)(locale);
+                    let desc = (arg_meta.get_description)(locale);
+                    println!("      [{}] {}: {}", locale.code(), name, desc);
+                }
+            }
+        }
+        println!();
+    }
+}
+```
+
+### Example: Validate All Translations
+
+```rust
+use crate::i18n::translations::{Locale, COMMANDS_META};
+
+fn validate_translations() {
+    for cmd_meta in COMMANDS_META {
+        for &locale in Locale::ALL {
+            let name = (cmd_meta.get_name)(locale);
+            let help = (cmd_meta.get_help)(locale);
+
+            assert!(!name.is_empty(), "Command {} has empty name for locale {}", cmd_meta.name, locale.code());
+            assert!(!help.is_empty(), "Command {} has empty help for locale {}", cmd_meta.name, locale.code());
+
+            for arg_meta in cmd_meta.args {
+                let arg_name = (arg_meta.get_name)(locale);
+                let arg_desc = (arg_meta.get_description)(locale);
+
+                assert!(!arg_name.is_empty(), "Arg {} has empty name for locale {}", arg_meta.name, locale.code());
+                assert!(!arg_desc.is_empty(), "Arg {} has empty desc for locale {}", arg_meta.name, locale.code());
             }
         }
     }

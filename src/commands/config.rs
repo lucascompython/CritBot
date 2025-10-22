@@ -5,15 +5,7 @@ use tracing::error;
 use crate::{bot_data::Context, i18n::translations::Locale};
 
 // TODO: Translate descriptions, etc.
-#[i18n_command(
-    prefix_command,
-    slash_command,
-    category = "Config",
-    name_localized("en-US", "locale"),
-    name_localized("pt-BR", "idioma"),
-    description_localized("en-US", "Change the bot's locale for the current server."),
-    description_localized("pt-BR", "Altera o idioma do bot para o servidor atual.")
-)]
+#[i18n_command(prefix_command, slash_command, category = "Config")]
 pub async fn change_locale(ctx: Context<'_>, new_locale: Locale) -> Result<(), Error> {
     if let Err(e) = change_locale_logic(ctx, new_locale).await {
         error!("Error changing locale: {}", e);

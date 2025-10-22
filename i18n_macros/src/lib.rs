@@ -452,6 +452,7 @@ pub fn i18n(input: TokenStream) -> TokenStream {
                             }
                         }
 
+                        // TODO: I probably can check the size of args and return early if it's empty
                         pub fn translate(self, locale: Locale, args: &[(&str, &str)]) -> String {
                             let template = self.get_template(locale);
                             crate::i18n::do_translate(template, args)
@@ -471,6 +472,56 @@ pub fn i18n(input: TokenStream) -> TokenStream {
     // global translations
     let (global_variants, global_arms, global_nested_modules) =
         generate_trans_items(&input.global, &input.locales);
+
+    // generate metadata for iteration
+    let all_locales = &input.locales;
+
+    let mut command_meta_items = Vec::new();
+    let mut all_args_meta = Vec::new();
+
+    for group in &input.commands {
+        let group_name = &group.name;
+        for cmd in &group.commands {
+            let cmd_name = &cmd.name;
+
+            let args_meta_const_name = syn::Ident::new(
+                &format!(
+                    "ARGS_META_{}_{}",
+                    group_name.to_string().to_uppercase(),
+                    cmd_name.to_string().to_uppercase()
+                ),
+                proc_macro2::Span::call_site(),
+            );
+
+            let mut arg_meta_items = Vec::new();
+            for arg in &cmd.args {
+                let arg_name = &arg.name;
+                arg_meta_items.push(quote! {
+                    ArgMeta {
+                        name: stringify!(#arg_name),
+                        get_name: commands::#group_name::#cmd_name::args::#arg_name::name,
+                        get_description: commands::#group_name::#cmd_name::args::#arg_name::description,
+                    }
+                });
+            }
+
+            all_args_meta.push(quote! {
+                const #args_meta_const_name: &[ArgMeta] = &[
+                    #(#arg_meta_items,)*
+                ];
+            });
+
+            command_meta_items.push(quote! {
+                CommandMeta {
+                    group: stringify!(#group_name),
+                    name: stringify!(#cmd_name),
+                    get_name: commands::#group_name::#cmd_name::name,
+                    get_help: commands::#group_name::#cmd_name::help,
+                    args: #args_meta_const_name,
+                }
+            });
+        }
+    }
 
     let expanded = quote! {
         #[derive(Debug, Clone, Copy, PartialEq, postgres_types::ToSql, postgres_types::FromSql, poise::ChoiceParameter)]
@@ -496,6 +547,18 @@ pub fn i18n(input: TokenStream) -> TokenStream {
                     #(Locale::#locale_variants => stringify!(#locale_variants),)*
                 }
             }
+
+            pub fn discord_code(self) -> &'static str {
+                match self {
+                    Locale::En => "en-US",
+                    Locale::Pt => "pt-BR",
+                    // TODO: add other locales here
+                }
+            }
+
+            pub const ALL: &'static [Locale] = &[
+                #(Locale::#all_locales,)*
+            ];
         }
 
         pub mod commands {
@@ -527,6 +590,26 @@ pub fn i18n(input: TokenStream) -> TokenStream {
                 }
             }
         }
+
+        pub struct ArgMeta {
+            pub name: &'static str,
+            pub get_name: fn(Locale) -> &'static str,
+            pub get_description: fn(Locale) -> &'static str,
+        }
+
+        pub struct CommandMeta {
+            pub group: &'static str,
+            pub name: &'static str,
+            pub get_name: fn(Locale) -> &'static str,
+            pub get_help: fn(Locale) -> &'static str,
+            pub args: &'static [ArgMeta],
+        }
+
+        #(#all_args_meta)*
+
+        pub const COMMANDS_META: &[CommandMeta] = &[
+            #(#command_meta_items,)*
+        ];
     };
 
     TokenStream::from(expanded)
@@ -611,8 +694,10 @@ fn generate_trans_items(
                             }
                         }
 
+                        // TODO: I think this is actually not used anywhere
                         pub fn translate(self, locale: Locale, args: &[(&str, &str)]) -> String {
                             let template = self.get_template(locale);
+                            println!("namespace");
                             crate::i18n::do_translate(template, args)
                         }
                     }

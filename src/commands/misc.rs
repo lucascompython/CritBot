@@ -37,9 +37,6 @@ pub async fn hey(ctx: Context<'_>) -> Result<(), Error> {
     ctx.say(t!(Messages::Greeting, user = user.as_str()))
         .await?;
 
-    let bot_name = t!(global::BotName);
-    ctx.say(format!("I am {}!", bot_name)).await?;
-
     Ok(())
 }
 
