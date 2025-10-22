@@ -1,4 +1,4 @@
-use i18n_macro::i18n_command;
+use i18n_macros::i18n_command;
 use poise::command;
 use tracing::error;
 

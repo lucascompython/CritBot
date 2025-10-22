@@ -262,7 +262,7 @@ version = "0.1.0"
 dependencies = [
  "ahash",
  "deadpool-postgres",
- "i18n_macro",
+ "i18n_macros",
  "mimalloc",
  "papaya",
  "poise",
@@ -833,7 +833,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "i18n_macro"
+name = "i18n_macros"
 version = "0.1.0"
 dependencies = [
  "proc-macro2",

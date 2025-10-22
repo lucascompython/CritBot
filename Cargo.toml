@@ -5,9 +5,7 @@ edition = "2024"
 
 [workspace]
 members = [
-    # ".",
-    # "i18n",
-    "i18n_macro"
+    "i18n_macros"
 ]
 
 [dependencies]
@@ -23,7 +21,7 @@ tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 tokio-postgres = "0.7"
 tracing = "0.1"
 tracing-subscriber = "0.3"
-i18n_macro = { path = "./i18n_macro" }
+i18n_macros = { path = "./i18n_macros" }
 postgres-types = { version = "0.2", features = ["derive"] }
 
 [profile.release]

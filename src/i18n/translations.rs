@@ -1,4 +1,4 @@
-use i18n_macro::i18n;
+use i18n_macros::i18n;
 
 i18n! {
     locales: [Pt, En],
