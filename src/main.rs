@@ -7,8 +7,6 @@ use serenity::{
 };
 use tracing::{error, info};
 
-use i18n::do_translate;
-
 use crate::{bot_data::BotData, config::Config, i18n::translations::Locale};
 
 mod bot_data;
@@ -83,14 +81,18 @@ async fn main() {
     let bot_config: &'static Config =
         Box::leak(Box::new(Config::new().expect("Failed to load config")));
 
+    let commands = vec![
+        commands::misc::ping(),
+        commands::misc::help(),
+        commands::misc::invite(),
+        commands::config::change_locale(),
+        commands::misc::hey(),
+    ];
+    // TODO: apply translations
+
     let options = poise::FrameworkOptions::<BotData, serenity::Error> {
-        commands: vec![
-            commands::misc::ping(),
-            commands::misc::help(),
-            commands::misc::invite(),
-            commands::misc::locale(),
-            commands::misc::hey(),
-        ],
+        commands,
+        // TODO: add custom prefix per guild
         prefix_options: poise::PrefixFrameworkOptions {
             prefix: Some(".".into()),
             mention_as_prefix: true,
@@ -135,9 +137,7 @@ async fn main() {
                     cache
                 };
 
-                let commands = &framework.options().commands;
-
-                poise::builtins::register_globally(ctx, commands).await?;
+                poise::builtins::register_globally(ctx, &framework.options().commands).await?;
                 Ok(BotData {
                     db,
                     bot_config,

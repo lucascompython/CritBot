@@ -74,20 +74,37 @@ pub fn get_locale(ctx: &Context) -> Locale {
 }
 
 macro_rules! t {
-    // simple key: t!(ctx, Hey) or t!(ctx, Hey, name = "John") or t!(ctx, Hey, name)
+    // command translation path: t!(ctx, commands::config::change_locale::AlreadySet)
+    ($ctx:expr, commands :: $group:ident :: $cmd:ident :: $key:ident $(, $($rest:tt)*)?) => {{
+        let locale = $crate::i18n::get_locale($ctx);
+        let args_slice: &[(&str, &str)] = $crate::i18n::t!(@args $($($rest)*)?);
+        $crate::i18n::translations::commands::$group::$cmd::Trans::$key.translate(locale, args_slice)
+    }};
+
+    // command translation nested path: t!(ctx, commands::config::change_locale::Nested::Key)
+    ($ctx:expr, commands :: $group:ident :: $cmd:ident :: $namespace:ident :: $key:ident $(, $($rest:tt)*)?) => {{
+        let locale = $crate::i18n::get_locale($ctx);
+        let args_slice: &[(&str, &str)] = $crate::i18n::t!(@args $($($rest)*)?);
+        $crate::i18n::translations::commands::$group::$cmd::Trans::$namespace(
+            $crate::i18n::translations::commands::$group::$cmd::$namespace::$key
+        ).translate(locale, args_slice)
+    }};
+
+    // TODO: see if I prefer this syntax over global::key
+
+    // global simple key: t!(ctx, BotName) or t!(ctx, BotName, name = "John")
     ($ctx:expr, $key:ident $(, $($rest:tt)*)?) => {{
         let locale = $crate::i18n::get_locale($ctx);
         let args_slice: &[(&str, &str)] = $crate::i18n::t!(@args $($($rest)*)?);
-        $crate::i18n::translations::TransKey::$key.translate(locale, args_slice)
+        $crate::i18n::translations::global::Trans::$key.translate(locale, args_slice)
     }};
 
-    // nested key: t!(ctx, Namespace::Key) or t!(ctx, Namespace::Key, title = "Hello") or t!(ctx, Namespace::Key, title)
-    // expands to TransKey::Namespace(translations::Namespace::Key)
+    // global nested key: t!(ctx, Events::GuildJoin) or t!(ctx, Events::GuildJoin, guild_name = "My Guild")
     ($ctx:expr, $namespace:ident :: $key:ident $(, $($rest:tt)*)?) => {{
         let locale = $crate::i18n::get_locale($ctx);
         let args_slice: &[(&str, &str)] = $crate::i18n::t!(@args $($($rest)*)?);
-        $crate::i18n::translations::TransKey::$namespace(
-            $crate::i18n::translations::$namespace::$key
+        $crate::i18n::translations::global::Trans::$namespace(
+            $crate::i18n::translations::global::$namespace::$key
         ).translate(locale, args_slice)
     }};
 

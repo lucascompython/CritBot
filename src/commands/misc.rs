@@ -1,11 +1,10 @@
 use i18n_macros::i18n_command;
 use poise::command;
-use tracing::error;
+use serenity::Error;
 
-use crate::{bot_data::Context, i18n::translations::Locale};
+use crate::bot_data::Context;
 
-type Error = serenity::Error;
-
+// TODO: Translate help command, show localized names(aliases) and descriptions
 /// A command to display help information about the bot's commands.
 #[command(prefix_command, slash_command, aliases("h"))]
 pub async fn help(ctx: Context<'_>, command: Option<String>) -> Result<(), Error> {
@@ -31,87 +30,17 @@ pub async fn ping(ctx: Context<'_>) -> Result<(), Error> {
 
 #[i18n_command(prefix_command, slash_command, category = "Misc")]
 pub async fn hey(ctx: Context<'_>) -> Result<(), Error> {
-    ctx.reply(t!(Hey)).await?;
+    ctx.reply(t!(Response)).await?;
+
+    let user = ctx.author().name.to_uppercase();
+
+    ctx.say(t!(Messages::Greeting, user = user.as_str()))
+        .await?;
+
+    let bot_name = t!(global::BotName);
+    ctx.say(format!("I am {}!", bot_name)).await?;
 
     Ok(())
-}
-
-// TODO: Translate descriptions, etc.
-
-#[i18n_command(
-    prefix_command,
-    slash_command,
-    category = "Misc",
-    name_localized("en-US", "locale"),
-    name_localized("pt-BR", "idioma"),
-    description_localized("en-US", "Change the bot's locale for the current server."),
-    description_localized("pt-BR", "Altera o idioma do bot para o servidor atual.")
-)]
-pub async fn locale(ctx: Context<'_>, locale: Locale) -> Result<(), Error> {
-    if let Err(e) = change_locale(ctx, locale).await {
-        error!("Error changing locale: {}", e);
-        ctx.say(t!(ChangeLocale::ErrorUpdating)).await?;
-    }
-
-    Ok(())
-}
-
-async fn change_locale(ctx: crate::bot_data::Context<'_>, locale: Locale) -> Result<(), Error> {
-    let guild_id = ctx.guild_id().unwrap().get();
-
-    let pref = ctx.guild().unwrap().preferred_locale.clone();
-
-    let ctx_data = &ctx.data();
-
-    enum Action {
-        AlreadySet,
-        Update,
-    }
-
-    let action = {
-        let pinned_guild_cache = ctx_data.guild_cache.pin();
-        match pinned_guild_cache.get(&guild_id) {
-            Some(guild) => {
-                if let Some(custom_locale) = &guild.locale {
-                    if custom_locale == &locale {
-                        Action::AlreadySet
-                    } else {
-                        Action::Update
-                    }
-                } else if Locale::from_code(&pref) == locale {
-                    Action::AlreadySet
-                } else {
-                    Action::Update
-                }
-            }
-            None => Action::Update,
-        }
-    };
-
-    match action {
-        Action::AlreadySet => {
-            ctx.say(crate::i18n::t!(&ctx, ChangeLocale::AlreadySet))
-                .await?;
-            Ok(())
-        }
-        Action::Update => {
-            ctx.data()
-                .update_guild_locale(locale, guild_id)
-                .await
-                .unwrap();
-            let locale_str = match locale {
-                Locale::En => crate::i18n::t!(&ctx, ChangeLocale::En),
-                Locale::Pt => crate::i18n::t!(&ctx, ChangeLocale::Pt),
-            };
-            ctx.say(crate::i18n::t!(
-                &ctx,
-                ChangeLocale::Updated,
-                locale = &locale_str
-            ))
-            .await?;
-            Ok(())
-        }
-    }
 }
 
 /// Get the bot's invite link.
