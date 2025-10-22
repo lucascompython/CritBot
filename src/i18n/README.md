@@ -219,6 +219,8 @@ The system uses enums for translation keys, providing full IDE autocomplete:
 // Inside a command with #[i18n_command], after typing `t!(`:
 // - All command-specific translation keys
 // - Nested command translations
+
+// In the translations definition, the IDE will warn about non-used translations
 ```
 
 ## Generated Structure
