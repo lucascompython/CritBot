@@ -733,6 +733,7 @@ pub fn i18n_command(attr: TokenStream, item: TokenStream) -> TokenStream {
         // no category, just inject regular t! macro
         quote! {
             {
+                // TODO: consider caching locale in ctx data to avoid fetching it every time
                 macro_rules! t {
                     ($($tt:tt)*) => {
                         crate::i18n::t!(&ctx, $($tt)*)
