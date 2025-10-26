@@ -452,10 +452,13 @@ pub fn i18n(input: TokenStream) -> TokenStream {
                             }
                         }
 
-                        // TODO: I probably can check the size of args and return early if it's empty
                         pub fn translate(self, locale: Locale, args: &[(&str, &str)]) -> String {
                             let template = self.get_template(locale);
-                            crate::i18n::do_translate(template, args)
+                            if args.is_empty() {
+                                template.to_string()
+                            } else {
+                                crate::i18n::do_translate(template, args)
+                            }
                         }
                     }
                 }
