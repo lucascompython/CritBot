@@ -696,13 +696,6 @@ fn generate_trans_items(
                                 #(#nested_arms,)*
                             }
                         }
-
-                        // TODO: I think this is actually not used anywhere
-                        pub fn translate(self, locale: Locale, args: &[(&str, &str)]) -> String {
-                            let template = self.get_template(locale);
-                            println!("namespace");
-                            crate::i18n::do_translate(template, args)
-                        }
                     }
                 });
 
