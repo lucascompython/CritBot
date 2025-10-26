@@ -60,12 +60,21 @@ pub fn do_translate(template: &str, args: &[(&str, &str)]) -> String {
     })
 }
 
+/// Get the locale for the current context, prioritizing in the following order:
+/// 1. Locale specified in the context (e.g., user preference)
+/// 2. Custom guild locale from the guild cache
+/// 3. Guild's preferred locale if it's DESCOVERABLE (defaults to en-US if unknown)
 pub fn get_locale(ctx: &Context) -> Locale {
     if let Some(code) = ctx.locale() {
         Locale::from_code(code)
     } else if let Some(guild_id) = ctx.guild_id()
-        && let Some(cached_guild) = ctx.data().guild_cache.pin().get(&guild_id.get())
-        && let Some(custom_locale) = cached_guild.locale
+        && let Some(custom_locale) = ctx
+            .data()
+            .guild_cache
+            .pin()
+            .get(&guild_id.get())
+            .unwrap()
+            .locale
     {
         custom_locale
     } else {

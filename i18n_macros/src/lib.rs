@@ -527,6 +527,7 @@ pub fn i18n(input: TokenStream) -> TokenStream {
     }
 
     let expanded = quote! {
+        // TODO: implement the serenity description for slash commands
         #[derive(Debug, Clone, Copy, PartialEq, postgres_types::ToSql, postgres_types::FromSql, poise::ChoiceParameter)]
         pub enum Locale {
             #(#locale_variants),*

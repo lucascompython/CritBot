@@ -43,9 +43,16 @@ async fn event_handler(
                     )
                     .await
                     .unwrap();
-                let guild_id = guild.id.get() as i64;
+                let guild_id = guild.id.get();
+                data.guild_cache.pin().insert(
+                    guild_id,
+                    crate::bot_data::Guild {
+                        locale: None,
+                        prefix: data.bot_config.discord.default_prefix.clone(),
+                    },
+                );
 
-                if let Err(e) = pool.execute(&stmt, &[&guild_id]).await {
+                if let Err(e) = pool.execute(&stmt, &[&(guild_id as i64)]).await {
                     error!("Failed to insert guild into database: {}", e);
                 }
             }
@@ -65,8 +72,11 @@ async fn event_handler(
                     .prepare_cached("DELETE FROM guilds WHERE id = $1")
                     .await
                     .unwrap();
-                let guild_id = incomplete.id.get() as i64;
-                if let Err(e) = pool.execute(&stmt, &[&guild_id]).await {
+                let guild_id = incomplete.id.get();
+
+                data.guild_cache.pin().remove(&guild_id);
+
+                if let Err(e) = pool.execute(&stmt, &[&(guild_id as i64)]).await {
                     error!("Failed to remove guild from database: {}", e);
                 }
             } else if let Some(full) = full {
@@ -89,20 +99,27 @@ async fn main() {
         commands::misc::ping(),
         commands::misc::help(),
         commands::misc::invite(),
-        commands::config::change_locale(),
         commands::misc::hey(),
+        commands::config::change_locale(),
+        commands::config::change_prefix(),
     ];
 
     apply_translations(&mut commands);
 
     let options = poise::FrameworkOptions::<BotData, serenity::Error> {
         commands,
-        // TODO: add custom prefix per guild
         prefix_options: poise::PrefixFrameworkOptions {
-            prefix: Some(".".into()),
             mention_as_prefix: true,
             ignore_bots: true,
             case_insensitive_commands: true,
+            dynamic_prefix: Some(|ctx| {
+                Box::pin(async move {
+                    let pinned_cache = ctx.data.guild_cache.pin();
+                    let cached_guild = pinned_cache.get(&ctx.guild_id.unwrap().get()).unwrap();
+
+                    Ok(Some(cached_guild.prefix.to_string()))
+                })
+            }),
             ..Default::default()
         },
 
@@ -125,7 +142,7 @@ async fn main() {
 
                     let db_pool = db.get_pool().await;
                     let stmt = db_pool
-                        .prepare_cached("SELECT id, locale FROM guilds")
+                        .prepare_cached("SELECT id, locale, prefix FROM guilds")
                         .await
                         .unwrap();
                     let rows = db_pool.query(&stmt, &[]).await.unwrap();
@@ -134,7 +151,9 @@ async fn main() {
                     for row in rows {
                         let guild_id: i64 = row.get(0);
                         let locale: Option<Locale> = row.get(1);
-                        pinned_guild_cache.insert(guild_id as u64, bot_data::Guild { locale });
+                        let prefix: String = row.get(2);
+                        pinned_guild_cache
+                            .insert(guild_id as u64, bot_data::Guild { locale, prefix });
                     }
 
                     drop(pinned_guild_cache);

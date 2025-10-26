@@ -14,6 +14,28 @@ pub async fn change_locale(ctx: Context<'_>, new_locale: Locale) -> Result<(), E
     Ok(())
 }
 
+#[i18n_command(prefix_command, slash_command, category = "Config")]
+pub async fn change_prefix(ctx: Context<'_>, prefix: String) -> Result<(), Error> {
+    let guild_id = ctx.guild_id().unwrap().get();
+
+    match ctx
+        .data()
+        .update_guild_prefix(prefix.clone(), guild_id)
+        .await
+    {
+        Ok(_) => {
+            let msg = t!(Updated, prefix = prefix.as_str());
+            ctx.say(msg).await?;
+        }
+        Err(e) => {
+            error!("Error changing prefix: {}", e);
+            ctx.say(t!(ErrorUpdating)).await?;
+        }
+    }
+
+    Ok(())
+}
+
 async fn change_locale_logic(
     ctx: crate::bot_data::Context<'_>,
     locale: Locale,

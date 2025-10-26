@@ -4,6 +4,7 @@ use serde::Deserialize;
 pub struct DiscordConfig {
     pub token: String,
     pub invite_link: String,
+    pub default_prefix: String,
 }
 
 #[derive(Deserialize)]

@@ -37,6 +37,32 @@ i18n! {
                     pt => { Pt: "Português", En: "Portuguese" },
                     en => { Pt: "Inglês", En: "English" }
                 }
+            },
+            change_prefix => {
+                name: { Pt: "mudar-prefixo", En: "change-prefix" },
+                help: {
+                    Pt: "Muda o prefixo do bot para este servidor",
+                    En: "Changes the bot's prefix for this server"
+                },
+                args: {
+                    prefix => {
+                        name: { Pt: "prefixo", En: "prefix" },
+                        description: {
+                            Pt: "O novo prefixo a definir",
+                            En: "The new prefix to set"
+                        }
+                    }
+                },
+                trans: {
+                    updated => {
+                        Pt: "Prefixo atualizado para `{prefix}`",
+                        En: "Prefix updated to `{prefix}`"
+                    },
+                    error_updating => {
+                        Pt: "Erro ao atualizar o prefixo",
+                        En: "Error updating prefix"
+                    }
+                }
             }
         },
         misc => {

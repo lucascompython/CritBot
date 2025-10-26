@@ -9,7 +9,7 @@ END$$;
 
 CREATE TABLE IF NOT EXISTS guilds(
     id BIGINT PRIMARY KEY,
-    prefix CHAR DEFAULT ',',
+    prefix CHAR DEFAULT '.',
     locale "Locale",
     sponsorblock_categories TEXT[] DEFAULT '{"sponsor","selfpromo","intro","outro","music_offtopic"}',
     sponsorblock_print_segment_skipped BOOLEAN DEFAULT TRUE
