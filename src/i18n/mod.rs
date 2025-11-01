@@ -7,6 +7,7 @@ thread_local! {
         std::cell::RefCell::new(Vec::with_capacity(512));
 }
 
+// TODO: see, simdutf8 and memchr
 pub fn do_translate(template: &str, args: &[(&str, &str)]) -> String {
     STRING_BUFFER.with(|buf| {
         let mut buffer = buf.borrow_mut();

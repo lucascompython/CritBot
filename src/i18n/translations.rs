@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use i18n_macros::i18n;
 
 use crate::bot_data::BotData;
@@ -98,53 +100,47 @@ i18n! {
 // TODO: this could be generated and "unrolled" by a macro, and there wouldn't be a need to all this COMMANDS_META boilerplate, thus making the i18n! macro simpler
 pub fn apply_translations(commands: &mut [poise::Command<BotData, serenity::Error>]) {
     for cmd_meta in COMMANDS_META {
-        if let Some(cmd) = commands
-            .iter_mut()
-            .find(|c| c.name.as_str() == cmd_meta.name)
-        {
+        if let Some(cmd) = commands.iter_mut().find(|c| c.name == cmd_meta.name) {
             // set defaults to English
-            cmd.name = (cmd_meta.get_name)(Locale::En).to_string();
-            cmd.description = Some((cmd_meta.get_help)(Locale::En).to_string());
+            cmd.name = (cmd_meta.get_name)(Locale::En).into();
+            cmd.description = Some((cmd_meta.get_help)(Locale::En).into());
+
+            let name_localizations = cmd.name_localizations.to_mut();
+            let description_localizations = cmd.description_localizations.to_mut();
+            let aliases = cmd.aliases.to_mut();
 
             for &locale in Locale::ALL {
-                let locale_code = locale.discord_code();
+                let locale_code: Cow<'static, str> = locale.discord_code().into();
 
-                let localized_name = (cmd_meta.get_name)(locale).to_string();
+                let localized_name: Cow<'static, str> = (cmd_meta.get_name)(locale).into();
 
-                cmd.name_localizations
-                    .insert(locale_code.to_string(), localized_name.clone());
-                cmd.description_localizations.insert(
-                    locale_code.to_string(),
-                    (cmd_meta.get_help)(locale).to_string(),
-                );
+                name_localizations.push((locale_code.clone(), localized_name.clone()));
+                description_localizations.push((locale_code, (cmd_meta.get_help)(locale).into()));
 
                 // set aliases for the commands nmes for locales other than english
 
-                if locale != Locale::En && !cmd.aliases.contains(&localized_name) {
-                    cmd.aliases.push(localized_name);
+                if locale != Locale::En && !aliases.contains(&localized_name) {
+                    aliases.push(localized_name);
                 }
             }
 
             for arg_meta in cmd_meta.args {
-                if let Some(param) = cmd
-                    .parameters
-                    .iter_mut()
-                    .find(|p| p.name.as_str() == arg_meta.name)
-                {
-                    param.name = (arg_meta.get_name)(Locale::En).to_string();
-                    param.description = Some((arg_meta.get_description)(Locale::En).to_string());
+                if let Some(param) = cmd.parameters.iter_mut().find(|p| p.name == arg_meta.name) {
+                    param.name = (arg_meta.get_name)(Locale::En).into();
+                    param.description = Some((arg_meta.get_description)(Locale::En).into());
+
+                    let name_localizations = param.name_localizations.to_mut();
+                    let description_localizations = param.description_localizations.to_mut();
 
                     for &locale in Locale::ALL {
                         let locale_code = locale.discord_code();
 
-                        param.name_localizations.insert(
-                            locale_code.to_string(),
-                            (arg_meta.get_name)(locale).to_string(),
-                        );
-                        param.description_localizations.insert(
-                            locale_code.to_string(),
-                            (arg_meta.get_description)(locale).to_string(),
-                        );
+                        name_localizations
+                            .push((locale_code.into(), (arg_meta.get_name)(locale).into()));
+                        description_localizations.push((
+                            locale_code.into(),
+                            (arg_meta.get_description)(locale).into(),
+                        ));
                     }
                 }
             }

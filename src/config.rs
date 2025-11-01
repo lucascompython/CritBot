@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct DiscordConfig {
-    pub token: String,
+    pub token: serenity::all::Token,
     pub invite_link: String,
     pub default_prefix: String,
 }
@@ -13,10 +13,12 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new() -> Result<Self, simd_json::Error> {
-        let mut config_data =
+    pub fn new() -> Result<Self, serde_json::Error> {
+        let config_data =
             std::fs::read_to_string("appconfig.json").expect("Failed to read appconfig.json file");
 
-        unsafe { simd_json::from_str(&mut config_data) }
+        serde_json::from_str(&config_data)
+
+        // unsafe { simd_json::from_str(&mut config_data) }
     }
 }
