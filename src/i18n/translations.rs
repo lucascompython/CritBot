@@ -84,6 +84,24 @@ i18n! {
                     }
                 }
             }
+        },
+        music => {
+            play => {
+                name: { Pt: "tocar", En: "play" },
+                help: {
+                    Pt: "Toca uma música a partir de uma URL ou pesquisa",
+                    En: "Plays a song from a URL or search"
+                },
+                args: {
+                    query => {
+                        name: { Pt: "consulta", En: "query" },
+                        description: {
+                            Pt: "A URL ou termo de pesquisa da música",
+                            En: "The URL or search term of the song"
+                        }
+                    }
+                },
+            }
         }
     },
     global: {

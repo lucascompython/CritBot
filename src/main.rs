@@ -1,4 +1,4 @@
-use std::{str::FromStr, sync::Arc};
+use std::{io::Read, str::FromStr, sync::Arc};
 
 use ahash::RandomState;
 use base64::{Engine, prelude::BASE64_STANDARD_NO_PAD};
@@ -87,10 +87,13 @@ async fn setup(bot_config: &'static Config) -> Result<BotData, serenity::Error> 
         .await
     };
 
+    let manager = Songbird::serenity();
+
     Ok(BotData {
         db,
         bot_config,
         guild_cache,
+        manager,
         lavalink,
     })
 }
@@ -146,13 +149,11 @@ async fn main() {
 
     let intents = GatewayIntents::all();
 
-    let manager = Songbird::serenity();
-
     let token = serenity::secrets::Token::from_str(&bot_config.discord.token).unwrap();
 
     let mut client = poise::serenity_prelude::ClientBuilder::new(token, intents)
         .event_handler(Handler)
-        .voice_manager::<Songbird>(manager)
+        .voice_manager::<Songbird>(bot_data.manager.clone())
         .compression(serenity::all::TransportCompression::None)
         .framework(framework)
         .data(Arc::new(bot_data))

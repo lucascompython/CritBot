@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use ahash::RandomState;
 use lavalink_rs::client::LavalinkClient;
 use papaya::HashMap;
@@ -15,6 +17,7 @@ pub struct BotData {
     pub db: db::Db,
     pub bot_config: &'static crate::config::Config,
     pub guild_cache: HashMap<u64, Guild, RandomState>,
+    pub manager: Arc<songbird::Songbird>,
     pub lavalink: LavalinkClient,
 }
 
