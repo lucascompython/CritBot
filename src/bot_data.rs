@@ -1,4 +1,5 @@
 use ahash::RandomState;
+use lavalink_rs::client::LavalinkClient;
 use papaya::HashMap;
 
 use crate::{db, i18n::translations::Locale};
@@ -14,6 +15,7 @@ pub struct BotData {
     pub db: db::Db,
     pub bot_config: &'static crate::config::Config,
     pub guild_cache: HashMap<u64, Guild, RandomState>,
+    pub lavalink: LavalinkClient,
 }
 
 impl BotData {

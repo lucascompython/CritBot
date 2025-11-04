@@ -1,18 +1,18 @@
-use std::sync::Arc;
+use std::{str::FromStr, sync::Arc};
 
 use ahash::RandomState;
+use base64::{Engine, prelude::BASE64_STANDARD_NO_PAD};
+use lavalink_rs::prelude::*;
 use mimalloc::MiMalloc;
 use papaya::HashMap;
-use serenity::{
-    all::{ClientBuilder, FullEvent},
-    async_trait,
-    prelude::*,
-};
-use tracing::{error, info};
+use serenity::prelude::*;
+use songbird::Songbird;
+use tracing::error;
 
 use crate::{
     bot_data::BotData,
     config::Config,
+    events::{discord_events::Handler, lavalink_events},
     i18n::translations::{Locale, apply_translations},
 };
 
@@ -20,79 +20,11 @@ mod bot_data;
 mod commands;
 mod config;
 mod db;
+mod events;
 mod i18n;
 
 #[global_allocator]
 static GLOBAL: MiMalloc = MiMalloc;
-
-struct Handler;
-#[async_trait]
-impl EventHandler for Handler {
-    async fn dispatch(&self, ctx: &Context, event: &FullEvent) {
-        match event {
-            FullEvent::Ready { data_about_bot, .. } => {
-                info!("Logged in as {}", data_about_bot.user.name);
-            }
-            FullEvent::GuildCreate { guild, is_new, .. } => {
-                if *is_new == Some(true) {
-                    info!("Joined new guild: {} (id {})", guild.name, guild.id);
-
-                    let data = ctx.data::<BotData>();
-                    let pool = data.db.get_pool().await;
-                    let stmt = pool
-                        .prepare_cached(
-                            "INSERT INTO guilds (id) VALUES ($1) ON CONFLICT (id) DO NOTHING",
-                        )
-                        .await
-                        .unwrap();
-                    let guild_id = guild.id.get();
-                    data.guild_cache.pin().insert(
-                        guild_id,
-                        crate::bot_data::Guild {
-                            locale: None,
-                            prefix: data.bot_config.discord.default_prefix.clone(),
-                        },
-                    );
-
-                    if let Err(e) = pool.execute(&stmt, &[&(guild_id as i64)]).await {
-                        error!("Failed to insert guild into database: {}", e);
-                    }
-                }
-            }
-
-            FullEvent::GuildDelete {
-                incomplete, full, ..
-            } => {
-                if !incomplete.unavailable {
-                    let guild_name = if let Some(full) = full {
-                        &full.name
-                    } else {
-                        "Unknown"
-                    };
-                    info!("Removed from guild: {} (id {})", guild_name, incomplete.id);
-
-                    let data = ctx.data::<BotData>();
-
-                    let pool = data.db.get_pool().await;
-                    let stmt = pool
-                        .prepare_cached("DELETE FROM guilds WHERE id = $1")
-                        .await
-                        .unwrap();
-                    let guild_id = incomplete.id.get();
-
-                    data.guild_cache.pin().remove(&guild_id);
-
-                    if let Err(e) = pool.execute(&stmt, &[&(guild_id as i64)]).await {
-                        error!("Failed to remove guild from database: {}", e);
-                    }
-                } else if let Some(full) = full {
-                    info!("Guild became unavailable: {} (id {})", full.name, full.id);
-                }
-            }
-            _ => {}
-        }
-    }
-}
 
 async fn setup(bot_config: &'static Config) -> Result<BotData, serenity::Error> {
     let db = db::Db::new().await.expect("Failed to create database pool");
@@ -114,10 +46,52 @@ async fn setup(bot_config: &'static Config) -> Result<BotData, serenity::Error> 
         drop(pinned_guild_cache);
         cache
     };
+
+    let lavalink = {
+        let events = lavalink_rs::model::events::Events {
+            raw: Some(lavalink_events::raw_event),
+            ready: Some(lavalink_events::ready_event),
+            track_start: Some(lavalink_events::track_start),
+            track_end: Some(lavalink_events::track_end),
+            ..Default::default()
+        };
+
+        let bot_id: u64 = {
+            // the bot id is stored in the in the first 24 characters of the token encoded in base64
+
+            let token_part = &bot_config.discord.token[0..24];
+            let mut decoded_bytes = [0u8; 68]; // 16 bytes = 128 bits
+            BASE64_STANDARD_NO_PAD
+                .decode_slice(token_part, &mut decoded_bytes)
+                .expect("Failed to decode bot id from token");
+            let s = unsafe { std::str::from_utf8_unchecked(&decoded_bytes) };
+            let s = s.trim_matches('\0');
+            s.parse()
+                .expect("Failed to parse bot id from decoded token part")
+        };
+
+        let node_local = lavalink_rs::node::NodeBuilder {
+            hostname: bot_config.lavalink.hostname.clone(),
+            is_ssl: bot_config.lavalink.is_ssl,
+            events: lavalink_rs::model::events::Events::default(),
+            password: bot_config.lavalink.password.clone(),
+            user_id: bot_id.into(), // probably better way to get the bot id, still waiting for response from maintainer
+            session_id: None,
+        };
+
+        lavalink_rs::client::LavalinkClient::new(
+            events,
+            vec![node_local],
+            NodeDistributionStrategy::round_robin(),
+        )
+        .await
+    };
+
     Ok(BotData {
         db,
         bot_config,
         guild_cache,
+        lavalink,
     })
 }
 
@@ -170,13 +144,16 @@ async fn main() {
         }
     };
 
-    let intents = GatewayIntents::non_privileged()
-        | GatewayIntents::MESSAGE_CONTENT
-        | GatewayIntents::DIRECT_MESSAGES;
+    let intents = GatewayIntents::all();
 
-    let mut client = ClientBuilder::new(bot_config.discord.token.clone(), intents)
+    let manager = Songbird::serenity();
+
+    let token = serenity::secrets::Token::from_str(&bot_config.discord.token).unwrap();
+
+    let mut client = poise::serenity_prelude::ClientBuilder::new(token, intents)
         .event_handler(Handler)
-        .compression(serenity::all::TransportCompression::Zstd)
+        .voice_manager::<Songbird>(manager)
+        .compression(serenity::all::TransportCompression::None)
         .framework(framework)
         .data(Arc::new(bot_data))
         .activity(serenity::all::ActivityData::custom(":)"))

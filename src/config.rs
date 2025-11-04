@@ -2,14 +2,22 @@ use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct DiscordConfig {
-    pub token: serenity::all::Token,
+    pub token: String,
     pub invite_link: String,
     pub default_prefix: String,
 }
 
 #[derive(Deserialize)]
+pub struct LavalinkConfig {
+    pub hostname: String,
+    pub is_ssl: bool,
+    pub password: String,
+}
+
+#[derive(Deserialize)]
 pub struct Config {
     pub discord: DiscordConfig,
+    pub lavalink: LavalinkConfig,
 }
 
 impl Config {

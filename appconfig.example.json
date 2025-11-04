@@ -3,5 +3,10 @@
     "token": "YOUR_BOT_TOKEN",
     "invite_link": "YOUR_INVITE_LINK",
     "default_prefix": "."
+  },
+  "lavalink": {
+    "hostname": "localhost:2333",
+    "is_ssl": false,
+    "password": "youshallnotpass"
   }
 }

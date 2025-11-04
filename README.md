@@ -21,6 +21,12 @@ CREATE ROLE user WITH LOGIN PASSWORD 'yourpw';
 CREATE DATABASE crit OWNER user;
 ```
 
+
+```bash
+# if you want to download Lavalink
+DOWNLOAD_LAVALINK=true cargo build
+```
+
 ## Todo's (mostly by order)
 
 + [X] add i18n system

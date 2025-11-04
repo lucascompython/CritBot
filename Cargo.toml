@@ -16,7 +16,10 @@ papaya = "0.2"
 serde = { version = "1", features = ["derive"] }
 # poise = { git = "https://github.com/serenity-rs/poise", branch = "serenity-next" }
 poise = { git = "https://github.com/mkrasnitski/poise", branch = "argument-convert" }
-serenity = { git = "https://github.com/serenity-rs/serenity", branch = "next",  features = ["temp_cache", "transport_compression_zstd"] } # https://github.com/serenity-rs/serenity/pull/2735#issuecomment-3456282921
+serenity = { git = "https://github.com/serenity-rs/serenity", branch = "next",  features = ["temp_cache", "transport_compression_zstd", "voice"] } # https://github.com/serenity-rs/serenity/pull/2735#issuecomment-3456282921
+songbird = { git = "https://github.com/serenity-rs/songbird", branch = "serenity-next", default-features = false, features =  ["gateway", "native", "serenity"] }
+lavalink-rs = { git = "https://gitlab.com/vicky5124/lavalink-rs", branch = "main", default-features = false, features = ["websockets-rustls-native-roots", "macros", "songbird", "serenity"] } # TODO: send PR to udpate deps
+
 # simd-json = {version = "0.17", default-features = false, features = ["serde_impl", "swar-number-parsing"]} see GH issue above
 serde_json = "1"
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
@@ -25,6 +28,10 @@ tracing = "0.1"
 tracing-subscriber = "0.3"
 i18n_macros = { path = "./i18n_macros" }
 postgres-types = { version = "0.2", features = ["derive"] }
+base64 = "0.22"
+
+[build-dependencies]
+reqwest = { version = "0.12", features = ["blocking"] }
 
 [profile.release]
 codegen-units = 1 # Allows LLVM to perform better optimization.
