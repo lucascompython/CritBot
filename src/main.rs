@@ -10,7 +10,7 @@ use songbird::Songbird;
 use tracing::error;
 
 use crate::{
-    bot_data::BotData,
+    bot_data::{BotData, Error},
     config::Config,
     events::{discord_events::Handler, lavalink_events},
     i18n::translations::{Locale, apply_translations},
@@ -104,7 +104,7 @@ async fn main() {
     let bot_config: &'static Config =
         Box::leak(Box::new(Config::new().expect("Failed to load config")));
 
-    let mut commands: Vec<poise::Command<BotData, SerenityError>> = vec![
+    let mut commands: Vec<poise::Command<BotData, Error>> = vec![
         commands::misc::ping(),
         // commands::misc::help(),
         commands::misc::invite(),
@@ -113,11 +113,13 @@ async fn main() {
         commands::config::change_locale(),
         commands::config::change_prefix(),
         commands::music::play(),
+        commands::music::join(),
+        commands::music::leave(),
     ];
 
     apply_translations(&mut commands);
 
-    let options = poise::FrameworkOptions::<BotData, serenity::Error> {
+    let options = poise::FrameworkOptions::<BotData, Error> {
         commands,
         prefix_options: poise::PrefixFrameworkOptions {
             mention_as_prefix: true,

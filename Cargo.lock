@@ -303,6 +303,7 @@ dependencies = [
  "serde_json",
  "serenity 0.12.4 (git+https://github.com/serenity-rs/serenity?branch=next)",
  "songbird 0.5.0",
+ "thiserror 2.0.17",
  "tokio",
  "tokio-postgres",
  "tracing",

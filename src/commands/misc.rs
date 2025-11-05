@@ -1,8 +1,7 @@
 use i18n_macros::i18n_command;
 use poise::command;
-use serenity::Error;
 
-use crate::bot_data::Context;
+use crate::bot_data::{Context, Error};
 
 // TODO: Translate help command, show localized names(aliases) and descriptions
 // TODO: Fix help command

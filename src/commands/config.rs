@@ -1,8 +1,10 @@
 use i18n_macros::i18n_command;
-use serenity::Error;
 use tracing::error;
 
-use crate::{bot_data::Context, i18n::translations::Locale};
+use crate::{
+    bot_data::{Context, Error},
+    i18n::translations::Locale,
+};
 
 #[i18n_command(prefix_command, slash_command, category = "Config")]
 pub async fn change_locale(ctx: Context<'_>, new_locale: Locale) -> Result<(), Error> {

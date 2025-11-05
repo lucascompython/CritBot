@@ -2,8 +2,9 @@ use std::borrow::Cow;
 
 use i18n_macros::i18n;
 
-use crate::bot_data::BotData;
+use crate::bot_data::{BotData, Error};
 
+// TODO: handle "normal" aliases here, so there are less places to look at for command metadata
 i18n! {
     locales: [Pt, En],
     commands: {
@@ -101,6 +102,57 @@ i18n! {
                         }
                     }
                 },
+            },
+            join => {
+                name: { Pt: "entrar", En: "join" },
+                help: {
+                    Pt: "Faz o bot entrar no canal de voz",
+                    En: "Makes the bot join the voice channel"
+                },
+                args: {
+                    channel => {
+                        name: { Pt: "canal", En: "channel" },
+                        description: {
+                            Pt: "O canal de voz para o bot entrar (padrão: seu canal atual)",
+                            En: "The voice channel for the bot to join (default: your current channel)"
+                        }
+                    }
+                },
+                trans: {
+                    joined => {
+                        Pt: "A entrar em {channel}!",
+                        En: "Joined {channel}!",
+                    },
+                    already_in_channel => {
+                        Pt: "Já estou num canal de voz!",
+                        En: "I'm already in a voice channel!"
+                    },
+                    you_not_in_channel => {
+                        Pt: "Não estás num canal de voz!",
+                        En: "You are not in a voice channel!"
+                    },
+                    error_joining => {
+                        Pt: "Erro ao entrar no canal de voz: {error}",
+                        En: "Error joining voice channel: {error}"
+                    }
+                }
+            },
+            leave => {
+                name: { Pt: "sair", En: "leave" },
+                help: {
+                    Pt: "Faz o bot sair do canal de voz",
+                    En: "Makes the bot leave the voice channel"
+                },
+                trans: {
+                    left => {
+                        Pt: "Saí do canal de voz.",
+                        En: "Left the voice channel."
+                    },
+                    not_in_channel => {
+                        Pt: "Não estou num canal de voz!",
+                        En: "I'm not in a voice channel!"
+                    }
+                }
             }
         }
     },
@@ -116,7 +168,7 @@ i18n! {
 }
 
 // TODO: this could be generated and "unrolled" by a macro, and there wouldn't be a need to all this COMMANDS_META boilerplate, thus making the i18n! macro simpler
-pub fn apply_translations(commands: &mut [poise::Command<BotData, serenity::Error>]) {
+pub fn apply_translations(commands: &mut [poise::Command<BotData, Error>]) {
     for cmd_meta in COMMANDS_META {
         if let Some(cmd) = commands.iter_mut().find(|c| c.name == cmd_meta.name) {
             // set defaults to English

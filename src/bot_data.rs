@@ -11,7 +11,24 @@ pub struct Guild {
     pub prefix: String,
 }
 
-pub type Context<'a> = poise::Context<'a, BotData, serenity::Error>;
+// pub type Error = Box<dyn std::error::Error + Send + Sync>;
+// define error enum for all the bots errors
+
+#[derive(thiserror::Error, Debug)]
+pub enum Error {
+    #[error("Database error: {0}")]
+    Database(#[from] tokio_postgres::Error),
+    #[error("Lavalink error: {0}")]
+    Lavalink(#[from] lavalink_rs::error::LavalinkError),
+    #[error("Serenity error: {0}")]
+    Serenity(#[from] serenity::Error),
+    #[error("Songbird join error: {0}")]
+    SongbirdJoin(#[from] songbird::error::JoinError),
+    #[error("IO error: {0}")]
+    Other(String),
+}
+
+pub type Context<'a> = poise::Context<'a, BotData, Error>;
 
 pub struct BotData {
     pub db: db::Db,
