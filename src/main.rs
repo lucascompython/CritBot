@@ -1,4 +1,4 @@
-use std::{io::Read, str::FromStr, sync::Arc};
+use std::{str::FromStr, sync::Arc, time::Duration};
 
 use ahash::RandomState;
 use base64::{Engine, prelude::BASE64_STANDARD_NO_PAD};
@@ -112,6 +112,7 @@ async fn main() {
         commands::misc::hey(),
         commands::config::change_locale(),
         commands::config::change_prefix(),
+        commands::music::play(),
     ];
 
     apply_translations(&mut commands);
@@ -120,6 +121,9 @@ async fn main() {
         commands,
         prefix_options: poise::PrefixFrameworkOptions {
             mention_as_prefix: true,
+            edit_tracker: Some(Arc::new(poise::EditTracker::for_timespan(
+                Duration::from_secs(120),
+            ))), // TODO: check reuse bod
             ignore_bots: true,
             case_insensitive_commands: true,
             dynamic_prefix: Some(|ctx| {
