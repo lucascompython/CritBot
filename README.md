@@ -37,6 +37,7 @@ DOWNLOAD_LAVALINK=true cargo build
 - [ ] improve searching, with [LavaSearch](https://github.com/topi314/LavaSearch)
 - [ ] support lyrics, [LavaLyrics](https://github.com/topi314/LavaLyrics)
 - [ ] support more filters, [LavaDSPX](https://github.com/Devoxin/LavaDSPX-Plugin)
+- [ ] see about user apps
 
 ## Rewrite Notes
 
