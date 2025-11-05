@@ -837,6 +837,7 @@ pub fn i18n_command(attr: TokenStream, item: TokenStream) -> TokenStream {
     };
 
     let output = quote! {
+        #[allow(unused_macros)]
         #poise_attr
         #func
     };
