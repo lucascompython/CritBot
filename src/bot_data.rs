@@ -100,3 +100,8 @@ impl BotData {
         Ok(())
     }
 }
+
+pub struct LavalinkData {
+    pub channel_id: serenity::model::id::GenericChannelId,
+    pub http: Arc<serenity::all::Http>,
+}

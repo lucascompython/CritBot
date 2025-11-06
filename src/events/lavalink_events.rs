@@ -1,7 +1,7 @@
 use lavalink_rs::{hook, model::events, prelude::*};
-use poise::serenity_prelude::Http;
-use serenity::all::GenericChannelId;
 use tracing::{debug, info};
+
+use crate::bot_data::LavalinkData;
 
 // The #[hook] macro transforms:
 // ```rs
@@ -23,7 +23,9 @@ use tracing::{debug, info};
 
 #[hook]
 pub async fn raw_event(_: LavalinkClient, session_id: String, event: &serde_json::Value) {
-    if event["op"].as_str() == Some("event") || event["op"].as_str() == Some("playerUpdate") {
+    if (event["op"].as_str() == Some("event") || event["op"].as_str() == Some("playerUpdate"))
+        && event["state"].as_object().is_none()
+    {
         info!("{:?} -> {:?}", session_id, event);
     }
 }
@@ -37,10 +39,8 @@ pub async fn ready_event(client: LavalinkClient, session_id: String, event: &eve
 #[hook]
 pub async fn track_start(client: LavalinkClient, _session_id: String, event: &events::TrackStart) {
     let player_context = client.get_player_context(event.guild_id).unwrap();
-    let data = player_context
-        .data::<(GenericChannelId, std::sync::Arc<Http>)>()
-        .unwrap();
-    let (channel_id, http) = (&data.0, &data.1);
+    let data = player_context.data::<LavalinkData>().unwrap();
+    let (channel_id, http) = (&data.channel_id, &data.http);
 
     let msg = {
         let track = &event.track;
