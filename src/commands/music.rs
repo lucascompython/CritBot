@@ -144,23 +144,21 @@ pub async fn play(ctx: Context<'_>, #[rest] query: String) -> Result<(), Error> 
     };
 
     if let Some(info) = playlist_info {
-        ctx.say(format!("Added playlist to queue: {}", info.name,))
-            .await?;
+        ctx.say(t!(AddedPlaylist, name = &info.name)).await?;
     } else {
         let track = &tracks[0].track;
 
         if let Some(uri) = &track.info.uri {
-            ctx.say(format!(
-                "Added to queue: [{} - {}](<{}>)",
-                track.info.author, track.info.title, uri
+            ctx.say(t!(
+                AddedTrack,
+                author = &track.info.author,
+                title = &track.info.title,
+                uri = uri
             ))
             .await?;
         } else {
-            ctx.say(format!(
-                "Added to queue: {} - {}",
-                track.info.author, track.info.title
-            ))
-            .await?;
+            // TODO: this if is most likely useless
+            ctx.say("`track.info.uri` = None").await?;
         }
     }
 

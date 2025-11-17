@@ -102,6 +102,15 @@ i18n! {
                         }
                     }
                 },
+                trans: {
+                    added_playlist => {
+                      Pt: "Playlist adicionada à fila: {name}", En: "Added playlist to queue: {name}"
+                    },
+                    added_track => {
+                        En: "Added to queue: [{author} - {title}](<{uri}>)", Pt: "Adicionado à fila: [{author} - {title}](<{uri}>)"
+                    },
+
+                },
             },
             join => {
                 name: { Pt: "entrar", En: "join" },
