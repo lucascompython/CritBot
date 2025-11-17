@@ -17,8 +17,8 @@ async fn _join(
 ) -> Result<Option<PlayerContext>, Error> {
     use crate::i18n::t;
     let data = ctx.data();
-    let lava_client = data.lavalink.clone();
-    let manager = data.manager.clone();
+    let lava_client = &data.lavalink;
+    let manager = &data.manager;
 
     let guild_id = ctx.guild_id().unwrap();
 
@@ -220,7 +220,7 @@ pub async fn leave(ctx: Context<'_>) -> Result<(), Error> {
     let guild_id = ctx.guild_id().unwrap();
 
     let data = ctx.data();
-    let manager = data.manager.clone();
+    let manager = &data.manager;
 
     let lava_client = data.lavalink.clone();
     lava_client.delete_player(guild_id.get()).await?;
