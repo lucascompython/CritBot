@@ -114,6 +114,8 @@ plugins:
 
   youtube:
     enabled: true # Whether this source can be used.
+    remoteCipher:
+      url: "http://localhost:8001"
     oauth:
       enabled: true
       # refreshToken: "put_refresh_in_here" # After the first run, the refresh token will be printed in the console, then you can put it here and uncomment this line
