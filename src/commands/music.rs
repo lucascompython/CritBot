@@ -2,7 +2,10 @@ use i18n_macros::i18n_command;
 use lavalink_rs::prelude::{PlayerContext, SearchEngines, TrackInQueue, TrackLoadData};
 use serenity::all::{Channel, Mentionable};
 
-use crate::bot_data::{Context, Error, LavalinkData};
+use crate::{
+    bot_data::{Context, Error, LavalinkData},
+    i18n::get_locale,
+};
 // TODO: search command, set the channel activity to the current track
 
 /// Returns true if joined, false if already connected
@@ -55,6 +58,8 @@ async fn _join(
                         session_id: connection_info.session_id,
                     };
 
+                    let locale = get_locale(ctx);
+
                     let player = lava_client
                         // The turbofish here is Optional, but it helps to figure out what type to
                         // provide in `PlayerContext::data()`
@@ -71,6 +76,7 @@ async fn _join(
                             std::sync::Arc::new(LavalinkData {
                                 channel_id: ctx.channel_id(),
                                 http: ctx.serenity_context().http.clone(),
+                                locale,
                             }),
                         )
                         .await?;
@@ -115,7 +121,9 @@ pub async fn play(ctx: Context<'_>, #[rest] query: String) -> Result<(), Error> 
         }
     };
 
-    let lava_client = ctx.data().lavalink.clone();
+    let lava_client = &ctx.data().lavalink;
+
+    let original_query = query.clone();
 
     let query = if query.starts_with("http") {
         query
@@ -138,7 +146,7 @@ pub async fn play(ctx: Context<'_>, #[rest] query: String) -> Result<(), Error> 
         }
 
         _ => {
-            ctx.say(format!("{:?}", loaded_tracks)).await?;
+            ctx.say(t!(NotFound, query = &original_query)).await?;
             return Ok(());
         }
     };
@@ -148,7 +156,10 @@ pub async fn play(ctx: Context<'_>, #[rest] query: String) -> Result<(), Error> 
     } else {
         let track = &tracks[0].track;
 
-        if let Some(uri) = &track.info.uri {
+        if let Ok(player_data) = player.get_player().await
+            && player_data.track.is_some()
+            && let Some(uri) = &track.info.uri
+        {
             ctx.say(t!(
                 AddedTrack,
                 author = &track.info.author,
@@ -156,9 +167,9 @@ pub async fn play(ctx: Context<'_>, #[rest] query: String) -> Result<(), Error> 
                 uri = uri
             ))
             .await?;
-        } else {
+        } else if track.info.uri.is_none() {
             // TODO: this if is most likely useless
-            ctx.say("`track.info.uri` = None").await?;
+            ctx.say("`track.info.uri` = None (play command)").await?;
         }
     }
 

@@ -109,6 +109,14 @@ i18n! {
                     added_track => {
                         En: "Added to queue: [{author} - {title}](<{uri}>)", Pt: "Adicionado à fila: [{author} - {title}](<{uri}>)"
                     },
+                    not_found => {
+                        Pt: "Nenhuma música encontrada para: `{query}`",
+                        En: "No song found for query: `{query}`"
+                    },
+                    now_playing => {
+                        Pt: "A tocar agora: [{author} - {title}](<{uri}>) | Requisitado por <@!{requester_id}>",
+                        En: "Now playing: [{author} - {title}](<{uri}>) | Requested by <@!{requester_id}>"
+                    }
 
                 },
             },

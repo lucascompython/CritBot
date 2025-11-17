@@ -44,26 +44,27 @@ pub async fn track_start(client: LavalinkClient, _session_id: String, event: &ev
 
     let msg = {
         let track = &event.track;
+        let requester_id = &track.user_data.as_ref().unwrap()["requester_id"];
 
         if let Some(uri) = &track.info.uri {
-            format!(
-                "Now playing: [{} - {}](<{}>) | Requested by <@!{}>",
-                track.info.author,
-                track.info.title,
-                uri,
-                track.user_data.clone().unwrap()["requester_id"]
+            // TODO: probably create a macro rule for this use case
+            let now_playing_template =
+                crate::i18n::translations::commands::music::play::Trans::NowPlaying;
+            now_playing_template.translate(
+                data.locale,
+                &[
+                    ("author", &track.info.author),
+                    ("title", &track.info.title),
+                    ("uri", uri),
+                    ("requester_id", &requester_id.as_u64().unwrap().to_string()),
+                ],
             )
         } else {
-            format!(
-                "Now playing: {} - {} | Requested by <@!{}>",
-                track.info.author,
-                track.info.title,
-                track.user_data.clone().unwrap()["requester_id"]
-            )
+            "track.info.uri = None (track_start event)".to_string()
         }
     };
 
-    let _ = channel_id.say(http, msg).await;
+    channel_id.say(http, msg).await.unwrap();
 }
 
 #[hook]
