@@ -46,6 +46,7 @@ impl BotData {
         guild_id: u64,
     ) -> Result<(), tokio_postgres::Error> {
         let pool = self.db.get_pool().await;
+        // TODO: I can probably just tokio::spawn this and not await it
         let stmt = pool
                 .prepare_cached("INSERT INTO guilds (locale, id) VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET locale = EXCLUDED.locale")
                 .await?;
