@@ -9,9 +9,11 @@ use crate::{
 // TODO: search command, set the channel activity to the current track
 
 /// Returns true if joined, false if already connected
+/// If from_play is true, then won't send the "already connected" message
 async fn _join(
     ctx: &Context<'_>,
     channel_id: Option<Channel>,
+    from_play: bool,
 ) -> Result<Option<PlayerContext>, Error> {
     use crate::i18n::t;
     let data = ctx.data();
@@ -22,8 +24,10 @@ async fn _join(
 
     match lava_client.get_player_context(guild_id.get()) {
         Some(player) => {
-            ctx.say(t!(ctx, commands::music::join::AlreadyInChannel))
-                .await?;
+            if !from_play {
+                ctx.say(t!(ctx, commands::music::join::AlreadyInChannel))
+                    .await?;
+            }
             Ok(Some(player))
         }
         None => {
@@ -112,7 +116,7 @@ async fn _join(
     category = "Music",
 )]
 pub async fn play(ctx: Context<'_>, #[rest] query: String) -> Result<(), Error> {
-    let player = _join(&ctx, None).await?;
+    let player = _join(&ctx, None, true).await?;
 
     let player = match player {
         Some(x) => x,
@@ -201,7 +205,7 @@ pub async fn join(
     ctx: Context<'_>,
     #[channel_types("Voice")] channel: Option<serenity::model::channel::Channel>,
 ) -> Result<(), Error> {
-    _join(&ctx, channel.clone()).await?;
+    _join(&ctx, channel.clone(), false).await?;
 
     Ok(())
 }
