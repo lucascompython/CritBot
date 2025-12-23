@@ -33,19 +33,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ahash"
-version = "0.8.12"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5a15f179cd60c4584b8a8c596927aadc462e27f2ca70c04e0071964a73ba7a75"
-dependencies = [
- "cfg-if",
- "getrandom 0.3.4",
- "once_cell",
- "version_check",
- "zerocopy",
-]
-
-[[package]]
 name = "aho-corasick"
 version = "1.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -289,9 +276,9 @@ dependencies = [
 name = "critbot"
 version = "0.1.0"
 dependencies = [
- "ahash",
  "base64",
  "deadpool-postgres",
+ "foldhash 0.2.0",
  "i18n_macros",
  "lavalink-rs",
  "mimalloc",
@@ -656,6 +643,12 @@ name = "foldhash"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d9c4f5dac5e15c24eb999c26181a6ca40b39fe946cbe4c263c7209467bc83af2"
+
+[[package]]
+name = "foldhash"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb"
 
 [[package]]
 name = "foreign-types"
@@ -2308,7 +2301,7 @@ dependencies = [
  "dashmap 6.1.0",
  "extract_map",
  "flate2",
- "foldhash",
+ "foldhash 0.1.5",
  "futures",
  "mime_guess",
  "mini-moka",

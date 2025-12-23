@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use ahash::RandomState;
+use foldhash::fast::RandomState;
 use lavalink_rs::client::LavalinkClient;
 use papaya::HashMap;
 

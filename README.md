@@ -30,7 +30,8 @@ DOWNLOAD_LAVALINK=true cargo build
 
 - [x] add i18n system
 - [x] add i18n to app_commands and on commands descriptions
-- [ ] add Music
+- [ ] finishing adding basic music features
+- [ ] check out [yt-cipher](https://github.com/kikkia/yt-cipher)
 - [ ] support downloading music with [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 - [ ] support [SponsorBlock](https://github.com/topi314/SponsorBlock-Plugin)
 - [ ] support more sources ([LavaSrc](https://github.com/topi314/LavaSrc), which also now support [yt-dlp](https://github.com/yt-dlp/yt-dlp) which supports even more sources)

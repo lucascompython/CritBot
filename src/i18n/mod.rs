@@ -8,6 +8,7 @@ thread_local! {
 }
 
 // From my testing simdutf8 and memchr are actually slower than this implementation
+// TODO: redo benchmark and implement my own search with portable simd
 pub fn do_translate(template: &str, args: &[(&str, &str)]) -> String {
     STRING_BUFFER.with(|buf| {
         let mut buffer = buf.borrow_mut();

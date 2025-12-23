@@ -1,7 +1,7 @@
 use std::{str::FromStr, sync::Arc, time::Duration};
 
-use ahash::RandomState;
 use base64::{Engine, prelude::BASE64_STANDARD_NO_PAD};
+use foldhash::fast::RandomState;
 use lavalink_rs::prelude::*;
 use mimalloc::MiMalloc;
 use papaya::HashMap;
@@ -29,7 +29,7 @@ static GLOBAL: MiMalloc = MiMalloc;
 async fn setup(bot_config: &'static Config) -> Result<BotData, serenity::Error> {
     let db = db::Db::new().await.expect("Failed to create database pool");
     let guild_cache = {
-        let cache = HashMap::builder().hasher(RandomState::new()).build();
+        let cache = HashMap::builder().hasher(RandomState::default()).build();
         let db_pool = db.get_pool().await;
         let stmt = db_pool
             .prepare_cached("SELECT id, locale, prefix FROM guilds")

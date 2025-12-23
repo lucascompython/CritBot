@@ -9,7 +9,6 @@ members = [
 ]
 
 [dependencies]
-ahash = "0.8"
 deadpool-postgres = "0.14"
 mimalloc = "0.1"
 papaya = "0.2"
@@ -30,6 +29,7 @@ i18n_macros = { path = "./i18n_macros" }
 postgres-types = { version = "0.2", features = ["derive"] }
 base64 = "0.22"
 thiserror = "2"
+foldhash = { version = "0.2", features = ["nightly"] }
 
 [build-dependencies]
 reqwest = { version = "0.12", features = ["blocking"] }
