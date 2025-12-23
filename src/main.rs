@@ -114,6 +114,7 @@ async fn main() {
         commands::config::change_prefix(),
         commands::music::play(),
         commands::music::skip(),
+        commands::music::stop(),
         commands::music::join(),
         commands::music::leave(),
     ];

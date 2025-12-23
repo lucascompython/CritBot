@@ -137,6 +137,27 @@ i18n! {
                 },
             }
         },
+        stop => {
+            name: { Pt: "parar", En: "stop" },
+            help: {
+                Pt: "Para a reprodução e limpa a fila",
+                En: "Stops playback and clears the queue"
+            },
+            trans: {
+                not_in_channel => { // TODO: make this a shared translation
+                    Pt: "Não estou num canal de voz!",
+                    En: "I'm in a voice channel!"
+                },
+                nothing_playing => {
+                    Pt: "Nada está a ser reproduzido!",
+                    En: "Nothing is playing!"
+                },
+                stopped => {
+                    Pt: "Reprodução parada.",
+                    En: "Playback stopped."
+                }
+            }
+        },
         join => {
             name: { Pt: "entrar", En: "join" },
             help: {

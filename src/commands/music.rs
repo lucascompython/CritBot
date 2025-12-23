@@ -222,6 +222,28 @@ pub async fn skip(ctx: Context<'_>) -> Result<(), Error> {
 
     Ok(())
 }
+#[i18n_command(slash_command, prefix_command, guild_only, category = "Music")]
+pub async fn stop(ctx: Context<'_>) -> Result<(), Error> {
+    let guild_id = ctx.guild_id().unwrap();
+
+    let lava_client = ctx.data().lavalink.clone();
+
+    let Some(player) = lava_client.get_player_context(guild_id.get()) else {
+        ctx.say(t!(NotInChannel)).await?;
+        return Ok(());
+    };
+
+    let now_playing = player.get_player().await?.track;
+
+    if let Some(_np) = now_playing {
+        player.stop_now().await?;
+        ctx.say(t!(Stopped)).await?;
+    } else {
+        ctx.say(t!(NothingPlaying)).await?;
+    }
+
+    Ok(())
+}
 
 #[i18n_command(
     slash_command,
