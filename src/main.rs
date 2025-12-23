@@ -113,6 +113,7 @@ async fn main() {
         commands::config::change_locale(),
         commands::config::change_prefix(),
         commands::music::play(),
+        commands::music::skip(),
         commands::music::join(),
         commands::music::leave(),
     ];

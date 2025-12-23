@@ -198,6 +198,35 @@ pub async fn play(ctx: Context<'_>, #[rest] query: String) -> Result<(), Error> 
     slash_command,
     prefix_command,
     guild_only,
+    aliases("s"),
+    category = "Music"
+)]
+pub async fn skip(ctx: Context<'_>) -> Result<(), Error> {
+    let guild_id = ctx.guild_id().unwrap();
+
+    let lava_client = ctx.data().lavalink.clone();
+
+    let Some(player) = lava_client.get_player_context(guild_id.get()) else {
+        ctx.say(t!(NotInChannel)).await?;
+        return Ok(());
+    };
+
+    let now_playing = player.get_player().await?.track;
+
+    if let Some(_np) = now_playing {
+        player.skip()?;
+        ctx.say(":white_check_mark:").await?;
+    } else {
+        ctx.say(t!(NothingPlaying)).await?;
+    }
+
+    Ok(())
+}
+
+#[i18n_command(
+    slash_command,
+    prefix_command,
+    guild_only,
     aliases("entra"),
     category = "Music"
 )]

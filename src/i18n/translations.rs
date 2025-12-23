@@ -119,57 +119,74 @@ i18n! {
                     }
 
                 },
+        },
+        skip => {
+            name: { Pt: "saltar", En: "skip" },
+            help: {
+                Pt: "Salta a música atual à frente",
+                En: "Skips the current song"
             },
-            join => {
-                name: { Pt: "entrar", En: "join" },
-                help: {
-                    Pt: "Faz o bot entrar no canal de voz",
-                    En: "Makes the bot join the voice channel"
+            trans: {
+                not_in_channel => {
+                    Pt: "Não estou num canal de voz!",
+                    En: "I'm in a voice channel!"
                 },
-                args: {
-                    channel => {
-                        name: { Pt: "canal", En: "channel" },
-                        description: {
-                            Pt: "O canal de voz para o bot entrar (padrão: seu canal atual)",
-                            En: "The voice channel for the bot to join (default: your current channel)"
-                        }
-                    }
+                nothing_playing => {
+                    Pt: "Nada está a ser reproduzido!",
+                    En: "Nothing is playing!"
                 },
-                trans: {
-                    joined => {
-                        Pt: "A entrar em {channel}!",
-                        En: "Joined {channel}!",
-                    },
-                    already_in_channel => {
-                        Pt: "Já estou num canal de voz!",
-                        En: "I'm already in a voice channel!"
-                    },
-                    you_not_in_channel => {
-                        Pt: "Não estás num canal de voz!",
-                        En: "You are not in a voice channel!"
-                    },
-                    error_joining => {
-                        Pt: "Erro ao entrar no canal de voz: {error}",
-                        En: "Error joining voice channel: {error}"
+            }
+        },
+        join => {
+            name: { Pt: "entrar", En: "join" },
+            help: {
+                Pt: "Faz o bot entrar no canal de voz",
+                En: "Makes the bot join the voice channel"
+            },
+            args: {
+                channel => {
+                    name: { Pt: "canal", En: "channel" },
+                    description: {
+                        Pt: "O canal de voz para o bot entrar (padrão: seu canal atual)",
+                        En: "The voice channel for the bot to join (default: your current channel)"
                     }
                 }
             },
-            leave => {
-                name: { Pt: "sair", En: "leave" },
-                help: {
-                    Pt: "Faz o bot sair do canal de voz",
-                    En: "Makes the bot leave the voice channel"
+            trans: {
+                joined => {
+                    Pt: "A entrar em {channel}!",
+                    En: "Joined {channel}!",
                 },
-                trans: {
-                    left => {
-                        Pt: "Saí do canal de voz.",
-                        En: "Left the voice channel."
-                    },
-                    not_in_channel => {
-                        Pt: "Não estou num canal de voz!",
-                        En: "I'm not in a voice channel!"
-                    }
+                already_in_channel => {
+                    Pt: "Já estou num canal de voz!",
+                    En: "I'm already in a voice channel!"
+                },
+                you_not_in_channel => {
+                    Pt: "Não estás num canal de voz!",
+                    En: "You are not in a voice channel!"
+                },
+                error_joining => {
+                    Pt: "Erro ao entrar no canal de voz: {error}",
+                    En: "Error joining voice channel: {error}"
                 }
+            }
+        },
+        leave => {
+            name: { Pt: "sair", En: "leave" },
+            help: {
+                Pt: "Faz o bot sair do canal de voz",
+                En: "Makes the bot leave the voice channel"
+            },
+            trans: {
+                left => {
+                    Pt: "Saí do canal de voz.",
+                    En: "Left the voice channel."
+                },
+                not_in_channel => {
+                    Pt: "Não estou num canal de voz!",
+                    En: "I'm not in a voice channel!"
+                }
+            }
             }
         }
     },
