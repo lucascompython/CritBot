@@ -13,8 +13,8 @@ deadpool-postgres = "0.14"
 mimalloc = "0.1"
 papaya = "0.2"
 serde = { version = "1", features = ["derive"] }
-# poise = { git = "https://github.com/serenity-rs/poise", branch = "serenity-next" }
-poise = { git = "https://github.com/mkrasnitski/poise", branch = "argument-convert" }
+poise = { git = "https://github.com/serenity-rs/poise", branch = "serenity-next" }
+# poise = { git = "https://github.com/mkrasnitski/poise", branch = "argument-convert" }
 serenity = { git = "https://github.com/serenity-rs/serenity", branch = "next",  features = ["temp_cache", "transport_compression_zstd", "voice"] } # https://github.com/serenity-rs/serenity/pull/2735#issuecomment-3456282921
 songbird = { git = "https://github.com/serenity-rs/songbird", branch = "serenity-next", default-features = false, features =  ["gateway", "native", "serenity"] }
 lavalink-rs = { git = "https://gitlab.com/vicky5124/lavalink-rs", branch = "main", default-features = false, features = ["websockets-rustls-native-roots", "macros", "songbird", "serenity"] } # TODO: send PR to udpate deps
