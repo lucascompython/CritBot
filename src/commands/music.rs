@@ -1,6 +1,8 @@
 use i18n_macros::i18n_command;
-use lavalink_rs::prelude::{PlayerContext, SearchEngines, TrackInQueue, TrackLoadData};
-use serenity::all::{Channel, Mentionable};
+use lavalink_rs::prelude::*;
+use poise::serenity_prelude as serenity;
+use serenity::model::channel::Channel;
+use serenity::prelude::Mentionable;
 
 use crate::{
     bot_data::{Context, Error, LavalinkData},
@@ -34,7 +36,7 @@ async fn _join(
             let connect_to = match channel_id {
                 Some(x) => x.id().expect_channel(),
                 None => {
-                    let guild = ctx.guild().unwrap().clone();
+                    let guild = guild_id.to_guild_cached(ctx.cache()).unwrap().clone();
                     let user_channel_id = guild
                         .voice_states
                         .get(&ctx.author().id)
@@ -55,13 +57,6 @@ async fn _join(
 
             match handler {
                 Ok((connection_info, _)) => {
-                    // having to do this is weird
-                    let connection_info = lavalink_rs::model::player::ConnectionInfo {
-                        endpoint: connection_info.endpoint,
-                        token: connection_info.token,
-                        session_id: connection_info.session_id,
-                    };
-
                     let locale = get_locale(ctx);
 
                     let player = lava_client

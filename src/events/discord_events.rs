@@ -1,6 +1,7 @@
 use serenity::{
     async_trait,
-    gateway::client::{Context, EventHandler, FullEvent},
+    gateway::client::{Context, EventHandler},
+    model::event::FullEvent,
 };
 use tracing::{error, info};
 
@@ -14,30 +15,28 @@ impl EventHandler for Handler {
             FullEvent::Ready { data_about_bot, .. } => {
                 info!("Logged in as {}", data_about_bot.user.name);
             }
-            FullEvent::GuildCreate { guild, is_new, .. } => {
-                if *is_new == Some(true) {
-                    info!("Joined new guild: {} (id {})", guild.name, guild.id);
+            FullEvent::GuildCreate { guild, is_new, .. } if *is_new == Some(true) => {
+                info!("Joined new guild: {} (id {})", guild.name, guild.id);
 
-                    let data = ctx.data::<BotData>();
-                    let pool = data.db.get_pool().await;
-                    let stmt = pool
-                        .prepare_cached(
-                            "INSERT INTO guilds (id) VALUES ($1) ON CONFLICT (id) DO NOTHING",
-                        )
-                        .await
-                        .unwrap();
-                    let guild_id = guild.id.get();
-                    data.guild_cache.pin().insert(
-                        guild_id,
-                        crate::bot_data::Guild {
-                            locale: None,
-                            prefix: data.bot_config.discord.default_prefix.clone(),
-                        },
-                    );
+                let data = ctx.data::<BotData>();
+                let pool = data.db.get_pool().await;
+                let stmt = pool
+                    .prepare_cached(
+                        "INSERT INTO guilds (id) VALUES ($1) ON CONFLICT (id) DO NOTHING",
+                    )
+                    .await
+                    .unwrap();
+                let guild_id = guild.id.get();
+                data.guild_cache.pin().insert(
+                    guild_id,
+                    crate::bot_data::Guild {
+                        locale: None,
+                        prefix: data.bot_config.discord.default_prefix.clone(),
+                    },
+                );
 
-                    if let Err(e) = pool.execute(&stmt, &[&(guild_id as i64)]).await {
-                        error!("Failed to insert guild into database: {}", e);
-                    }
+                if let Err(e) = pool.execute(&stmt, &[&(guild_id as i64)]).await {
+                    error!("Failed to insert guild into database: {}", e);
                 }
             }
 

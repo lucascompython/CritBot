@@ -159,10 +159,10 @@ async fn main() {
 
     let token = serenity::secrets::Token::from_str(&bot_config.discord.token).unwrap();
 
-    let mut client = poise::serenity_prelude::ClientBuilder::new(token, intents)
+    let mut client = serenity::all::ClientBuilder::new(token, intents)
         .event_handler(Arc::new(Handler))
         .voice_manager(bot_data.manager.clone())
-        .compression(serenity::all::TransportCompression::None)
+        .compression(serenity::all::TransportCompression::Zstd)
         .framework(Box::new(framework))
         .data(Arc::new(bot_data))
         .activity(serenity::all::ActivityData::custom(":)"))
