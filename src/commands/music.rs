@@ -6,7 +6,7 @@ use serenity::prelude::Mentionable;
 
 use crate::{
     bot_data::{Context, Error, LavalinkData},
-    i18n::get_locale,
+    i18n::translations::Locale,
 };
 // TODO: search command, set the channel activity to the current track
 
@@ -16,6 +16,7 @@ async fn _join(
     ctx: &Context<'_>,
     channel_id: Option<Channel>,
     from_play: bool,
+    locale: Locale,
 ) -> Result<Option<PlayerContext>, Error> {
     use crate::i18n::t;
     let data = ctx.data();
@@ -57,8 +58,6 @@ async fn _join(
 
             match handler {
                 Ok((connection_info, _)) => {
-                    let locale = get_locale(ctx);
-
                     let player = lava_client
                         // The turbofish here is Optional, but it helps to figure out what type to
                         // provide in `PlayerContext::data()`
@@ -111,7 +110,7 @@ async fn _join(
     category = "Music",
 )]
 pub async fn play(ctx: Context<'_>, #[rest] query: String) -> Result<(), Error> {
-    let player = _join(&ctx, None, true).await?;
+    let player = _join(&ctx, None, true, locale).await?;
 
     let player = match player {
         Some(x) => x,
@@ -249,7 +248,7 @@ pub async fn join(
     ctx: Context<'_>,
     #[channel_types("Voice")] channel: Option<serenity::model::channel::Channel>,
 ) -> Result<(), Error> {
-    _join(&ctx, channel.clone(), false).await?;
+    _join(&ctx, channel.clone(), false, locale).await?;
 
     Ok(())
 }
