@@ -122,8 +122,6 @@ pub async fn play(ctx: Context<'_>, #[rest] query: String) -> Result<(), Error> 
 
     let lava_client = &ctx.data().lavalink;
 
-    let original_query = query.clone();
-
     let query = if query.starts_with("http") {
         query
     } else {
@@ -145,7 +143,7 @@ pub async fn play(ctx: Context<'_>, #[rest] query: String) -> Result<(), Error> 
         }
 
         _ => {
-            ctx.say(t!(NotFound, query = &original_query)).await?;
+            ctx.say(t!(NotFound, query = &query)).await?;
             return Ok(());
         }
     };
