@@ -7,6 +7,13 @@ edition = "2024"
 members = [
     "i18n_macros"
 ]
+exclude = [
+    "xtask"
+]
+
+[features]
+default = []
+zstd-fat-lto = ["zstd/fat-lto"]
 
 [dependencies]
 deadpool-postgres = "0.14"
@@ -30,7 +37,8 @@ postgres-types = { version = "0.2", features = ["derive"] }
 base64 = "0.22"
 thiserror = "2"
 foldhash = { version = "0.2", features = ["nightly"] }
-zstd = { version = "0.13", default-features = false, features = ["fat-lto"] }
+# zstd = { version = "0.13", default-features = false, features = ["fat-lto"] }
+zstd = { version = "0.13", default-features = false }
 # rustls = { version = "0.23", default-features = true, features = ["aws-lc-rs"] }
 
 [build-dependencies]

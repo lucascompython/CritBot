@@ -1,0 +1,18 @@
+cargo-features = ["profile-rustflags"]
+
+[package]
+name = "xtask"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+
+
+[profile.dev]
+debug = false
+strip = "debuginfo"
+rustflags = ["-Clinker=clang", "-Clink-arg=--ld-path=wild", "-Zthreads=4", "-Zcodegen-backend=cranelift"]
+
+[profile.dev.build-override]
+opt-level = 3
