@@ -106,8 +106,8 @@ async fn _join(
     prefix_command,
     slash_command,
     guild_only,
-    aliases("p", "toca")
-    category = "Music",
+    aliases("p", "toca"),
+    category = "Music"
 )]
 pub async fn play(ctx: Context<'_>, #[rest] query: String) -> Result<(), Error> {
     let player = _join(&ctx, None, true, locale).await?;

@@ -69,6 +69,42 @@ i18n! {
             }
         },
         misc => {
+            help => {
+                name: { Pt: "ajuda", En: "help" },
+                help: {
+                    Pt: "Mostra informações de ajuda sobre os comandos do bot",
+                    En: "Shows help information about the bot's commands"
+                },
+                args: {
+                    command => {
+                        name: { Pt: "comando", En: "command" },
+                        description: {
+                            Pt: "O comando para mostrar a ajuda (opcional)",
+                            En: "The command to show help for (optional)"
+                        }
+                    }
+                },
+                trans: {
+                    no_description => {
+                        Pt: "Sem descrição",
+                        En: "No description"
+                    },
+                    cmd_not_found => {
+                        Pt: "Comando não encontrado: `{command}`",
+                        En: "Command not found: `{command}`"
+                    },
+                    uncategorized => {
+                        Pt: "Sem categoria",
+                        En: "Uncategorized"
+                    },
+                    type_helper => {
+                        Pt: "Use `{prefix}help <comando>` para mais detalhes sobre um comando específico.",
+                        En: "Use `{prefix}help <command>` for more details on a specific command."
+                    }
+
+
+                }
+            },
             hey => {
                 name: { Pt: "olá", En: "hey" },
                 help: {

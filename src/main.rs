@@ -106,7 +106,7 @@ async fn main() {
 
     let mut commands: Vec<poise::Command<BotData, Error>> = vec![
         commands::misc::ping(),
-        // commands::misc::help(),
+        commands::misc::help(),
         commands::misc::invite(),
         commands::misc::register(),
         commands::misc::hey(),
