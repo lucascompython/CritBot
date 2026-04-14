@@ -732,21 +732,28 @@ pub fn i18n_command(attr: TokenStream, item: TokenStream) -> TokenStream {
     while let Some(token) = iter.next() {
         if let proc_macro2::TokenTree::Ident(ident) = token {
             if ident == "category" {
+                poise_attrs.push(token.clone());
+
                 if let Some(proc_macro2::TokenTree::Punct(punct)) = iter.peek()
                     && punct.as_char() == '='
                 {
-                    iter.next();
+                    poise_attrs.push(iter.next().unwrap().clone());
                 }
 
-                if let Some(proc_macro2::TokenTree::Literal(lit)) = iter.next() {
-                    let cat_str = lit.to_string();
-                    let cat_str = cat_str.trim_matches('"');
-                    category = Some(cat_str.to_lowercase());
+                if let Some(lit_token) = iter.next() {
+                    poise_attrs.push(lit_token.clone());
+
+                    if let proc_macro2::TokenTree::Literal(lit) = lit_token {
+                        let cat_str = lit.to_string();
+                        let cat_str = cat_str.trim_matches('"');
+                        category = Some(cat_str.to_lowercase());
+                    }
                 }
+
                 if let Some(proc_macro2::TokenTree::Punct(punct)) = iter.peek()
                     && punct.as_char() == ','
                 {
-                    iter.next();
+                    poise_attrs.push(iter.next().unwrap().clone());
                 }
             } else {
                 poise_attrs.push(token.clone());
