@@ -44,7 +44,14 @@ impl fmt::Display for CommandError {
 impl Error for CommandError {}
 
 #[derive(Parser, Debug)]
-#[command(name = "xtask", author, version, about = "Build helper for project", long_about = None)]
+#[command(
+    name = "xtask",
+    author,
+    version,
+    about = "Build helper for project",
+    after_help = "EXTRA ARGS SYNTAX:\n  cargo xtask <PROFILE> [profile-flags] -- [cargo-args] -- [program-args]\n\nEXAMPLES:\n  cargo xtask fast-dev -- --features foo -- --verbose\n  cargo xtask min-size --upx -- --features bar --package my-crate\n  cargo xtask speed --native -- --features foo -- --ignored",
+    long_about = None
+)]
 struct Cli {
     #[command(subcommand)]
     mode: SubCommands,
@@ -52,21 +59,34 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum SubCommands {
-    /// Build dev version with fast linking
+    /// Run dev build with fast linking. Syntax: -- [cargo-args] -- [program-args]
     FastDev(FastDevArgs),
-    /// Build release version optimized for minimum binary size
+    /// Build release optimized for minimum binary size. Syntax: -- [cargo-args]
     MinSize(MinSizeArgs),
-    /// Build release version optimized for execution speed
+    /// Build release optimized for execution speed. Syntax: -- [cargo-args]
     Speed(SpeedArgs),
     /// Run clippy with fast-dev flags
     Clippy(ClippyArgs),
 }
 
+/// Splits a `Vec<String>` on the first `"--"` token into `(before, after)`.
+///
+/// In practice this means the shell invocation:
+///   `cargo xtask <profile> [profile-flags] -- [cargo-args] -- [program-args]`
+/// has the outer `--` consumed by clap's `last = true`, giving us a flat vec of
+/// `[cargo-args..., "--", program-args...]` which this function then splits.
+fn split_extra_args(raw: Vec<String>) -> (Vec<String>, Vec<String>) {
+    match raw.iter().position(|a| a == "--") {
+        Some(pos) => (raw[..pos].to_vec(), raw[pos + 1..].to_vec()),
+        None => (raw, vec![]),
+    }
+}
+
 #[derive(Args, Debug)]
 struct FastDevArgs {
-    /// Arguments to pass to the program when running in fast-dev mode
+    /// Pass `-- [cargo-args] -- [program-args]` after the profile flags
     #[arg(last = true)]
-    program_args: Vec<String>,
+    raw_args: Vec<String>,
 }
 
 #[derive(Args, Debug)]
@@ -81,6 +101,10 @@ struct MinSizeArgs {
     /// Whether to compress the final binary with upx
     #[arg(long)]
     upx: bool,
+
+    /// Pass `-- [cargo-args]` after the profile flags (program-args are ignored for build-only profiles)
+    #[arg(last = true)]
+    raw_args: Vec<String>,
 }
 
 #[derive(Args, Debug)]
@@ -92,6 +116,10 @@ struct SpeedArgs {
     /// Compile with -C target-cpu=native
     #[arg(long)]
     native: bool,
+
+    /// Pass `-- [cargo-args]` after the profile flags (program-args are ignored for build-only profiles)
+    #[arg(last = true)]
+    raw_args: Vec<String>,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -128,26 +156,24 @@ fn get_fast_dev_rustflags() -> String {
 
 fn build_fast_dev(args: FastDevArgs) -> Result<(), Box<dyn Error>> {
     let project_root = env::current_dir()?;
-
     let dev_rustflags = get_fast_dev_rustflags();
+
+    let (cargo_args, program_args) = split_extra_args(args.raw_args);
 
     println!("Building in dev mode (fast build)...");
 
-    let cmd = RUN_CMD[0]; // e.g. "cargo"
-    let mut cargo_args = vec!["+nightly"];
-    cargo_args.extend_from_slice(&RUN_CMD[1..]);
-    cargo_args.push("--");
-    cargo_args.extend_from_slice(
-        &args
-            .program_args
-            .iter()
-            .map(|s| s.as_str())
-            .collect::<Vec<&str>>(),
-    );
+    let cmd = RUN_CMD[0];
+    let mut full_args = vec!["+nightly"];
+    full_args.extend_from_slice(&RUN_CMD[1..]);
+    full_args.extend(cargo_args.iter().map(|s| s.as_str()));
+    if !program_args.is_empty() {
+        full_args.push("--");
+        full_args.extend(program_args.iter().map(|s| s.as_str()));
+    }
 
     run_command(
         cmd,
-        &cargo_args,
+        &full_args,
         &[("RUSTFLAGS", &dev_rustflags)],
         &project_root,
     )?;
@@ -158,15 +184,16 @@ fn build_fast_dev(args: FastDevArgs) -> Result<(), Box<dyn Error>> {
 
 fn run_clippy(_args: ClippyArgs) -> Result<(), Box<dyn Error>> {
     let project_root = env::current_dir()?;
-
     let dev_rustflags = get_fast_dev_rustflags();
 
     println!("Running clippy with fast-dev flags...");
 
-    let cmd = "cargo";
-    let args = vec!["+nightly", "clippy"];
-
-    run_command(cmd, &args, &[("RUSTFLAGS", &dev_rustflags)], &project_root)?;
+    run_command(
+        "cargo",
+        &["+nightly", "clippy"],
+        &[("RUSTFLAGS", &dev_rustflags)],
+        &project_root,
+    )?;
 
     println!("Clippy finished successfully.");
     Ok(())
@@ -187,7 +214,7 @@ fn build_min_size(args: MinSizeArgs) -> Result<(), Box<dyn Error>> {
 
     let project_root = env::current_dir()?;
 
-    let app_rustflags = "-Csymbol-mangling-version=v0 -Zunstable-options -Cdebuginfo=0 -Cpanic=immediate-abort -Zfmt-debug=none -Zlocation-detail=none -Clink-args=-fuse-ld=lld -Clink-args=-Wl,--icf=all,-z,pack-relative-relocs -Copt-level=z -Clto=true";
+    let app_rustflags = "-Csymbol-mangling-version=v0 -Zunstable-options -Cdebuginfo=0 -Cpanic=immediate-abort -Zfmt-debug=none -Zlocation-detail=none -Clink-args=-fuse-ld=lld -Clink-args=-Wl,--icf=all,-z,pack-relative-relocs -Copt-level=z";
 
     let env_vars = vec![
         ("RUSTFLAGS", app_rustflags),
@@ -203,7 +230,16 @@ fn build_min_size(args: MinSizeArgs) -> Result<(), Box<dyn Error>> {
         .join(BINARY_NAME)
         .with_extension(std::env::consts::EXE_EXTENSION);
 
-    build_app(target, &project_root, &binary_path, args.upx, &env_vars)
+    let (cargo_args, _) = split_extra_args(args.raw_args);
+
+    build_app(
+        target,
+        &project_root,
+        &binary_path,
+        args.upx,
+        &env_vars,
+        &cargo_args,
+    )
 }
 
 fn build_speed(args: SpeedArgs) -> Result<(), Box<dyn Error>> {
@@ -221,7 +257,7 @@ fn build_speed(args: SpeedArgs) -> Result<(), Box<dyn Error>> {
 
     let project_root = env::current_dir()?;
 
-    let mut rustflags = "-Clinker-plugin-lto -Copt-level=3 -Csymbol-mangling-version=v0 -Zunstable-options -Cdebuginfo=0 -Cpanic=immediate-abort -Zfmt-debug=none -Zlocation-detail=none -Clink-args=-fuse-ld=lld -Clink-args=-Wl,--icf=all,-z,pack-relative-relocs".to_string();
+    let mut rustflags = "-Copt-level=3 -Csymbol-mangling-version=v0 -Zunstable-options -Cdebuginfo=0 -Cpanic=immediate-abort -Zfmt-debug=none -Zlocation-detail=none -Clink-args=-fuse-ld=lld -Clink-args=-Wl,--icf=all,-z,pack-relative-relocs".to_string();
     if args.native {
         rustflags.push_str(" -Ctarget-cpu=native");
     }
@@ -239,7 +275,16 @@ fn build_speed(args: SpeedArgs) -> Result<(), Box<dyn Error>> {
         .join(BINARY_NAME)
         .with_extension(std::env::consts::EXE_EXTENSION);
 
-    build_app(target, &project_root, &binary_path, false, &env_vars)
+    let (cargo_args, _) = split_extra_args(args.raw_args);
+
+    build_app(
+        target,
+        &project_root,
+        &binary_path,
+        false,
+        &env_vars,
+        &cargo_args,
+    )
 }
 
 fn run_command(
@@ -286,13 +331,15 @@ fn build_app(
     binary_path: &Path,
     upx: bool,
     env_vars: &[(&str, &str)],
+    extra_cargo_args: &[String],
 ) -> Result<(), Box<dyn Error>> {
     println!("Building for {}...", target);
 
-    let cmd = BUILD_CMD[0]; // e.g. "cargo"
+    let cmd = BUILD_CMD[0];
     let mut args = vec!["+nightly"];
     args.extend_from_slice(&BUILD_CMD[1..]);
     args.extend_from_slice(&["--target", target]);
+    args.extend(extra_cargo_args.iter().map(|s| s.as_str()));
 
     let build_result = run_command(cmd, &args, env_vars, project_root);
 
