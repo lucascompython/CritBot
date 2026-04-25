@@ -1,7 +1,8 @@
 # CritBot (the discord bot)<img src="https://cdn.discordapp.com/attachments/628637327878520872/1017256259138900030/unknown.png" width="3.5%" heigth="3.5%"/>
 
-This is a discord bot written in rust with serenity and poise.
-The bot has a custom [i18n](src/i18n/) system.
+This is a discord bot written in rust with serenity and poise.  
+The bot has a custom [i18n](src/i18n/) system.  
+Created using the following [xtask-template](https://github.com/lucascompython/xtask-template).
 
 ## Features
 
@@ -31,7 +32,6 @@ DOWNLOAD_LAVALINK=true cargo build
 - [x] add i18n system
 - [x] add i18n to app_commands and on commands descriptions
 - [ ] finishing adding basic music features
-- [ ] check out [yt-cipher](https://github.com/kikkia/yt-cipher)
 - [ ] support downloading music with [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 - [ ] support [SponsorBlock](https://github.com/topi314/SponsorBlock-Plugin)
 - [ ] support more sources ([LavaSrc](https://github.com/topi314/LavaSrc), which also now support [yt-dlp](https://github.com/yt-dlp/yt-dlp) which supports even more sources)
@@ -42,4 +42,4 @@ DOWNLOAD_LAVALINK=true cargo build
 
 ## Rewrite Notes
 
-- The new i18n system is stateless, meaning that in contrast to the old one, I'm not doing any hacky stuff to get determine the locale before a command is executed. Now the locale is determined every time a translation is needed.
+- The new i18n system is stateless, meaning that in contrast to the old one, I'm not doing any hacky stuff to get determine the locale before a command is executed. Now the locale is determined on every command execution or if thats not possible, it determines the locale in each translation call.
