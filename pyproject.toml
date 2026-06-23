@@ -1,7 +1,7 @@
 [project]
 dependencies = [
     "aiofiles==24.1.0",
-    "aiohttp>=3.11.16",
+    "aiohttp>=3.14.1",
     "asyncpg==0.30.0",
     "colorlog==6.9.0",
     "PyYAML==6.0.2",
